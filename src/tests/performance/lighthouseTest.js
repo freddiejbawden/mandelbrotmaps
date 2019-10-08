@@ -25,7 +25,8 @@ const config = {
   },
 }
 const opts = {
-  onlyCategories: ['performance']
+  onlyCategories: ['performance'],
+  chromeFlags: ['--headless']
 };
 
 // Usage:
