@@ -2,6 +2,7 @@ import React from 'react';
 import Timer from '../Timer/Timer'
 import Settings from '../Settings/Settings'
 import './Mandelbrot.css'
+import { tsThisType } from '@babel/types';
 class Mandelbrot extends React.Component {
   constructor(props) {
     super(props);
@@ -14,17 +15,41 @@ class Mandelbrot extends React.Component {
     this.pixelSize = 0.003 
     this.state = {
       time: 0,
+      max_i: 200,
+      renderMode: "javascript"
     };
-    this.max_i = 200;
     this.updateIter = this.updateIter.bind(this);
+    this.updateRenderMethod = this.updateRenderMethod.bind(this);
+    this.mandelbrot = undefined;
   }
-  updateIter(iter) {
-    if (!iter) {
-      this.max_i = 100
-    }  else {
-      this.max_i = iter
+  loadWasm = async () => {
+    try {
+      const {Mandelbrot} = await import('mmap');
+      const mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i) 
+      console.log(mandelbrot.escape_algorithm)
+      this.setState({
+        mandelbrot
+      });
+    } catch(err) {
+      console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
-    this.drawFractal()
+  };
+  updateIter(iter) {
+    let i 
+    if (!iter) {
+      i = 100
+    }  else {
+      i = iter
+    }
+    console.log(i)
+    this.setState({
+      max_i: parseInt(i)
+    });
+  }
+  updateRenderMethod(renderMode) {
+    this.setState({
+      renderMode
+    })
   }
   pixelsToCoord(x,y) {
     let coord_X = this.fractalLimitX + this.pixelSize*x;
@@ -38,7 +63,7 @@ class Mandelbrot extends React.Component {
     let y = 0
     let i = 0
    
-    while(x*x + y*y < 4 && i < this.max_i) {
+    while(x*x + y*y < 4 && i < this.state.max_i) {
       let xtemp = x*x - y*y + fractalPos[0]
       y = 2*x*y + fractalPos[1]
       x = xtemp
@@ -57,25 +82,29 @@ class Mandelbrot extends React.Component {
   drawFractal() {
     let timerStart = Date.now();
 
-    console.log("mounted");
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    console.log( this.width,  this.height)
     this.fractalLimitX = this.centreCoords[0]-(this.width*this.pixelSize)/2
-    console.log(this.fractalLimitX, (this.width*this.pixelSize)+this.fractalLimitX)
-
     this.fractalLimitY = this.centreCoords[1]-(this.height*this.pixelSize)/2
-    console.log(this.fractalLimitY, (this.height*this.pixelSize)+this.fractalLimitY)
-
     const fractalContext = this.fractal.current.getContext('2d');
     fractalContext.canvas.width = window.innerWidth;
     fractalContext.canvas.height = window.innerHeight;
     const arr = new Uint8ClampedArray(this.width*this.height*4);
-    console.log(arr.length)
+    console.log(this.state.max_i)
     // Iterate through every pixel
-    let colorScale = 255/this.max_i;
+
+    let colorScale = 255/this.state.max_i;
     for (let i = 0; i < arr.length; i += 4) {
-      let iter = this.escapeAlgorithm(i/4)
+      let iter;
+      if (this.state.renderMode === "javascript") {
+        iter = this.escapeAlgorithm(i/4)
+      } else if (this.state.renderMode === "wasm") {
+        if (this.state.mandelbrot) {
+          iter = this.state.mandelbrot.escape_algorithm(i/4);
+        }
+      } else {
+        iter = 0;
+      }
       arr[i + 0] = iter*colorScale;;    // R value
       arr[i + 1] = iter*colorScale;  // G value
       arr[i + 2] = iter*colorScale;    // B value
@@ -87,17 +116,21 @@ class Mandelbrot extends React.Component {
     fractalContext.putImageData(imageData, 0,0);
     this.timer.current.updateTime(Date.now() - timerStart)
   }
+  
   componentDidMount() {
+    this.loadWasm()
     window.addEventListener('resize', this.updateDimensions);
     this.drawFractal()
-    
+  }
+  componentDidUpdate() {
+    this.drawFractal()
   }
   render() {
     return (
       <div>
         <div className="info-panel">
           <Timer time={this.time} ref={this.timer}></Timer>
-          <Settings updateIter={this.updateIter} ></Settings>
+          <Settings updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} ></Settings>
         </div>
         <canvas className="fractal" id="fractal" ref={this.fractal}></canvas>
       </div>
