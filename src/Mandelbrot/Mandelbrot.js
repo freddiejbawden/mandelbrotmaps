@@ -1,4 +1,6 @@
 import React from 'react';
+import RBush from 'rbush';
+
 import Timer from '../Timer/Timer'
 import Settings from '../Settings/Settings'
 import './Mandelbrot.css'
@@ -59,6 +61,15 @@ class Mandelbrot extends React.Component {
   escapeAlgorithm(pixelNum) {
     const pixelPos = this.calculatePosition(pixelNum);
     const fractalPos = this.pixelsToCoord(...pixelPos)
+    
+    // check to see if it is in the RTree already
+    const result = this.rtree.search({
+      minX: fractalPos[0],
+      minY: fractalPos[1],
+      maxX: fractalPos[0]+this.pixelSize,
+      maxY: fractalPos[1]+this.pixelSize
+    });
+
     let x = 0
     let y = 0
     let i = 0
@@ -69,7 +80,8 @@ class Mandelbrot extends React.Component {
       x = xtemp
       i++
     }
-    return (i)
+    
+    return (i);
   }
   updateDimensions = () => {
     this.drawFractal()
@@ -120,6 +132,7 @@ class Mandelbrot extends React.Component {
   componentDidMount() {
     this.loadWasm()
     window.addEventListener('resize', this.updateDimensions);
+    window.performance.mark('fractal_rendered_start')
     this.drawFractal()
   }
   componentDidUpdate() {
