@@ -15,7 +15,10 @@ export default class Settings extends Component {
     }, 1000)
 
   }
-
+  updateRenderMethod(val) {
+    console.log(val)
+    this.props.updateRenderMethod(val);
+  }
   render() {
     
     return (
@@ -27,6 +30,14 @@ export default class Settings extends Component {
         <div >
           <label>Pixel Size:</label> <input type="number" defaultValue={1}onChange={event => this.updateIterations(event.target.value)} id="iterations"></input>
         </div>
+        <div>
+          <label>Render Method</label>
+          <select onChange={event => this.updateRenderMethod(event.target.value)}>
+            <option value="javascript" >Javascript</option>
+            <option value="wasm">WASM + Rust (Single Thread)</option>
+          </select> 
+        </div>
+        
       </div>
     )
   }
