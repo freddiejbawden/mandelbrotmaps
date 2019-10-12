@@ -3,6 +3,7 @@ import React from 'react';
 import Timer from '../Timer/Timer'
 import Settings from '../Settings/Settings'
 import './Mandelbrot.css'
+import { runInThisContext } from 'vm';
 class Mandelbrot extends React.Component {
   constructor(props) {
     super(props);
@@ -16,7 +17,7 @@ class Mandelbrot extends React.Component {
     this.state = {
       time: 0,
       max_i: 200,
-      renderMode: "javascript"
+      renderMode: this.props.renderMode
     };
     this.updateIter = this.updateIter.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
@@ -25,11 +26,8 @@ class Mandelbrot extends React.Component {
   loadWasm = async () => {
     try {
       const {Mandelbrot} = await import('freddiejbawden-mmap');
-      const mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i) 
-      console.log(mandelbrot.escape_algorithm)
-      this.setState({
-        mandelbrot
-      });
+      this.mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i);
+      this.drawFractal()
     } catch(err) {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
@@ -83,7 +81,7 @@ class Mandelbrot extends React.Component {
   }
   drawFractal() {
     let timerStart = Date.now();
-
+    console.log(this.state.renderMode)
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.fractalLimitX = this.centreCoords[0]-(this.width*this.pixelSize)/2
@@ -92,17 +90,15 @@ class Mandelbrot extends React.Component {
     fractalContext.canvas.width = window.innerWidth;
     fractalContext.canvas.height = window.innerHeight;
     const arr = new Uint8ClampedArray(this.width*this.height*4);
-    console.log(this.state.max_i)
     // Iterate through every pixel
-
     let colorScale = 255/this.state.max_i;
     for (let i = 0; i < arr.length; i += 4) {
       let iter;
       if (this.state.renderMode === "javascript") {
         iter = this.escapeAlgorithm(i/4)
       } else if (this.state.renderMode === "wasm") {
-        if (this.state.mandelbrot) {
-          iter = this.state.mandelbrot.escape_algorithm(i/4);
+        if (this.mandelbrot) {
+          iter = this.mandelbrot.escape_algorithm(i/4);
         }
       } else {
         iter = 0;
@@ -124,6 +120,9 @@ class Mandelbrot extends React.Component {
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start')
     this.drawFractal()
+    window.performance.mark('fractal_rendered_end')
+    window.performance.measure('fractal_render_time','fractal_rendered_start','fractal_rendered_end')
+
   }
   componentDidUpdate() {
     this.drawFractal()
@@ -133,7 +132,7 @@ class Mandelbrot extends React.Component {
       <div>
         <div className="info-panel">
           <Timer time={this.time} ref={this.timer}></Timer>
-          <Settings updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} ></Settings>
+          <Settings selectedRenderMode={this.state.renderMode} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} ></Settings>
         </div>
         <canvas className="fractal" id="fractal" ref={this.fractal}></canvas>
       </div>

@@ -16,7 +16,6 @@ export default class Settings extends Component {
 
   }
   updateRenderMethod(val) {
-    console.log(val)
     this.props.updateRenderMethod(val);
   }
   render() {
@@ -32,7 +31,7 @@ export default class Settings extends Component {
         </div>
         <div>
           <label>Render Method</label>
-          <select onChange={event => this.updateRenderMethod(event.target.value)}>
+          <select defaultValue={this.props.selectedRenderMode} onChange={event => this.updateRenderMethod(event.target.value)}>
             <option value="javascript" >Javascript</option>
             <option value="wasm">WASM + Rust (Single Thread)</option>
           </select> 
