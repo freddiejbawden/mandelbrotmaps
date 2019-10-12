@@ -1,42 +1,45 @@
+const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
-const chromeLauncher = require('chrome-launcher');
+const {URL} = require('url');
 
-function launchChromeAndRunLighthouse(url, opts, config = null) {
-  return chromeLauncher.launch({chromeFlags: opts.chromeFlags}).then(chrome => {
-    opts.port = chrome.port;
-    return lighthouse(url, opts, config).then(results => {
-      // use results.lhr for the JS-consumeable output
-      // https://github.com/GoogleChrome/lighthouse/blob/master/types/lhr.d.ts
-      // use results.report for the HTML/JSON/CSV output as a string
-      // use results.artifacts for the trace/screenshots/other specific case you need (rarer)
-      return chrome.kill().then(() => results.lhr)
-    });
-  });
-}
-const config = {
-  extends: 'lighthouse:default',
-  settings: {
-    onlyAudits: [
-      'first-meaningful-paint',
-      'speed-index',
-      'first-cpu-idle',
-      'interactive',
-    ],
-  },
-}
-const opts = {
+const testFractalTime = async (url,headless=true) => {
+
+// Use Puppeteer to launch headful Chrome and don't use its default 800x600 viewport.
+const browser = await puppeteer.launch({
+  headless
+});
+
+// Wait for Lighthouse to open url, then customize network conditions.
+// Note: this will re-establish these conditions when LH reloads the page. Think that's ok....
+browser.on('targetchanged', async target => {
+  const page = await target.page();
+});
+
+// Lighthouse will open URL. Puppeteer observes `targetchanged` and sets up network conditions.
+// Possible race condition.
+const {lhr} = await lighthouse(url, {
+  port: (new URL(browser.wsEndpoint())).port,
+  output: 'json',
   onlyCategories: ['performance'],
   chromeFlags: ['--headless']
-};
-
-// Usage:
-launchChromeAndRunLighthouse('http://localhost:3000', opts,config).then(results => {
-  // Use results!
-  results.audits['user-timings'].details.items.forEach(elem => {
-    if (elem.name === "fractal_render_time") {
-      console.log(elem.startTime);
-    }
-  })
-}).catch(e => {
-  console.log(`An error occured ${e}`);
+});
+let renderTime; 
+lhr.audits['user-timings'].details.items.forEach(elem => {
+  if (elem.name === "fractal_render_time") {
+    renderTime = elem.startTime
+  }
 })
+await browser.close();
+return renderTime
+}
+(async() => {
+  console.log("Starting JS Test")
+  const jsRender = await testFractalTime('http://localhost:3000/javascript',false)
+  console.log("JS Test Complete")
+  console.log("Staring WASM Test")
+  const wasmRender = await testFractalTime('http://localhost:3000/wasm')
+  console.log("WASM Test Complete")
+
+  console.log("\n=================== RESULTS ===================")
+  console.log(`JS:\t${jsRender}\nWASM:\t${wasmRender}`)
+})();
