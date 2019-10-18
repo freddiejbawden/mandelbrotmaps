@@ -6,7 +6,7 @@ const testFractalTime = async (url,headless=true) => {
 
 // Use Puppeteer to launch headful Chrome and don't use its default 800x600 viewport.
 const browser = await puppeteer.launch({
-  headless
+  headless,
 });
 
 // Wait for Lighthouse to open url, then customize network conditions.
@@ -34,12 +34,11 @@ return renderTime
 }
 (async() => {
   console.log("Starting JS Test")
-  const jsRender = await testFractalTime('http://localhost:3000/javascript',false)
+  const jsRender = await testFractalTime('http://localhost:3000/javascript')
   console.log("JS Test Complete")
   console.log("Staring WASM Test")
   const wasmRender = await testFractalTime('http://localhost:3000/wasm')
   console.log("WASM Test Complete")
-
   console.log("\n=================== RESULTS ===================")
   console.log(`JS:\t${jsRender}\nWASM:\t${wasmRender}`)
 })();

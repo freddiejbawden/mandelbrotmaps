@@ -16,7 +16,7 @@ class Mandelbrot extends React.Component {
     this.pixelSize = 0.003 
     this.state = {
       time: 0,
-      max_i: 200,
+      max_i: parseInt(this.props.maxi),
       renderMode: this.props.renderMode
     };
     this.updateIter = this.updateIter.bind(this);
@@ -93,7 +93,7 @@ class Mandelbrot extends React.Component {
     this.fractalLimitX = this.centreCoords[0]-(this.width*this.pixelSize)/2
     this.fractalLimitY = this.centreCoords[1]-(this.height*this.pixelSize)/2
 
-    if (this.state.renderMode == "wasm") {
+    if (this.state.renderMode == "wasm" && this.mandelbrot) {
       this.mandelbrot.set_width_height(this.width, this.height);
       this.mandelbrot.set_limits(this.fractalLimitX, this.fractalLimitY)
     }
@@ -132,8 +132,8 @@ class Mandelbrot extends React.Component {
     this.timer.current.updateTime(Date.now() - timerStart)
   }
   
-  componentDidMount() {
-    this.loadWasm()
+  async componentDidMount() {
+    await this.loadWasm()
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start')
     this.drawFractal()
@@ -149,7 +149,7 @@ class Mandelbrot extends React.Component {
       <div>
         <div className="info-panel">
           <Timer time={this.time} ref={this.timer}></Timer>
-          <Settings selectedRenderMode={this.state.renderMode} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} ></Settings>
+          <Settings selectedRenderMode={this.state.renderMode} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} maxi={this.state.max_i}></Settings>
         </div>
         <canvas className="fractal" id="fractal" ref={this.fractal}></canvas>
       </div>
