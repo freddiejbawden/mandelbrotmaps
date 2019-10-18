@@ -27,7 +27,10 @@ class Mandelbrot extends React.Component {
     try {
       const {Mandelbrot} = await import('mmap');
       this.mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i);
-      this.drawFractal()
+      console.log(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i)
+      if (this.state.renderMode == "wasm") {
+        this.drawFractal()
+      }
     } catch(err) {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
@@ -40,6 +43,9 @@ class Mandelbrot extends React.Component {
       i = iter
     }
     console.log(i)
+    if (this.mandelbrot) {
+      this.mandelbrot.set_max_i(i)
+    }
     this.setState({
       max_i: parseInt(i)
     });
@@ -86,12 +92,22 @@ class Mandelbrot extends React.Component {
     this.height = window.innerHeight;
     this.fractalLimitX = this.centreCoords[0]-(this.width*this.pixelSize)/2
     this.fractalLimitY = this.centreCoords[1]-(this.height*this.pixelSize)/2
+
+    if (this.state.renderMode == "wasm") {
+      this.mandelbrot.set_width_height(this.width, this.height);
+      this.mandelbrot.set_limits(this.fractalLimitX, this.fractalLimitY)
+    }
+
     const fractalContext = this.fractal.current.getContext('2d');
     fractalContext.canvas.width = window.innerWidth;
     fractalContext.canvas.height = window.innerHeight;
+
+    
+
     const arr = new Uint8ClampedArray(this.width*this.height*4);
     // Iterate through every pixel
     let colorScale = 255/this.state.max_i;
+    console.log(colorScale)
     for (let i = 0; i < arr.length; i += 4) {
       let iter;
       if (this.state.renderMode === "javascript") {
@@ -103,6 +119,7 @@ class Mandelbrot extends React.Component {
       } else {
         iter = 0;
       }
+     
       arr[i + 0] = iter*colorScale;;    // R value
       arr[i + 1] = iter*colorScale;  // G value
       arr[i + 2] = iter*colorScale;    // B value

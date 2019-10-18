@@ -41,6 +41,20 @@ impl Mandelbrot {
 }
 #[wasm_bindgen]
 impl Mandelbrot {
+  pub fn set_max_i(&mut self, max_i: i32) {
+    self.max_i = max_i;
+  }
+  pub fn set_width_height(&mut self, width: i32, height: i32) {
+    self.width = width;
+    self.height = height
+  }
+  pub fn set_limits(&mut self, fractal_limit_x: f32, fractal_limit_y: f32) {
+   self.fractal_limit_x = fractal_limit_x;
+   self.fractal_limit_y = fractal_limit_y;
+  }
+  pub fn set_pixel_size(&mut self, pixel_size: f32) {
+    self.pixel_size = pixel_size;
+  }
   pub fn greet() {
     alert("Hello, Mandelbrot!");
   }

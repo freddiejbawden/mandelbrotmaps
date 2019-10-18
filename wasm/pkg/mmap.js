@@ -31,6 +31,32 @@ export class Mandelbrot {
         wasm.__wbg_mandelbrot_free(ptr);
     }
     /**
+    * @param {number} max_i
+    */
+    set_max_i(max_i) {
+        wasm.mandelbrot_set_max_i(this.ptr, max_i);
+    }
+    /**
+    * @param {number} width
+    * @param {number} height
+    */
+    set_width_height(width, height) {
+        wasm.mandelbrot_set_width_height(this.ptr, width, height);
+    }
+    /**
+    * @param {number} fractal_limit_x
+    * @param {number} fractal_limit_y
+    */
+    set_limits(fractal_limit_x, fractal_limit_y) {
+        wasm.mandelbrot_set_limits(this.ptr, fractal_limit_x, fractal_limit_y);
+    }
+    /**
+    * @param {number} pixel_size
+    */
+    set_pixel_size(pixel_size) {
+        wasm.mandelbrot_set_pixel_size(this.ptr, pixel_size);
+    }
+    /**
     */
     static greet() {
         wasm.mandelbrot_greet();
