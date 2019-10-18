@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "freddiejbawden-mmap": "^0.1.0",
+    "mmap": "file:wasm/pkg",
     "puppeteer": "^1.20.0",
     "react": "^16.10.1",
     "react-app-rewired": "^2.1.3",
