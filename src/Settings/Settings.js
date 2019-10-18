@@ -24,7 +24,7 @@ export default class Settings extends Component {
       <div className="settings-container ">
         <strong>Settings</strong>
         <div >
-          <label>Iteration Count:</label> <input type="number" defaultValue={200}onChange={event => this.updateIterations(event.target.value)} id="iterations"></input>
+          <label>Iteration Count:</label> <input type="number" defaultValue={this.props.maxi} onChange={event => this.updateIterations(event.target.value)} id="iterations"></input>
         </div>
         <div >
           <label>Pixel Size:</label> <input type="number" defaultValue={1}onChange={event => this.updateIterations(event.target.value)} id="iterations"></input>
