@@ -1,0 +1,15 @@
+{
+  "name": "mmap",
+  "collaborators": [
+    "freddiejbawden <freddiejbawden@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "mmap_bg.wasm",
+    "mmap.js",
+    "mmap.d.ts"
+  ],
+  "module": "mmap.js",
+  "types": "mmap.d.ts",
+  "sideEffects": "false"
+}

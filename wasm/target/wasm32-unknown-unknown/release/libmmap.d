@@ -1,0 +1,1 @@
+/Users/frederickbawden/Documents/Uni/vanilla-js/mmap/target/wasm32-unknown-unknown/release/libmmap.rlib: /Users/frederickbawden/Documents/Uni/vanilla-js/mmap/src/lib.rs /Users/frederickbawden/Documents/Uni/vanilla-js/mmap/src/utils.rs

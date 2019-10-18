@@ -25,7 +25,7 @@ class Mandelbrot extends React.Component {
   }
   loadWasm = async () => {
     try {
-      const {Mandelbrot} = await import('freddiejbawden-mmap');
+      const {Mandelbrot} = await import('mmap');
       this.mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i);
       this.drawFractal()
     } catch(err) {
