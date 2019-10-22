@@ -1,13 +1,10 @@
 import React from 'react';
-
 import Timer from '../Timer/Timer'
 import Settings from '../Settings/Settings'
 import './Mandelbrot.css'
-import { runInThisContext } from 'vm';
 class Mandelbrot extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { width: window.innerWidth, height: window.innerHeight };
     this.fractal = React.createRef();
     this.timer = React.createRef();
     this.width = window.innerWidth;
@@ -21,7 +18,10 @@ class Mandelbrot extends React.Component {
     };
     this.updateIter = this.updateIter.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
+    this.updateCentreCoords = this.updateCentreCoords.bind(this);
+    this.updatePixelSize = this.updatePixelSize.bind(this)
     this.mandelbrot = undefined;
+    this.zoomTimeout = undefined;
   }
   loadWasm = async () => {
     try {
@@ -55,6 +55,10 @@ class Mandelbrot extends React.Component {
       renderMode
     })
   }
+  updatePixelSize(px) {
+    this.pixelSize = px;
+    this.drawFractal()
+  }
   pixelsToCoord(x,y) {
     let coord_X = this.fractalLimitX + this.pixelSize*x;
     let coord_Y = this.fractalLimitY + this.pixelSize*y/(this.width/this.height);
@@ -77,21 +81,28 @@ class Mandelbrot extends React.Component {
     
     return (i);
   }
-  updateDimensions = () => {
+  updateCentreCoords(x,y) {
+    this.centreCoords = [
+      x ? x : this.centreCoords[0],
+      y ? y : this.centreCoords[1]
+    ]
     this.drawFractal()
-  };
+  }
+  
   calculatePosition(pixelNum) {
     let x = (pixelNum % this.width)
     let y = Math.floor((pixelNum/this.height));
     return [x,y];
   }
+
   drawFractal() {
     let timerStart = Date.now();
     console.log(this.state.renderMode)
+
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.fractalLimitX = this.centreCoords[0]-(this.width*this.pixelSize)/2
-    this.fractalLimitY = this.centreCoords[1]-(this.height*this.pixelSize)/2
+    this.fractalLimitX = this.centreCoords[0]-(this.width/2)*this.pixelSize
+    this.fractalLimitY = this.centreCoords[1]-(this.height/2)*this.pixelSize
 
     if (this.state.renderMode == "wasm" && this.mandelbrot) {
       this.mandelbrot.set_width_height(this.width, this.height);
@@ -132,6 +143,7 @@ class Mandelbrot extends React.Component {
     this.timer.current.updateTime(Date.now() - timerStart)
   }
   
+
   async componentDidMount() {
     await this.loadWasm()
     window.addEventListener('resize', this.updateDimensions);
@@ -139,9 +151,14 @@ class Mandelbrot extends React.Component {
     this.drawFractal()
     window.performance.mark('fractal_rendered_end')
     window.performance.measure('fractal_render_time','fractal_rendered_start','fractal_rendered_end')
-
   }
   componentDidUpdate() {
+    this.drawFractal()
+  }
+
+  handleClick(e) {
+    // in case of a wide border, the boarder-width needs to be considered in the formula above
+    this.centreCoords = [-1,-1];
     this.drawFractal()
   }
   render() {
@@ -149,9 +166,9 @@ class Mandelbrot extends React.Component {
       <div>
         <div className="info-panel">
           <Timer time={this.time} ref={this.timer}></Timer>
-          <Settings selectedRenderMode={this.state.renderMode} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} maxi={this.state.max_i}></Settings>
+          <Settings selectedRenderMode={this.state.renderMode} updatePixelSize={this.updatePixelSize} updateCentreCoords={this.updateCentreCoords} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} maxi={this.state.max_i}></Settings>
         </div>
-        <canvas className="fractal" id="fractal" ref={this.fractal}></canvas>
+        <canvas onClick={(e) => this.handleClick(e)} className="fractal" id="fractal" ref={this.fractal}></canvas>
       </div>
     );
   }

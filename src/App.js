@@ -7,11 +7,15 @@ import {
   Route,
   useParams
 } from "react-router-dom";
+
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+
 const AppRouter = () => {
+  disableBodyScroll(document.querySelector('#app'))
   return (
     <Router>
       <Switch >
-        <Route path="/:renderMode?/:iterations?" children={<App />}></Route>
+        <Route path="/:renderMode?/:iterations?" children={<App id="app" />}></Route>
       </Switch>
     </Router>
   )
