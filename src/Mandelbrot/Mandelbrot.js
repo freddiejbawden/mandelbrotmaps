@@ -158,8 +158,8 @@ class Mandelbrot extends React.Component {
 
   handleClick(e) {
     // in case of a wide border, the boarder-width needs to be considered in the formula above
-    this.centreCoords = [-1,-1];
-    this.drawFractal()
+    //this.centreCoords = [-1,-1];
+    //this.drawFractal()
   }
   render() {
     return (
