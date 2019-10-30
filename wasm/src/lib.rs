@@ -103,6 +103,7 @@ impl Mandelbrot {
     return i;
   }
   pub fn render(&mut self) -> *const u8 {
+    self.arr = Vec::new();
     let w = *&self.width as f32;
     let h = *&self.height as f32;
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
