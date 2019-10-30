@@ -57,21 +57,16 @@ export class Mandelbrot {
         wasm.mandelbrot_set_pixel_size(this.ptr, pixel_size);
     }
     /**
-    */
-    static greet() {
-        wasm.mandelbrot_greet();
-    }
-    /**
     * @param {number} width
     * @param {number} height
-    * @param {number} fractal_limit_x
-    * @param {number} fractal_limit_y
     * @param {number} pixel_size
     * @param {number} max_i
+    * @param {number} centre_coords_x
+    * @param {number} centre_coords_y
     * @returns {Mandelbrot}
     */
-    static new(width, height, fractal_limit_x, fractal_limit_y, pixel_size, max_i) {
-        const ret = wasm.mandelbrot_new(width, height, fractal_limit_x, fractal_limit_y, pixel_size, max_i);
+    static new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y) {
+        const ret = wasm.mandelbrot_new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y);
         return Mandelbrot.__wrap(ret);
     }
     /**
@@ -80,13 +75,16 @@ export class Mandelbrot {
     */
     escape_algorithm(pixel_num) {
         const ret = wasm.mandelbrot_escape_algorithm(this.ptr, pixel_num);
+        return ret >>> 0;
+    }
+    /**
+    * @returns {number}
+    */
+    render() {
+        const ret = wasm.mandelbrot_render(this.ptr);
         return ret;
     }
 }
-
-export const __wbg_alert_c992628627e92c20 = function(arg0, arg1) {
-    alert(getStringFromWasm(arg0, arg1));
-};
 
 export const __wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm(arg0, arg1));
