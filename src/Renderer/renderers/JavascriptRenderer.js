@@ -34,11 +34,6 @@ class MandelbrotRenderer {
     return (i);
   }
   render() {
-    const w = new Worker('./MultithreadedJS/worker.js', { type: 'module' });
-    w.addEventListener('message', (e) => {
-      console.log(`Worker said ${e.data}`)
-    }, false)
-    w.postMessage('Hello world')
     this.fractalLimitX = this.centreCoords[0]-(this.width/2)*this.pixelSize
     this.fractalLimitY = this.centreCoords[1]-(this.height/2)*this.pixelSize
     console.log(this.fractalLimitX, this.fractalLimitY)

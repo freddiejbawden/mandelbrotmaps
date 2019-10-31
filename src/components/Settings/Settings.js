@@ -33,6 +33,7 @@ export default class Settings extends Component {
           <select defaultValue={this.props.selectedRenderMode} onChange={event => this.updateRenderMethod(event.target.value)}>
             <option value="javascript" >Javascript</option>
             <option value="wasm">WASM + Rust (Single Thread)</option>
+            <option value="jsmt">Javascript (Web Worker)</option>
           </select> 
         </div>
         

@@ -1,6 +1,8 @@
 import Mode from '../utils/RenderMode'
 import JavascriptRenderer from './renderers/JavascriptRenderer';
 import WASMRenderer from './renderers/WASMRenderer';
+import JSMultithreaded from './renderers/MultithreadedJS';
+
 class Renderer {
   constructor(renderMethod, width, height ,max_i) {
     this.mode = renderMethod;
@@ -26,6 +28,13 @@ class Renderer {
         const arr = await this.wasm_render.render()
         console.log(`WASM Len: ${arr.length}`)
         resolve(arr)
+      } else if (this.mode === Mode.JAVASCRIPTMT) {
+        const js_mt_render = new JSMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
+        await js_mt_render.render().then((arr) => {
+          console.log(arr[0])
+          resolve(arr)
+        }).catch((e) => reject(e))
+        
       }
       reject(`Render Mode ${this.mode} is not valid`)
     })

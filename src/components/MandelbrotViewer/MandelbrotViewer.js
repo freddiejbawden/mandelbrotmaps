@@ -52,6 +52,8 @@ class MandelbrotViewer extends React.Component {
       this.renderer.mode = Mode.WASM
     } else if (renderMode === "javascript") {
       this.renderer.mode = Mode.JAVASCRIPT
+    } else if (renderMode === "jsmt") {
+      this.renderer.mode = Mode.JAVASCRIPTMT
     }
     this.drawFractal()
   }
@@ -74,12 +76,6 @@ class MandelbrotViewer extends React.Component {
       fractalContext.canvas.height = window.innerHeight;
       const imageData = fractalContext.createImageData(fractalContext.canvas.width, window.innerHeight);
       imageData.data.set(arr)
-      console.log(imageData)
-      if (this.last_arr === arr) {
-        console.log("match")
-      } else {
-        console.log("do not match")
-      }
       this.last_arr = arr
       fractalContext.putImageData(imageData,0,0)
       this.timer.current.updateTime(Date.now() - timerStart)
