@@ -17,7 +17,6 @@ class JSMultithreaded {
     return new Promise((res,rej) => {
       console.log('Render Started ')
     let nThreadsFree = navigator.hardwareConcurrency
-    
     console.log(`Client has ${nThreadsFree} threads ready`);
     this.pixelSplit = (this.height*this.width)/nThreadsFree
     console.log(this.pixelSplit)
@@ -29,15 +28,15 @@ class JSMultithreaded {
         console.log(e.data.arr.slice(0,8))
         this.arr.set(e.data.arr, e.data.offset)
         this.remaining_threads-=1
-        if (this.remaining_threads == 0) {
+        if (this.remaining_threads === 0) {
           console.log('Done!')
           res(this.arr)
         }
       }
       w.postMessage({
         id: i,
-        startPixel: i*this.pixelSplit,
-        endPixel: (i+1)*this.pixelSplit,
+        startPixel: Math.floor(i*this.pixelSplit),
+        endPixel: Math.floor((i+1)*this.pixelSplit),
         arrSize: this.pixelSplit*4,
         pixelSize: this.pixelSize,
         width: this.width,
