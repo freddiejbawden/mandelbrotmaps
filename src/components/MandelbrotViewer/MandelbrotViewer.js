@@ -3,7 +3,6 @@ import Timer from '../Timer'
 import Settings from '../Settings'
 import './MandelbrotViewer.css'
 import Renderer from '../../Renderer'
-import Mode from '../../utils/RenderMode'
 class MandelbrotViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -47,14 +46,8 @@ class MandelbrotViewer extends React.Component {
     this.drawFractal()
   }
   updateRenderMethod(renderMode) {
-    console.log(renderMode)
-    if (renderMode === "wasm") {
-      this.renderer.mode = Mode.WASM
-    } else if (renderMode === "javascript") {
-      this.renderer.mode = Mode.JAVASCRIPT
-    } else if (renderMode === "jsmt") {
-      this.renderer.mode = Mode.JAVASCRIPTMT
-    }
+    console.log(`Render Mode: ${renderMode}`)
+    this.renderer.mode = parseInt(renderMode)
     this.drawFractal()
   }
   updatePixelSize(px) {

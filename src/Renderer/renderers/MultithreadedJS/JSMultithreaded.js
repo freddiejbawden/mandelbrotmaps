@@ -1,4 +1,3 @@
-
 class JSMultithreaded {
   constructor(pixelSize, width, height, centreCoords, max_i) {
     this.pixelSize = pixelSize;
@@ -22,7 +21,7 @@ class JSMultithreaded {
     console.log(this.pixelSplit)
     this.remaining_threads = nThreadsFree;
     for (let i = 0; i < nThreadsFree; i++) {
-      const w = new Worker('./RenderWorker/worker.js', { type: 'module' });
+      const w = new Worker('./../renderworker.js', { name: `js`, type: 'module' });
       w.onmessage = (e) => {
         console.log(`Worker ${e.data.id} done,\n\treturned array of length ${e.data.arr.length}`)
         console.log(e.data.arr.slice(0,8))
@@ -35,6 +34,7 @@ class JSMultithreaded {
       }
       w.postMessage({
         id: i,
+        renderer: "js",
         startPixel: Math.floor(i*this.pixelSplit),
         endPixel: Math.floor((i+1)*this.pixelSplit),
         arrSize: this.pixelSplit*4,
@@ -44,7 +44,7 @@ class JSMultithreaded {
         fractalLimitX: this.fractalLimitX,
         fractalLimitY: this.fractalLimitY,
         max_i: this.max_i,
-        centreCoords: this.centreCoords
+        centreCoords: this.centreCoords,
         })
       }
     });

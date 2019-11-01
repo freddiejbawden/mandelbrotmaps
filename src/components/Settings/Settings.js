@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './Settings.css'
 import DelayedInput from '../DelayedInput';
+import RenderMode from '../../utils/RenderMode'
 export default class Settings extends Component {
   constructor(props) {
     super(props)
@@ -31,9 +32,11 @@ export default class Settings extends Component {
         <div>
           <label>Render Method</label>
           <select defaultValue={this.props.selectedRenderMode} onChange={event => this.updateRenderMethod(event.target.value)}>
-            <option value="javascript" >Javascript</option>
-            <option value="wasm">WASM + Rust (Single Thread)</option>
-            <option value="jsmt">Javascript (Web Worker)</option>
+            <option value={RenderMode.JAVASCRIPT} >Javascript</option>
+            <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
+            <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
+            <option value={RenderMode.RUSTMT}>WASM + Rust (Web Worker)</option>
+
           </select> 
         </div>
         

@@ -91,6 +91,7 @@ impl Mandelbrot {
   }
   pub fn escape_algorithm(&self, pixel_num: u32) -> u32 {
     let (x_fractal, y_fractal) = &self.pixels_to_coord(pixel_num);
+
     let mut x: f32 = 0.0;
     let mut y: f32 = 0.0;
     let mut i : u32 = 0;
@@ -102,6 +103,7 @@ impl Mandelbrot {
     }
     return i;
   }
+  
   pub fn render(&mut self) -> *const u8 {
     self.arr = Vec::new();
     let w = *&self.width as f32;
@@ -111,6 +113,22 @@ impl Mandelbrot {
     let _color_scale = 255.0/(self.max_i as f32);
     for i in 0..(self.width*self.height) {
       let iter = ((self.escape_algorithm(i) as f32) * _color_scale) as u8;
+      self.arr.push(iter);
+      self.arr.push(iter);
+      self.arr.push(iter);
+      self.arr.push(255);
+    }
+    return self.arr.as_ptr();
+  }
+  pub fn render_from_to(&mut self, start: u32, end: u32) -> *const u8 {
+    self.arr = Vec::new();
+    let w = *&self.width as f32;
+    let h = *&self.height as f32;
+    self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
+    self.fractal_limit_y = self.centre_coords.1 - (h/2.0)*self.pixel_size;
+    let _color_scale = 255.0/(self.max_i as f32);
+    for i in 0..(end-start) {
+      let iter = ((self.escape_algorithm(i+start) as f32) * _color_scale) as u8;
       self.arr.push(iter);
       self.arr.push(iter);
       self.arr.push(iter);
