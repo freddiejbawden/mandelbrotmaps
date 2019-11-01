@@ -70,7 +70,7 @@ class MandelbrotViewer extends React.Component {
   drawFractal() {
     let timerStart = Date.now();
     this.renderer.render().then((arr) => {
-      console.log(`Viewer Len: ${arr.slice(0,8)}`)
+      console.log(`Viewer Len: ${arr.slice(arr.length-8)}`)
       const fractalContext = this.fractal.current.getContext('2d');
       fractalContext.canvas.width = window.innerWidth;
       fractalContext.canvas.height = window.innerHeight;

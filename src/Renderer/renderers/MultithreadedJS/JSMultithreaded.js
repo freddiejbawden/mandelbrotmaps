@@ -16,17 +16,17 @@ class JSMultithreaded {
   async render() {
     return new Promise((res,rej) => {
       console.log('Render Started ')
-    const nThreadsFree = navigator.hardwareConcurrency
+    let nThreadsFree = navigator.hardwareConcurrency
+    //nThreadsFree = 1
     console.log(`Client has ${nThreadsFree} threads ready`);
-    this.splitHeight = this.height/4;
+    this.pixelSplit = (this.height*this.width)/nThreadsFree
     this.remaining_threads = nThreadsFree;
     for (let i = 0; i < nThreadsFree; i++) {
       const w = new Worker('./RenderWorker/worker.js', { type: 'module' });
       w.onmessage = (e) => {
-        console.log(`Worker ${e.data.id} done`)
-        console.log(`Arr ${e.data.arr[0]}`)
-        this.arr.set(e.data.arr, this.splitHeight*4*e.data.id*this.width)
-        console.log(`this.arr ${this.arr[this.splitHeight*e.data.id*this.width]}`)
+        console.log(`Worker ${e.data.id} done,\n\treturned array of length ${e.data.arr.length}`)
+        console.log(e.data.arr.slice(0,8))
+        this.arr.set(e.data.arr, e.data.offset)
         this.remaining_threads-=1
         if (this.remaining_threads == 0) {
           res(this.arr)
@@ -34,8 +34,9 @@ class JSMultithreaded {
       }
       w.postMessage({
         id: i,
-        startRow: i*this.splitHeight,
-        numRows: this.splitHeight,
+        startPixel: i*this.pixelSplit,
+        endPixel: (i+1)*this.pixelSplit,
+        arrSize: this.pixelSplit*4,
         pixelSize: this.pixelSize,
         width: this.width,
         height: this.height,

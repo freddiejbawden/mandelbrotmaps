@@ -33,9 +33,12 @@ class MandelbrotRenderer {
     }
     return (i);
   }
-  render() {
+  calculateFractalLimit() {
     this.fractalLimitX = this.centreCoords[0]-(this.width/2)*this.pixelSize
     this.fractalLimitY = this.centreCoords[1]-(this.height/2)*this.pixelSize
+  }
+  render() {
+    this.calculateFractalLimit()
     console.log(this.fractalLimitX, this.fractalLimitY)
     const arr = new Uint8ClampedArray(this.width*this.height*4);
     // Iterate through every pixel

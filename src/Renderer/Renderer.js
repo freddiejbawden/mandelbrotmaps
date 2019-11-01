@@ -22,11 +22,9 @@ class Renderer {
       if (this.mode === Mode.JAVASCRIPT) {
         const js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         const arr = js_render.render()
-        console.log(`JS Len: ${arr.length}`)
         resolve(arr)
       } else if (this.mode === Mode.WASM) {
         const arr = await this.wasm_render.render()
-        console.log(`WASM Len: ${arr.length}`)
         resolve(arr)
       } else if (this.mode === Mode.JAVASCRIPTMT) {
         const js_mt_render = new JSMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
