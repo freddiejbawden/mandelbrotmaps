@@ -8,9 +8,9 @@ addEventListener('message', e => {
   mr.calculateFractalLimit()
   for (let i = 0; i <= e.data.endPixel*4-e.data.startPixel*4; i+=4) {
     const iter = mr.escapeAlgorithm((i/4)+e.data.startPixel)
-    arr[i] = (e.data.id == 0 || e.data.id == 3) ? iter : 0
-    arr[i+1] = (e.data.id == 1) ? iter : 0
-    arr[i+2] = (e.data.id == 2) ? iter : 0
+    arr[i] = (e.data.id % 3 == 0) ? iter : 0
+    arr[i+1] = (e.data.id % 3 == 1) ? iter : 0
+    arr[i+2] = (e.data.id % 3 == 2) ? iter : 0
     arr[i+3] = 255
   }
   postMessage({

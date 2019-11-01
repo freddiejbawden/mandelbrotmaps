@@ -17,9 +17,10 @@ class JSMultithreaded {
     return new Promise((res,rej) => {
       console.log('Render Started ')
     let nThreadsFree = navigator.hardwareConcurrency
-    //nThreadsFree = 1
+    
     console.log(`Client has ${nThreadsFree} threads ready`);
     this.pixelSplit = (this.height*this.width)/nThreadsFree
+    console.log(this.pixelSplit)
     this.remaining_threads = nThreadsFree;
     for (let i = 0; i < nThreadsFree; i++) {
       const w = new Worker('./RenderWorker/worker.js', { type: 'module' });
@@ -29,6 +30,7 @@ class JSMultithreaded {
         this.arr.set(e.data.arr, e.data.offset)
         this.remaining_threads-=1
         if (this.remaining_threads == 0) {
+          console.log('Done!')
           res(this.arr)
         }
       }
