@@ -25,7 +25,7 @@ class Renderer {
         const arr = js_render.render()
         resolve(arr)
       } else if (this.mode === Mode.WASM) {
-        const arr = await this.wasm_render.render()
+        const arr = await this.wasm_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         resolve(arr)
       } else if (this.mode === Mode.JAVASCRIPTMT) {
         const js_mt_render = new JSMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);

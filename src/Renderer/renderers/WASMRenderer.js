@@ -35,7 +35,12 @@ class WASMRenderer {
     })
     
   }
-  async render() {
+  async render(pixelSize, width, height, centreCoords, max_i) {
+    this.pixelSize = pixelSize;
+    this.width = width;
+    this.height = height;
+    this.centreCoords = centreCoords;
+    this.max_i = max_i;
     if (!this.wasm_renderer) {
       await this.loadWasm()
     }
