@@ -3,7 +3,6 @@ import Timer from '../Timer'
 import Settings from '../Settings'
 import './MandelbrotViewer.css'
 import Renderer from '../../Renderer'
-import Mode from '../../utils/RenderMode'
 class MandelbrotViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -47,12 +46,8 @@ class MandelbrotViewer extends React.Component {
     this.drawFractal()
   }
   updateRenderMethod(renderMode) {
-    console.log(renderMode)
-    if (renderMode === "wasm") {
-      this.renderer.mode = Mode.WASM
-    } else if (renderMode === "javascript") {
-      this.renderer.mode = Mode.JAVASCRIPT
-    }
+    console.log(`Render Mode: ${renderMode}`)
+    this.renderer.mode = parseInt(renderMode)
     this.drawFractal()
   }
   updatePixelSize(px) {
@@ -68,18 +63,12 @@ class MandelbrotViewer extends React.Component {
   drawFractal() {
     let timerStart = Date.now();
     this.renderer.render().then((arr) => {
-      console.log(`Viewer Len: ${arr.slice(0,8)}`)
+      console.log(`Viewer Len: ${arr.slice(arr.length-8)}`)
       const fractalContext = this.fractal.current.getContext('2d');
       fractalContext.canvas.width = window.innerWidth;
       fractalContext.canvas.height = window.innerHeight;
       const imageData = fractalContext.createImageData(fractalContext.canvas.width, window.innerHeight);
       imageData.data.set(arr)
-      console.log(imageData)
-      if (this.last_arr === arr) {
-        console.log("match")
-      } else {
-        console.log("do not match")
-      }
       this.last_arr = arr
       fractalContext.putImageData(imageData,0,0)
       this.timer.current.updateTime(Date.now() - timerStart)

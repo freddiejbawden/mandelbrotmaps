@@ -84,6 +84,15 @@ export class Mandelbrot {
         const ret = wasm.mandelbrot_render(this.ptr);
         return ret;
     }
+    /**
+    * @param {number} start
+    * @param {number} end
+    * @returns {number}
+    */
+    render_from_to(start, end) {
+        const ret = wasm.mandelbrot_render_from_to(this.ptr, start, end);
+        return ret;
+    }
 }
 
 export const __wbindgen_throw = function(arg0, arg1) {

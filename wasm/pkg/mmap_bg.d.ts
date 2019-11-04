@@ -8,3 +8,4 @@ export function mandelbrot_set_pixel_size(a: number, b: number): void;
 export function mandelbrot_new(a: number, b: number, c: number, d: number, e: number, f: number): number;
 export function mandelbrot_escape_algorithm(a: number, b: number): number;
 export function mandelbrot_render(a: number): number;
+export function mandelbrot_render_from_to(a: number, b: number, c: number): number;
