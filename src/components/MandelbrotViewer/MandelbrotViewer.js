@@ -16,6 +16,7 @@ class MandelbrotViewer extends React.Component {
     };
 
     //Set up hooks for Setting Component
+    this.updateDimensions = this.updateDimensions.bind(this)
     this.updateIter = this.updateIter.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateCentreCoords = this.updateCentreCoords.bind(this);
@@ -77,7 +78,11 @@ class MandelbrotViewer extends React.Component {
     })
     
   }
-  
+  updateDimensions(e) {
+    this.renderer.width = window.innerWidth
+    this.renderer.height = window.innerHeight
+    this.drawFractal()
+  }
 
   async componentDidMount() {
     await this.loadWasm()
