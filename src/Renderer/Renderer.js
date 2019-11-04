@@ -1,6 +1,8 @@
 import Mode from '../utils/RenderMode'
 import JavascriptRenderer from './renderers/JavascriptRenderer';
 import WASMRenderer from './renderers/WASMRenderer';
+import JSMultithreaded from './renderers/MultithreadedJS';
+import RustMultithreaded from './renderers/RustMultithreaded'
 class Renderer {
   constructor(renderMethod, width, height ,max_i) {
     this.mode = renderMethod;
@@ -23,11 +25,9 @@ class Renderer {
       if (this.mode === Mode.JAVASCRIPT) {
         const js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         const arr = js_render.render()
-        console.log(`JS Len: ${arr.length}`)
         resolve(arr)
       } else if (this.mode === Mode.WASM) {
-        const arr = await this.wasm_render.render()
-        console.log(`WASM Len: ${arr.length}`)
+        const arr = await this.wasm_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         resolve(arr)
       } else if (this.mode === Mode.JAVASCRIPTMT) {
         this.js_mt_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i).then((arr) => {
@@ -43,7 +43,6 @@ class Renderer {
       } else {
         reject(`Render Mode ${this.mode} is not valid`)
       }
-      reject(`Render Mode ${this.mode} is not valid`)
     })
     return renderPromise  
   }

@@ -40,4 +40,10 @@ export class Mandelbrot {
 * @returns {number} 
 */
   render(): number;
+/**
+* @param {number} start 
+* @param {number} end 
+* @returns {number} 
+*/
+  render_from_to(start: number, end: number): number;
 }
