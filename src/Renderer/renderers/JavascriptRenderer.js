@@ -39,11 +39,9 @@ class MandelbrotRenderer {
   }
   render() {
     this.calculateFractalLimit()
-    console.log(this.fractalLimitX, this.fractalLimitY)
     const arr = new Uint8ClampedArray(this.width*this.height*4);
     // Iterate through every pixel
     let colorScale = 255/this.max_i;
-    console.log(colorScale)
     for (let i = 0; i < arr.length; i += 4) {
       let iter = this.escapeAlgorithm(i/4)*colorScale;
       arr[i] = iter;    // R value
@@ -51,7 +49,11 @@ class MandelbrotRenderer {
       arr[i + 2] = iter;    // B value
       arr[i + 3] = 2555;  // A value
     }
-    return arr
+    return {
+      arr,
+      width: this.width,
+      height: this.height
+    }
   }
 }
 

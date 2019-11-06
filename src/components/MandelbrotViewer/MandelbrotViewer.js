@@ -63,14 +63,14 @@ class MandelbrotViewer extends React.Component {
   
   drawFractal() {
     let timerStart = Date.now();
-    this.renderer.render().then((arr) => {
-      console.log(`Viewer Len: ${arr.slice(arr.length-8)}`)
+    this.renderer.render().then((fractal) => {
       const fractalContext = this.fractal.current.getContext('2d');
       fractalContext.canvas.width = window.innerWidth;
       fractalContext.canvas.height = window.innerHeight;
-      const imageData = fractalContext.createImageData(fractalContext.canvas.width, window.innerHeight);
-      imageData.data.set(arr)
-      this.last_arr = arr
+      console.log(fractal.width, fractal.height)
+      const imageData = fractalContext.createImageData(fractal.width, fractal.height);
+      imageData.data.set(fractal.arr)
+      this.last_arr = fractal.arr
       fractalContext.putImageData(imageData,0,0)
       this.timer.current.updateTime(Date.now() - timerStart)
     }).catch((err) => {
@@ -79,9 +79,13 @@ class MandelbrotViewer extends React.Component {
     
   }
   updateDimensions(e) {
-    this.renderer.width = window.innerWidth
-    this.renderer.height = window.innerHeight
-    this.drawFractal()
+   
+    if (this.renderTimer) clearTimeout(this.renderTimer)
+    this.renderTimer = setTimeout(() => {
+      this.renderer.width = window.innerWidth
+      this.renderer.height = window.innerHeight
+      this.drawFractal()
+    },100)
   }
 
   async componentDidMount() {

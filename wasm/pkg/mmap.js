@@ -78,22 +78,49 @@ export class Mandelbrot {
         return ret >>> 0;
     }
     /**
+    * @param {number} pixel_size
+    * @param {number} width
+    * @param {number} height
+    * @param {number} centre_coords_x
+    * @param {number} centre_coords_y
+    * @param {number} max_i
+    */
+    update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i) {
+        wasm.mandelbrot_update(this.ptr, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
+    }
+    /**
+    * @param {number} pixel_size
+    * @param {number} width
+    * @param {number} height
+    * @param {number} centre_coords_x
+    * @param {number} centre_coords_y
+    * @param {number} max_i
     * @returns {number}
     */
-    render() {
-        const ret = wasm.mandelbrot_render(this.ptr);
+    render(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i) {
+        const ret = wasm.mandelbrot_render(this.ptr, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
         return ret;
     }
     /**
     * @param {number} start
     * @param {number} end
+    * @param {number} pixel_size
+    * @param {number} width
+    * @param {number} height
+    * @param {number} centre_coords_x
+    * @param {number} centre_coords_y
+    * @param {number} max_i
     * @returns {number}
     */
-    render_from_to(start, end) {
-        const ret = wasm.mandelbrot_render_from_to(this.ptr, start, end);
+    render_from_to(start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i) {
+        const ret = wasm.mandelbrot_render_from_to(this.ptr, start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
         return ret;
     }
 }
+
+export const __wbg_log_4311e14956b0ab98 = function(arg0) {
+    console.log(arg0 >>> 0);
+};
 
 export const __wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm(arg0, arg1));

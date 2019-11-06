@@ -14,6 +14,7 @@ class Renderer {
     this.max_i = parseInt(max_i);
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
+    this.timer = undefined;
     this.wasm_render = new WASMRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
     this.wasm_mt_renderer = new RustMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
     this.js_mt_render = new JSMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
@@ -30,11 +31,11 @@ class Renderer {
         const arr = await this.wasm_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         resolve(arr)
       } else if (this.mode === Mode.JAVASCRIPTMT) {
-        this.js_mt_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i).then((arr) => {
-          console.log(arr[0])
-          resolve(arr)
-        }).catch((e) => reject(e))
-      } else if (this.mode === Mode.RUSTMT) {
+          this.js_mt_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
+          .then((arr) => {
+            resolve(arr)
+          }).catch((e) => reject(e))
+      } else if (this.mode === Mode.RUSTMT) {      
         await this.wasm_mt_renderer.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
         .then((arr) => {
           console.log(arr[0])

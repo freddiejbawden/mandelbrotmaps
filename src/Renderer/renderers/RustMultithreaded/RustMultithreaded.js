@@ -1,3 +1,4 @@
+import idGenerator from '../../../utils/IDGenerator';
 
 class RustMultithreaded {
   constructor(pixelSize, width, height, centreCoords, max_i, memory, mandelbrotWASM) {
@@ -28,12 +29,14 @@ class RustMultithreaded {
   }
   async render(pixelSize, width, height, centreCoords, max_i) {
     return new Promise((res,rej) => {
+      console.log(width,height)
+      this.arr = new Uint8ClampedArray(height*width*4) 
       console.log('Render Started ')
       let nThreadsFree = navigator.hardwareConcurrency
       console.log(`Client has ${nThreadsFree} threads ready`);
       this.pixelSplit = (height*width)/nThreadsFree
       this.remaining_threads = nThreadsFree;
-      // create workers
+      const roundID = idGenerator()
       if (this.workers.length < this.remaining_threads) {
         console.log(`Creating ${this.remaining_threads - this.workers.length} threads`)
         for (let i = this.workers.length; i < this.remaining_threads; i++) {
@@ -42,21 +45,28 @@ class RustMultithreaded {
         }
       }
       for (let i = 0; i < this.remaining_threads; i++) {
-        console.log(`Create Worker ${i}`)
         const w = this.workers[i]
         w.onmessage = (e) => {
           console.log(e.data)
           console.log(`Worker ${e.data.id} done`)
-          console.log('All done, resolving')
-          this.arr.set(e.data.arr, e.data.offset)
-          this.remaining_threads-=1
-          if (this.remaining_threads === 0) {
-            console.log('All done, resolving')
-            res(this.arr)
+          if (e.data.id === roundID) {
+            this.arr.set(e.data.arr, e.data.offset)
+            this.remaining_threads-=1
+            if (this.remaining_threads === 0) {
+              console.log('All done, resolving')
+              res(
+                {
+                  arr: this.arr,
+                  width: width,
+                  height: height
+                }
+              )
+            }
           }
+          
         }
         w.postMessage({
-          id: i,
+          id: roundID,
           renderer: "wasm",
           startPixel: Math.floor(i*this.pixelSplit),
           endPixel: Math.floor((i+1)*this.pixelSplit),
