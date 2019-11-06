@@ -103,8 +103,17 @@ impl Mandelbrot {
     }
     return i;
   }
-  
-  pub fn render(&mut self) -> *const u8 {
+  pub fn update(&mut self, pixel_size: f32, width: u32, height: u32, centre_coords_x: f32, centre_coords_y: f32, max_i: u32)  {
+    self.pixel_size = pixel_size;
+    self.width = width;
+    self.height = height;
+    self.max_i = max_i;
+    self.centre_coords =  (centre_coords_x, centre_coords_y);
+  }
+  pub fn render(&mut self, pixel_size: f32, width: u32, height: u32, centre_coords_x: f32, centre_coords_y: f32, max_i: u32) -> *const u8 {
+    self.update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
+    log_u32(self.width);
+    log_u32(self.height);
     self.arr = Vec::new();
     let w = *&self.width as f32;
     let h = *&self.height as f32;
@@ -120,7 +129,8 @@ impl Mandelbrot {
     }
     return self.arr.as_ptr();
   }
-  pub fn render_from_to(&mut self, start: u32, end: u32) -> *const u8 {
+  pub fn render_from_to(&mut self, start: u32, end: u32, pixel_size: f32, width: u32, height: u32, centre_coords_x: f32, centre_coords_y: f32, max_i: u32 ) -> *const u8 {
+    self.update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
     self.arr = Vec::new();
     let w = *&self.width as f32;
     let h = *&self.height as f32;
