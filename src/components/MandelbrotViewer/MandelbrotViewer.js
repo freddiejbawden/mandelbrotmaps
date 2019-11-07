@@ -72,6 +72,7 @@ class MandelbrotViewer extends React.Component {
       imageData.data.set(fractal.arr)
       this.last_arr = fractal.arr
       fractalContext.putImageData(imageData,0,0)
+      fractalContext.fillRect(this.width/2-5, this.height/2-5,10,10)
       this.timer.current.updateTime(Date.now() - timerStart)
     }).catch((err) => {
       alert(`Error when drawing fractal ${err}`)
@@ -84,6 +85,8 @@ class MandelbrotViewer extends React.Component {
     this.renderTimer = setTimeout(() => {
       this.renderer.width = window.innerWidth
       this.renderer.height = window.innerHeight
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
       this.drawFractal()
     },100)
   }
@@ -101,9 +104,13 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleClick(e) {
-    // in case of a wide border, the boarder-width needs to be considered in the formula above
-    //this.centreCoords = [-1,-1];
-    //this.drawFractal()
+    let fracLimX = this.renderer.centreCoords[0]-(this.width/2)*this.renderer.pixelSize
+    let fracLimY = this.renderer.centreCoords[1]-(this.height/2)*this.renderer.pixelSize
+    let frac_X = fracLimX + this.renderer.pixelSize*e.clientX
+    let frac_Y = fracLimY + (this.renderer.pixelSize *e.clientY)
+    console.log(frac_X,frac_Y)
+    this.renderer.centreCoords = [frac_X, frac_Y]
+    this.drawFractal()
   }
   render() {
     return (

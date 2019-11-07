@@ -12,8 +12,6 @@ class Renderer {
     console.log(width,height)
     this.centreCoords = [-1,0]
     this.max_i = parseInt(max_i);
-    this.fractalLimitX = 0;
-    this.fractalLimitY = 0;
     this.timer = undefined;
     this.wasm_render = new WASMRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
     this.wasm_mt_renderer = new RustMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
