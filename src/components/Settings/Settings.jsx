@@ -48,7 +48,10 @@ export default class Settings extends Component {
         <DelayedInput label="Centre Y" type="number" defaultValue={0} callback={this.updateY} timeout={500} />
         <div>
           <div>Render Method</div>
-          <select defaultValue={p.selectedRenderMode} onChange={(event) => this.updateRenderMethod(event.target.value)}>
+          <select
+            defaultValue={p.selectedRenderMode}
+            onChange={(event) => this.updateRenderMethod(event.target.value)}
+          >
             <option value={RenderMode.JAVASCRIPT}>Javascript</option>
             <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
             <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>

@@ -36,6 +36,7 @@ class Renderer {
       this.centreCoords,
       this.maxIter,
     );
+    this.mtTimer = undefined;
   }
 
   async renderRange(xRect, yRect, dX, dY, arr) {
@@ -47,10 +48,14 @@ class Renderer {
         this.centreCoords,
         this.maxIter,
       );
-      return jsRender.renderRange(xRect, yRect, dX, dY, arr);
+      return {
+        arr: await jsRender.renderRange(xRect, yRect, dX, dY, arr),
+        width: this.width,
+        height: this.height,
+      };
     }
     if (this.mode === Mode.WASM) {
-      return this.wasm_render.renderRange(
+      const a = await this.wasm_render.renderRange(
         xRect,
         yRect,
         dX,
@@ -60,7 +65,25 @@ class Renderer {
         this.centreCoords[0],
         this.centreCoords[1],
       );
+      return {
+        arr: a,
+        width: this.width,
+        height: this.height,
+      };
     }
+    if (this.mode === Mode.JAVASCRIPTMT) {
+      const a = await this.jsMTRender.renderRange(
+        xRect,
+        yRect,
+        dX,
+        dY,
+        this.width,
+        this.height,
+        this.centreCoords,
+      );
+      return a;
+    }
+
     const jsRender = new JavascriptRenderer(
       this.pixelSize,
       this.width,
@@ -68,7 +91,11 @@ class Renderer {
       this.centreCoords,
       this.maxIter,
     );
-    return jsRender.renderRange(xRect, yRect, dX, dY, arr);
+    return {
+      arr: await jsRender.renderRange(xRect, yRect, dX, dY, arr),
+      width: this.width,
+      height: this.height,
+    };
   }
 
   render() {

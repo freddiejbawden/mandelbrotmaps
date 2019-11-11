@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Timer from '../Timer';
 import Settings from '../Settings';
 import './MandelbrotViewer.css';
@@ -46,15 +47,24 @@ class MandelbrotViewer extends React.Component {
   }
 
   loadWasm = async () => {
-    const s = this.state;
     try {
       // eslint-disable-next-line import/no-unresolved
       const { Mandelbrot } = await import('mmap');
-      this.mandelbrot = Mandelbrot.new(this.width, this.height, this.fractalLimitX, this.fractalLimitY, this.pixelSize, this.state.max_i);
+      const s = this.state;
+      this.mandelbrot = Mandelbrot.new(
+        this.width,
+        this.height,
+        this.fractalLimitX,
+        this.fractalLimitY,
+        this.pixelSize,
+        s.maxIter,
+      );
       if (s.renderMode === 'wasm') {
         this.drawFractal();
       }
     } catch (err) {
+      // TODO: notify user
+      // eslint-disable-next-line no-console
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
   };
@@ -66,7 +76,7 @@ class MandelbrotViewer extends React.Component {
     } else {
       i = iter;
     }
-    this.renderer.max_i = parseInt(i, 10);
+    this.renderer.maxIter = parseInt(i, 10);
     this.drawFractal();
   }
 
@@ -88,16 +98,16 @@ class MandelbrotViewer extends React.Component {
   drawFractal() {
     const timerStart = Date.now();
     this.renderer.render().then((fractal) => {
-      console.log(fractal.width, fractal.height);
       this.putImage(fractal.arr, fractal.width, fractal.height);
       this.timer.current.updateTime(Date.now() - timerStart);
     }).catch((err) => {
+      // TODO: alert user
+      // eslint-disable-next-line no-alert
       alert(`Error when drawing fractal ${err}`);
     });
   }
 
   putImage(arr, width, height) {
-    console.log(arr.length);
     const fractalContext = this.fractal.current.getContext('2d');
     fractalContext.canvas.width = window.innerWidth;
     fractalContext.canvas.height = window.innerHeight;
@@ -109,13 +119,17 @@ class MandelbrotViewer extends React.Component {
   }
 
   updateImagePos() {
-    console.log(this.deltaX, this.deltaY);
     if (!this.imageData) return;
     const fractalContext = this.fractal.current.getContext('2d');
-    fractalContext.fillStyle = '#00FF00';
+    fractalContext.fillStyle = '#000000';
     fractalContext.fillRect(0, 0, this.width, this.height);
     fractalContext.putImageData(this.imageData, this.deltaX, this.deltaY);
-    fractalContext.fillRect((this.width) / 2 - 5 + this.deltaX, (this.height / 2) - 5 + this.deltaY, 10, 10);
+    fractalContext.fillRect(
+      (this.width) / 2 - 5 + this.deltaX,
+      (this.height / 2) - 5 + this.deltaY,
+      10,
+      10,
+    );
   }
 
   updateDimensions() {
@@ -130,7 +144,6 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleDragStart() {
-    console.log('drag start');
     this.dragging = true;
   }
 
@@ -142,11 +155,10 @@ class MandelbrotViewer extends React.Component {
     }
   }
 
-  async handleDragEnd(e) {
+  async handleDragEnd() {
     if (this.dragging) {
+      this.dragging = false;
       const timerStart = Date.now();
-      console.log('drag end');
-      console.log(this.deltaX, this.deltaY);
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;
       this.renderer.centreCoords[1] += -1 * this.deltaY * this.renderer.pixelSize;
       let xRect;
@@ -161,11 +173,18 @@ class MandelbrotViewer extends React.Component {
       } else {
         yRect = new Rectangle(0, this.height + this.deltaY, this.width, this.height);
       }
-      this.arr = await this.renderer.renderRange(xRect, yRect, this.deltaX, this.deltaY, this.arr);
+      const result = await this.renderer.renderRange(
+        xRect,
+        yRect,
+        this.deltaX,
+        this.deltaY,
+        this.arr,
+      );
+      console.log(this.deltaX, this.deltaY);
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;
-      this.putImage(this.arr, this.width, this.height);
+      this.putImage(result.arr, result.width, result.height);
       this.timer.current.updateTime(Date.now() - timerStart);
     }
   }
@@ -182,7 +201,7 @@ class MandelbrotViewer extends React.Component {
             updateCentreCoords={this.updateCentreCoords}
             updateIter={this.updateIter}
             updateRenderMethod={this.updateRenderMethod}
-            axi={s.max_i}
+            axi={s.maxIter}
           />
         </div>
         <canvas
@@ -199,5 +218,8 @@ class MandelbrotViewer extends React.Component {
     );
   }
 }
-
+MandelbrotViewer.propTypes = {
+  renderMode: PropTypes.number.isRequired,
+  maxi: PropTypes.string.isRequired,
+};
 export default MandelbrotViewer;

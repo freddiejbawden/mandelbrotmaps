@@ -16,6 +16,63 @@ class JSMultithreaded {
     this.arr = new Uint8ClampedArray(this.height * this.width * 4);
   }
 
+  async renderRange(xRect, yRect, dX, dY, width, height, centreCoords) {
+    return new Promise((res) => {
+      const newArr = new Uint8ClampedArray(height * width * 4);
+      const nThreadsFree = navigator.hardwareConcurrency;
+      this.pixelSplit = (height * width) / nThreadsFree;
+      this.remaining_threads = nThreadsFree;
+      const roundID = idGenerator();
+      if (this.workers.length < nThreadsFree) {
+        for (let i = this.workers.length; i < nThreadsFree; i += 1) {
+          console.log('spinning up');
+          const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
+          this.workers.push(w);
+        }
+      }
+      for (let i = 0; i < nThreadsFree; i += 1) {
+        const w = this.workers[i];
+        w.onmessage = (e) => {
+          if (e.data.id === roundID) {
+            newArr.set(e.data.arr, e.data.offset);
+            this.remaining_threads -= 1;
+            if (this.remaining_threads === 0) {
+              this.arr = newArr;
+              res(
+                {
+                  arr: this.arr,
+                  height,
+                  width,
+                },
+              );
+            }
+          }
+        };
+        w.postMessage({
+          id: roundID,
+          renderer: 'js',
+          type: 'partial',
+          startPixel: Math.floor(i * this.pixelSplit),
+          endPixel: Math.floor((i + 1) * this.pixelSplit),
+          arrSize: this.pixelSplit * 4,
+          pixelSize: this.pixelSize,
+          width,
+          height,
+          fractalLimitX: this.fractalLimitX,
+          fractalLimitY: this.fractalLimitY,
+          maxIter: this.maxIter,
+          centreCoords,
+          oldArr: this.arr,
+          xRect,
+          yRect,
+          dX,
+          dY,
+        });
+      }
+    });
+  }
+
+
   async render(pixelSize, width, height, centreCoords, maxIter) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
