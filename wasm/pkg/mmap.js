@@ -17,8 +17,6 @@ function addHeapObject(obj) {
     return idx;
 }
 
-function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
-
 function getObject(idx) { return heap[idx]; }
 
 function dropObject(idx) {
@@ -220,12 +218,6 @@ export class Mandelbrot {
         return ret;
     }
 }
-
-export const __wbg_log_4311e14956b0ab98 = function(arg0) {
-    console.log(arg0 >>> 0);
-};
-
-export const __wbg_log_d32de19c7ed89d4d = typeof console.log == 'function' ? console.log : notDefined('console.log');
 
 export const __wbg_pointInBounds_de90712800e2fa23 = function(arg0, arg1, arg2) {
     const ret = getObject(arg0).pointInBounds(arg1 >>> 0, arg2 >>> 0);
