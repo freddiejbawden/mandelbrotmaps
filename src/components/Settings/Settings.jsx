@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './Settings.css';
 import DelayedInput from '../DelayedInput';
 import RenderMode from '../../utils/RenderMode';
@@ -15,34 +16,39 @@ export default class Settings extends Component {
   updateIterations(i) {
     this.iterations = i;
     if (this.iterationUpdateTimer) clearTimeout(this.iterationUpdateTimer);
+    const p = this.props;
     this.iterationUpdateTimer = setTimeout(() => {
-      this.props.updateIter(i);
+      p.updateIter(i);
     }, 1000);
   }
 
   updateRenderMethod(val) {
-    this.props.updateRenderMethod(val);
+    const p = this.props;
+    p.updateRenderMethod(val);
   }
 
   updateX(val) {
-    this.props.updateCentreCoords(val, undefined);
+    const p = this.props;
+    p.updateCentreCoords(val, undefined);
   }
 
   updateY(val) {
-    this.props.updateCentreCoords(undefined, val);
+    const p = this.props;
+    p.updateCentreCoords(undefined, val);
   }
 
   render() {
+    const p = this.props;
     return (
       <div className="settings-container ">
         <strong>Settings</strong>
-        <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={this.props.updateIter} timeout={1000} />
-        <DelayedInput label="Pixel Size" type="number" defaultValue={0.003} callback={this.props.updatePixelSize} timeout={500} />
+        <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={p.updateIter} timeout={1000} />
+        <DelayedInput label="Pixel Size" type="number" defaultValue={0.003} callback={p.updatePixelSize} timeout={500} />
         <DelayedInput label="Centre X" type="number" defaultValue={-1} callback={this.updateX} timeout={500} />
         <DelayedInput label="Centre Y" type="number" defaultValue={0} callback={this.updateY} timeout={500} />
         <div>
-          <label>Render Method</label>
-          <select defaultValue={this.props.selectedRenderMode} onChange={(event) => this.updateRenderMethod(event.target.value)}>
+          <div>Render Method</div>
+          <select defaultValue={p.selectedRenderMode} onChange={(event) => this.updateRenderMethod(event.target.value)}>
             <option value={RenderMode.JAVASCRIPT}>Javascript</option>
             <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
             <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
@@ -55,3 +61,13 @@ export default class Settings extends Component {
     );
   }
 }
+Settings.propTypes = {
+  updateIter: PropTypes.func.isRequired,
+  updateRenderMethod: PropTypes.func.isRequired,
+  updateCentreCoords: PropTypes.func.isRequired,
+  updatePixelSize: PropTypes.func.isRequired,
+  selectedRenderMode: PropTypes.string,
+};
+Settings.defaultProps = {
+  selectedRenderMode: '0',
+};

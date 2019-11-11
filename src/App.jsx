@@ -23,7 +23,8 @@ const AppRouter = () => {
 };
 
 const App = () => {
-  let { renderMode, iterations } = useParams();
+  const { renderMode } = useParams();
+  let { iterations } = useParams();
   let mode;
   if (renderMode === 'javascript') {
     mode = Mode.JAVASCRIPT;

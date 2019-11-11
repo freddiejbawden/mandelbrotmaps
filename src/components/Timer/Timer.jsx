@@ -12,25 +12,21 @@ export default class Timer extends Component {
   }
 
   updateTime(time) {
+    const getSum = (p, c) => (p + c);
     this.prevTime.push(time);
-    this.meanTime = Math.round(this.prevTime.reduce((p, c) => c += p) / this.prevTime.length * 100) / 100;
+    this.meanTime = Math.round(this.prevTime.reduce(getSum, 0) / this.prevTime.length);
     this.setState({ time });
   }
 
   render() {
+    const times = this.state;
+    const lastTime = `Last Time:${times.time}ms`;
+    const averageTime = `Average Time:${this.meanTime}ms`;
     return (
       <div className="timer-container">
         <strong>Timer</strong>
-        <div>
-Last Time:
-          {this.state.time}
-ms
-        </div>
-        <div>
-Average Time:
-          {this.meanTime}
-ms
-        </div>
+        <div>{lastTime}</div>
+        <div>{averageTime}</div>
 
       </div>
     );

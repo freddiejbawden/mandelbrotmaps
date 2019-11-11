@@ -1,12 +1,16 @@
 import MandelbrotRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
-/* eslint no-restricted-globals:0 */
 
+/* eslint no-restricted-globals:0 */
 const renderJS = (e) => {
-  console.log(`Worker ${e.data.id} started running from ${e.data.startPixel}  ${e.data.endPixel}`);
   const arr = new Uint8ClampedArray(e.data.arrSize);
-  console.log(`Arr Size ${e.data.arrSize}`);
-  const mr = new MandelbrotRenderer(e.data.pixelSize, e.data.width, e.data.height, e.data.centreCoords, e.data.max_i);
+  const mr = new MandelbrotRenderer(
+    e.data.pixelSize,
+    e.data.width,
+    e.data.height,
+    e.data.centreCoords,
+    e.data.max_i,
+  );
   mr.calculateFractalLimit();
   for (let i = 0; i <= e.data.endPixel * 4 - e.data.startPixel * 4; i += 4) {
     const iter = mr.escapeAlgorithm((i / 4) + e.data.startPixel);
@@ -22,9 +26,22 @@ const renderJS = (e) => {
   });
 };
 const renderWasm = async (e) => {
-  console.log(`Worker ${e.data.id} started running from ${e.data.startPixel}  ${e.data.endPixel}`);
-  const wasm_renderer = new WASMRenderer(e.data.pixelSize, e.data.width, e.data.height, e.data.centreCoords, e.data.max_i);
-  wasm_renderer.render_from_to(e.data.startPixel, e.data.endPixel, e.data.pixelSize, e.data.width, e.data.height, e.data.centreCoords, e.data.max_i).then((arr) => {
+  const wasmRenderer = new WASMRenderer(
+    e.data.pixelSize,
+    e.data.width,
+    e.data.height,
+    e.data.centreCoords,
+    e.data.max_i,
+  );
+  wasmRenderer.renderFromTo(
+    e.data.startPixel,
+    e.data.endPixel,
+    e.data.pixelSize,
+    e.data.width,
+    e.data.height,
+    e.data.centreCoords,
+    e.data.max_i,
+  ).then((arr) => {
     postMessage({
       arr,
       offset: e.data.startPixel * 4,
@@ -33,6 +50,7 @@ const renderWasm = async (e) => {
   });
 };
 addEventListener('message', async (e) => {
+  console.log(e.data);
   if (e.data.renderer === 'js') {
     renderJS(e);
   } else {

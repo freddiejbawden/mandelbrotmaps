@@ -1,18 +1,18 @@
 class MandelbrotRenderer {
-  constructor(pixelSize, width, height, centreCoords, max_i) {
+  constructor(pixelSize, width, height, centreCoords, maxIter) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
     this.centreCoords = centreCoords;
-    this.max_i = max_i;
+    this.maxIter = (maxIter) || 200;
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
   }
 
   pixelsToCoord(x, y) {
-    const coord_X = this.fractalLimitX + this.pixelSize * x;
-    const coord_Y = this.fractalLimitY + this.pixelSize * y / (this.width / this.height);
-    return [coord_X, coord_Y];
+    const coordX = this.fractalLimitX + this.pixelSize * x;
+    const coordY = (this.fractalLimitY + this.pixelSize * y) / (this.width / this.height);
+    return [coordX, coordY];
   }
 
   calculatePosition(pixelNum) {
@@ -27,11 +27,11 @@ class MandelbrotRenderer {
     let x = 0;
     let y = 0;
     let i = 0;
-    while (x * x + y * y < 4 && i < this.max_i) {
+    while (x * x + y * y < 4 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
       x = xtemp;
-      i++;
+      i += 1;
     }
     return (i);
   }
@@ -43,9 +43,11 @@ class MandelbrotRenderer {
 
   render() {
     this.calculateFractalLimit();
+    console.log(this.fractalLimitY);
+
     const arr = new Uint8ClampedArray(this.width * this.height * 4);
     // Iterate through every pixel
-    const colorScale = 255 / this.max_i;
+    const colorScale = 255 / this.maxIter;
     for (let i = 0; i < arr.length; i += 4) {
       const iter = this.escapeAlgorithm(i / 4) * colorScale;
       arr[i] = iter; // R value

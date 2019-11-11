@@ -6,6 +6,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "body-scroll-lock": "^2.6.4",
     "mmap": "file:wasm/pkg",
+    "prop-types": "^15.7.2",
     "puppeteer": "^1.20.0",
     "react": "^16.10.1",
     "react-app-rewired": "^2.1.3",
@@ -21,9 +22,8 @@
     "test": "react-app-rewired test",
     "wasm-build": "cd mmap && wasm-pack build",
     "performanceTest": "node src/tests/performance/lighthouseTest.js",
-    "lint": "eslint.",
+    "lint": "eslint --ignore-path .eslintignore  .",
     "lintfix": "eslint --ignore-path .eslintignore  . --fix"
-
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -1,7 +1,8 @@
 const path = require('path');
 const WorkerPlugin = require('worker-plugin');
 
-module.exports = function override(config, env) {
+// eslint-disable-next-line no-unused-vars
+module.exports = function override(config, _env) {
   config.plugins.push(new WorkerPlugin());
   const wasmExtensionRegExp = /\.wasm$/;
 

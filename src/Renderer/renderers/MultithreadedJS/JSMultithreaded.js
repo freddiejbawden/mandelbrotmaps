@@ -1,12 +1,12 @@
 import idGenerator from '../../../utils/IDGenerator';
 
 class JSMultithreaded {
-  constructor(pixelSize, width, height, centreCoords, max_i) {
+  constructor(pixelSize, width, height, centreCoords, maxIter) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
     this.centreCoords = centreCoords;
-    this.max_i = max_i;
+    this.maxIter = maxIter;
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
     this.splitHeight = this.height;
@@ -14,31 +14,29 @@ class JSMultithreaded {
     this.workers = [];
 
     this.arr = new Uint8ClampedArray(this.height * this.width * 4);
-    console.log(this.arr.length);
   }
 
-  async render(pixelSize, width, height, centreCoords, max_i) {
-    return new Promise((res, rej) => {
-      console.log(width, height);
+  async render(pixelSize, width, height, centreCoords, maxIter) {
+    return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
       this.pixelSplit = (height * width) / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
-        for (let i = this.workers.length; i < nThreadsFree; i++) {
+        for (let i = this.workers.length; i < nThreadsFree; i += 1) {
           const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }
       }
-      for (let i = 0; i < nThreadsFree; i++) {
+      for (let i = 0; i < nThreadsFree; i += 1) {
+        console.log('starting');
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
             this.arr.set(e.data.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
-              console.log('Done!');
               res(
                 {
                   arr: this.arr,
@@ -60,7 +58,7 @@ class JSMultithreaded {
           height,
           fractalLimitX: this.fractalLimitX,
           fractalLimitY: this.fractalLimitY,
-          max_i,
+          maxIter,
           centreCoords,
         });
       }

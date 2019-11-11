@@ -1,56 +1,89 @@
+/* eslint-disable import/no-unresolved */
 class WASMRenderer {
-  constructor(pixelSize, width, height, centreCoords, max_i) {
-    this.pixelSize = pixelSize
-    this.width = width
-    this.height = height
-    this.centreCoords = centreCoords
-    this.max_i = max_i
-    this.memory = undefined
-    this.loadWasm = this.loadWasm.bind(this)
-    this.m = undefined
+  constructor(pixelSize, width, height, centreCoords, maxIter) {
+    this.pixelSize = pixelSize;
+    this.width = width;
+    this.height = height;
+    this.centreCoords = centreCoords;
+    this.maxIter = maxIter;
+    this.memory = undefined;
+    this.loadWasm = this.loadWasm.bind(this);
+    this.m = undefined;
   }
-  async loadWasm()  {  
+
+  async loadWasm() {
     try {
-      const {Mandelbrot} = await import('mmap');
-      const { memory } = await import("mmap/mmap_bg")
-      this.m = Mandelbrot.new
-      this.wasm_renderer = Mandelbrot.new(this.width,this.height,this.pixelSize, this.max_i,this.centreCoords[0], this.centreCoords[1])
+      const { Mandelbrot } = await import('mmap');
+      const { memory } = await import('mmap/mmap_bg');
+      this.m = Mandelbrot.new;
+      this.wasm_renderer = Mandelbrot.new(
+        this.width,
+        this.height,
+        this.pixelSize,
+        this.maxIter,
+        this.centreCoords[0],
+        this.centreCoords[1],
+      );
       this.memory = memory;
-      return memory
-    } catch(err) {
-      console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`)
+      return memory;
+    } catch (err) {
+      // TODO: alert user
+      // eslint-disable-next-line no-console
+      console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
+      return [];
     }
   }
-  async render_from_to(s,e,pixelSize,width,height,centreCoords,max_i) {
-    return new Promise(async(res,rej) => {
+
+  async renderFromTo(s, e, pixelSize, width, height, centreCoords, maxIter) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (res, rej) => {
       if (!this.wasm_renderer) {
-        await this.loadWasm()
+        await this.loadWasm();
       }
-      const arr_pointer = this.wasm_renderer.render_from_to(s,e,pixelSize,width,height,centreCoords[0],centreCoords[1],max_i)
+      const arrPointer = this.wasm_renderer.render_from_to(
+        s,
+        e,
+        pixelSize,
+        width,
+        height,
+        centreCoords[0],
+        centreCoords[1],
+        maxIter,
+      );
       try {
-        console.log((e-s)*4)
-        const arr = new Uint8Array(this.memory.buffer, arr_pointer, (e-s)*4)
-        res(arr)
-      } catch (e) {
-        rej(e);
+        const arr = new Uint8Array(this.memory.buffer, arrPointer, (e - s) * 4);
+        res(arr);
+      } catch (err) {
+        rej(err);
       }
-    })
-    
+    });
   }
-  async render(pixelSize,width,height,centreCoords,max_i) {
+
+  async render(pixelSize, width, height, centreCoords, maxIter) {
+    console.log(centreCoords);
     if (!this.wasm_renderer) {
-      await this.loadWasm()
+      await this.loadWasm();
     }
-    const arr_pointer =  this.wasm_renderer.render(pixelSize,width,height,centreCoords[0],centreCoords[1],max_i)
+    const arrPointer = this.wasm_renderer.render(
+      pixelSize,
+      width,
+      height,
+      centreCoords[0],
+      centreCoords[1],
+      maxIter,
+    );
     try {
-      const arr = new Uint8Array(this.memory.buffer, arr_pointer, width*height*4)
+      const arr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
       return {
         arr,
         width,
-        height
-      }
-    } catch (e) {
-      console.log(e)
+        height,
+      };
+    } catch (err) {
+      // TODO: alert user
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return [];
     }
   }
 }
