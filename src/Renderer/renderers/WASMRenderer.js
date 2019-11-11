@@ -60,7 +60,7 @@ class WASMRenderer {
   }
 
   async render(pixelSize, width, height, centreCoords, maxIter) {
-    console.log(centreCoords);
+    console.log(pixelSize, width, height, centreCoords, maxIter);
     if (!this.wasm_renderer) {
       await this.loadWasm();
     }

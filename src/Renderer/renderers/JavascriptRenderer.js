@@ -5,13 +5,11 @@ class MandelbrotRenderer {
     this.height = height;
     this.centreCoords = centreCoords;
     this.maxIter = (maxIter) || 200;
-    this.fractalLimitX = 0;
-    this.fractalLimitY = 0;
   }
 
   pixelsToCoord(x, y) {
     const coordX = this.fractalLimitX + this.pixelSize * x;
-    const coordY = (this.fractalLimitY + this.pixelSize * y) / (this.width / this.height);
+    const coordY = this.fractalLimitY + this.pixelSize * (y / (this.width / this.height));
     return [coordX, coordY];
   }
 
@@ -37,14 +35,13 @@ class MandelbrotRenderer {
   }
 
   calculateFractalLimit() {
+    console.log(this.centreCoords[1] - (this.height / 2) * this.pixelSize);
     this.fractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
     this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }
 
   render() {
     this.calculateFractalLimit();
-    console.log(this.fractalLimitY);
-
     const arr = new Uint8ClampedArray(this.width * this.height * 4);
     // Iterate through every pixel
     const colorScale = 255 / this.maxIter;
@@ -53,7 +50,7 @@ class MandelbrotRenderer {
       arr[i] = iter; // R value
       arr[i + 1] = iter; // G value
       arr[i + 2] = iter; // B value
-      arr[i + 3] = 2555; // A value
+      arr[i + 3] = 255; // A value
     }
     return {
       arr,
