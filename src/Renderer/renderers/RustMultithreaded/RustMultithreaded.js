@@ -49,7 +49,6 @@ class RustMultithreaded {
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
             this.arr.set(e.data.arr, e.data.offset);
-            console.log(this.arr.slice(600, 608));
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
               res(

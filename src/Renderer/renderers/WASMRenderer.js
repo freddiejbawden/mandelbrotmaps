@@ -48,7 +48,7 @@ class WASMRenderer {
         height,
         centreCoords[0],
         centreCoords[1],
-        maxIter,
+        maxIter || 200,
       );
       try {
         const arr = new Uint8Array(this.memory.buffer, arrPointer, (e - s) * 4);
@@ -60,7 +60,6 @@ class WASMRenderer {
   }
 
   async render(pixelSize, width, height, centreCoords, maxIter) {
-    console.log(pixelSize, width, height, centreCoords, maxIter);
     if (!this.wasm_renderer) {
       await this.loadWasm();
     }

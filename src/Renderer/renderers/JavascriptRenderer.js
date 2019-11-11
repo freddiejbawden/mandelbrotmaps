@@ -35,7 +35,6 @@ class MandelbrotRenderer {
   }
 
   calculateFractalLimit() {
-    console.log(this.centreCoords[1] - (this.height / 2) * this.pixelSize);
     this.fractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
     this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }

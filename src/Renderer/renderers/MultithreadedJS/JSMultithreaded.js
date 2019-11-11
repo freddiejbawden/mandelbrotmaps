@@ -30,7 +30,6 @@ class JSMultithreaded {
         }
       }
       for (let i = 0; i < nThreadsFree; i += 1) {
-        console.log('starting');
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {

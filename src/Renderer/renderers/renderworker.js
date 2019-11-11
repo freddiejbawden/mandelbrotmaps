@@ -50,7 +50,6 @@ const renderWasm = async (e) => {
   });
 };
 addEventListener('message', async (e) => {
-  console.log(e.data);
   if (e.data.renderer === 'js') {
     renderJS(e);
   } else {

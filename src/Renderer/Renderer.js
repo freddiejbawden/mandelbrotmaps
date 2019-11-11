@@ -66,7 +66,6 @@ class Renderer {
           this.centreCoords,
           this.maxIter,
         ).then((arr) => {
-          console.log(arr.arr.slice(0, 8));
           resolve(arr);
         }).catch((e) => reject(e));
       } else if (this.mode === Mode.RUSTMT) {
