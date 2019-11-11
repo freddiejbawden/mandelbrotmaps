@@ -32,6 +32,18 @@ export class Mandelbrot {
 */
   static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number): Mandelbrot;
 /**
+* @param {any} xRect 
+* @param {any} yRect 
+* @param {number} deltaX 
+* @param {number} deltaY 
+* @param {number} width 
+* @param {number} height 
+* @param {number} centre_coords_x 
+* @param {number} centre_coords_y 
+* @returns {number} 
+*/
+  render_range(xRect: any, yRect: any, deltaX: number, deltaY: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number): number;
+/**
 * @param {number} pixel_num 
 * @returns {number} 
 */

@@ -3,18 +3,16 @@
 #![cfg(target_arch = "wasm32")]
 extern crate mmap;
 use mmap::Mandelbrot;
-
+use mmap::Rectangle;
 extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
 
-wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen_test]
-fn escape_1() {
-  let _m = Mandelbrot::new(5, 5,0.03, 200,-1.0,0.0);
-  let fractal = _m.render();
-  assert_eq!(fractal.len(),5*5*4);
+fn rectangle_test(){
+  let r = Rectangle::new(0,0,10,10);
+  assert_eq!(r.pointInBounds(5,5),true);
+  assert_eq!(r.pointInBounds(10,10),true);
 }
-
 
 

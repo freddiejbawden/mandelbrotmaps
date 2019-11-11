@@ -12,9 +12,7 @@ class JSMultithreaded {
     this.splitHeight = this.height
     this.remaining_threads  = 0;
     this.workers = []
-
     this.arr = new Uint8ClampedArray(this.height*this.width*4)
-    console.log(this.arr.length)
   };
   async render(pixelSize, width, height, centreCoords, max_i) {
     return new Promise((res,rej) => {

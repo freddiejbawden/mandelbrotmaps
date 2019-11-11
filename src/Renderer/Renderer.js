@@ -13,17 +13,29 @@ class Renderer {
     this.centreCoords = [-1,0]
     this.max_i = parseInt(max_i);
     this.timer = undefined;
+    this.js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
     this.wasm_render = new WASMRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
     this.wasm_mt_renderer = new RustMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
     this.js_mt_render = new JSMultithreaded(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i);
 
   }
+  async renderRange(xRect,yRect,dX,dY,arr) {
+    if (this.mode === Mode.JAVASCRIPT) {
+      const js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
+      return js_render.renderRange(xRect,yRect,dX,dY,arr)
+    } else if (this.mode === Mode.WASM) {
+      return await this.wasm_render.renderRange(xRect,yRect,dX,dY,this.width,this.height, this.centreCoords[0], this.centreCoords[1])
+    } else {
+      const js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
+      return js_render.renderRange(xRect,yRect,dX,dY,arr)
+    }
+  }
   render() {
     console.log(this.mode)
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
-        const js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
-        const arr = js_render.render()
+        this.js_render = new JavascriptRenderer(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)
+        const arr = this.js_render.render()
         resolve(arr)
       } else if (this.mode === Mode.WASM) {
         const arr = await this.wasm_render.render(this.pixelSize, this.width, this.height, this.centreCoords,this.max_i)

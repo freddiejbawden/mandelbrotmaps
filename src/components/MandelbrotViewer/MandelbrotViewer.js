@@ -3,6 +3,7 @@ import Timer from '../Timer'
 import Settings from '../Settings'
 import './MandelbrotViewer.css'
 import Renderer from '../../Renderer'
+import Rectangle from '../../utils/Rectangle'
 class MandelbrotViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +15,9 @@ class MandelbrotViewer extends React.Component {
     this.state = {
       time: 0,
     };
-
+    this.dragging = false
+    this.deltaX = 0
+    this.deltaY = 0
     //Set up hooks for Setting Component
     this.updateDimensions = this.updateDimensions.bind(this)
     this.updateIter = this.updateIter.bind(this);
@@ -64,23 +67,34 @@ class MandelbrotViewer extends React.Component {
   drawFractal() {
     let timerStart = Date.now();
     this.renderer.render().then((fractal) => {
-      const fractalContext = this.fractal.current.getContext('2d');
-      fractalContext.canvas.width = window.innerWidth;
-      fractalContext.canvas.height = window.innerHeight;
       console.log(fractal.width, fractal.height)
-      const imageData = fractalContext.createImageData(fractal.width, fractal.height);
-      imageData.data.set(fractal.arr)
-      this.last_arr = fractal.arr
-      fractalContext.putImageData(imageData,0,0)
-      fractalContext.fillRect(this.width/2-5, this.height/2-5,10,10)
+      this.putImage(fractal.arr,fractal.width,fractal.height)
       this.timer.current.updateTime(Date.now() - timerStart)
     }).catch((err) => {
       alert(`Error when drawing fractal ${err}`)
     })
-    
+  }
+  putImage(arr,width,height) {
+    console.log(arr.length)
+    const fractalContext = this.fractal.current.getContext('2d');
+    fractalContext.canvas.width = window.innerWidth;
+    fractalContext.canvas.height = window.innerHeight;
+    this.imageData = fractalContext.createImageData(width, height);
+    this.arr = arr
+    this.imageData.data.set(arr)
+    fractalContext.putImageData(this.imageData,0,0)
+    fractalContext.fillRect(this.width/2-5, this.height/2-5,10,10)
+  }
+  updateImagePos() {
+    console.log(this.deltaX, this.deltaY)
+    if (!this.imageData)  return;
+    const fractalContext = this.fractal.current.getContext('2d');
+    fractalContext.fillStyle = "#00FF00"
+    fractalContext.fillRect(0, 0,this.width,this.height)
+    fractalContext.putImageData(this.imageData,this.deltaX,this.deltaY)
+    fractalContext.fillRect((this.width)/2-5+this.deltaX, (this.height/2)-5+this.deltaY,10,10)
   }
   updateDimensions(e) {
-   
     if (this.renderTimer) clearTimeout(this.renderTimer)
     this.renderTimer = setTimeout(() => {
       this.renderer.width = window.innerWidth
@@ -103,14 +117,46 @@ class MandelbrotViewer extends React.Component {
     this.drawFractal()
   }
 
-  handleClick(e) {
-    let fracLimX = this.renderer.centreCoords[0]-(this.width/2)*this.renderer.pixelSize
-    let fracLimY = this.renderer.centreCoords[1]-(this.height/2)*this.renderer.pixelSize
-    let frac_X = fracLimX + this.renderer.pixelSize*e.clientX
-    let frac_Y = fracLimY + (this.renderer.pixelSize *e.clientY)
-    console.log(frac_X,frac_Y)
-    this.renderer.centreCoords = [frac_X, frac_Y]
-    this.drawFractal()
+  handleDragStart(e){
+    console.log("drag start")
+    this.dragging = true
+  }
+  handleDrag(e) {
+    if (this.dragging) {
+      this.deltaX += e.movementX
+      this.deltaY += e.movementY
+      this.updateImagePos()
+    }
+  }
+
+  async handleDragEnd(e) {
+    if (this.dragging) {
+      let timerStart = Date.now();
+      console.log("drag end")
+      console.log(this.deltaX, this.deltaY)
+      this.renderer.centreCoords[0] += -1*this.deltaX*this.renderer.pixelSize
+      this.renderer.centreCoords[1] += -1*this.deltaY*this.renderer.pixelSize
+      let xRect = undefined
+      let yRect = undefined
+      if (this.deltaX > 0) {
+        xRect = new Rectangle(0,0,this.deltaX,this.height)
+      } else {
+        xRect = new Rectangle(this.width+this.deltaX,0,this.width,this.height)
+      }
+      if (this.deltaY > 0) {
+        yRect = new Rectangle(0,0,this.width,this.deltaY,this.deltaY)
+      } else {
+        yRect = new Rectangle(0, this.height+this.deltaY,this.width,this.height)
+      }
+      this.arr = await this.renderer.renderRange(xRect,yRect,this.deltaX,this.deltaY,this.arr)
+      this.dragging = false
+      this.deltaX = 0
+      this.deltaY = 0
+      this.putImage(this.arr,this.width,this.height)
+      this.timer.current.updateTime(Date.now() - timerStart)
+
+    }
+
   }
   render() {
     return (
@@ -119,7 +165,12 @@ class MandelbrotViewer extends React.Component {
           <Timer time={this.time} ref={this.timer}></Timer>
           <Settings selectedRenderMode={this.state.renderMode} updatePixelSize={this.updatePixelSize} updateCentreCoords={this.updateCentreCoords} updateIter={this.updateIter} updateRenderMethod={this.updateRenderMethod} maxi={this.state.max_i}></Settings>
         </div>
-        <canvas onClick={(e) => this.handleClick(e)} className="fractal" id="fractal" ref={this.fractal}></canvas>
+        <canvas draggable="true" 
+                onMouseDown={(e) => this.handleDragStart(e)} 
+                onMouseMove={(e) => this.handleDrag(e)} 
+                onMouseUp={(e) => this.handleDragEnd(e)} 
+                onMouseLeave={(e) => this.handleDragEnd(e)} 
+                className="fractal" id="fractal" ref={this.fractal}></canvas>
       </div>
     );
   }

@@ -8,18 +8,31 @@ class WASMRenderer {
     this.memory = undefined
     this.loadWasm = this.loadWasm.bind(this)
     this.m = undefined
+    this.r = undefined
   }
   async loadWasm()  {  
     try {
       const {Mandelbrot} = await import('mmap');
       const { memory } = await import("mmap/mmap_bg")
-      this.m = Mandelbrot.new
       this.wasm_renderer = Mandelbrot.new(this.width,this.height,this.pixelSize, this.max_i,this.centreCoords[0], this.centreCoords[1])
       this.memory = memory;
       return memory
     } catch(err) {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`)
     }
+  }
+  async renderRange(xRect,yRect,dX,dY,width,height,centreCoordsX,centreCoordsY) {
+    return new Promise(async(res,rej) => {
+      console.log(xRect, yRect)
+      const arr_pointer = this.wasm_renderer.render_range(xRect,yRect,dX,dY,width,height,centreCoordsX,centreCoordsY);
+      try {
+        const arr = new Uint8Array(this.memory.buffer, arr_pointer, width*height*4)
+        console.log(arr.slice(0.8))
+        res(arr)
+      } catch (e) {
+        rej(e);
+      }
+    })
   }
   async render_from_to(s,e,pixelSize,width,height,centreCoords,max_i) {
     return new Promise(async(res,rej) => {
