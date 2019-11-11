@@ -22,8 +22,8 @@
     "test": "react-app-rewired test",
     "wasm-build": "cd mmap && wasm-pack build",
     "performanceTest": "node src/tests/performance/lighthouseTest.js",
-    "lint": "eslint --ignore-path .eslintignore  .",
-    "lintfix": "eslint --ignore-path .eslintignore  . --fix"
+    "lint": "eslint --ignore-path .eslintignore  --ext .js --ext .jsx .",
+    "lintfix": "eslint --ignore-path .eslintignore  --ext .js --ext .jsx . --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
