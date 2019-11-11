@@ -1,59 +1,61 @@
 class MandelbrotRenderer {
-  constructor(pixelSize, width, height, centreCoords, max_i) {
+  constructor(pixelSize, width, height, centreCoords, maxIter) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
     this.centreCoords = centreCoords;
-    this.max_i = max_i;
-    this.fractalLimitX = 0;
-    this.fractalLimitY = 0;
-  };
-  pixelsToCoord(x,y) {
-    let coord_X = this.fractalLimitX + this.pixelSize*x;
-    let coord_Y = this.fractalLimitY + this.pixelSize*y/(this.width/this.height);
-    return [coord_X, coord_Y]
+    this.maxIter = (maxIter) || 200;
   }
+
+  pixelsToCoord(x, y) {
+    const coordX = this.fractalLimitX + this.pixelSize * x;
+    const coordY = this.fractalLimitY + this.pixelSize * (y / (this.width / this.height));
+    return [coordX, coordY];
+  }
+
   calculatePosition(pixelNum) {
-    let x = (pixelNum % this.width)
-    let y = Math.floor((pixelNum/this.height));
-    return [x,y];
+    const x = (pixelNum % this.width);
+    const y = Math.floor((pixelNum / this.height));
+    return [x, y];
   }
+
   escapeAlgorithm(pixelNum) {
-    
     const pixelPos = this.calculatePosition(pixelNum);
     const fractalPos = this.pixelsToCoord(...pixelPos);
-    let x = 0
-    let y = 0
-    let i = 0
-    while(x*x + y*y < 4 && i < this.max_i) {
-      let xtemp = x*x - y*y + fractalPos[0]
-      y = 2*x*y + fractalPos[1]
-      x = xtemp
-      i++
+    let x = 0;
+    let y = 0;
+    let i = 0;
+    while (x * x + y * y < 4 && i < this.maxIter) {
+      const xtemp = x * x - y * y + fractalPos[0];
+      y = 2 * x * y + fractalPos[1];
+      x = xtemp;
+      i += 1;
     }
     return (i);
   }
+
   calculateFractalLimit() {
-    this.fractalLimitX = this.centreCoords[0]-(this.width/2)*this.pixelSize
-    this.fractalLimitY = this.centreCoords[1]-(this.height/2)*this.pixelSize
+    this.fractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
+    this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }
+
   render() {
-    this.calculateFractalLimit()
-    const arr = new Uint8ClampedArray(this.width*this.height*4);
+    this.calculateFractalLimit();
+    const arr = new Uint8ClampedArray(this.width * this.height * 4);
     // Iterate through every pixel
-    let colorScale = 255/this.max_i;
+    const colorScale = 255 / this.maxIter;
     for (let i = 0; i < arr.length; i += 4) {
-      let iter = this.escapeAlgorithm(i/4)*colorScale;
-      arr[i] = iter;    // R value
-      arr[i + 1] = iter;  // G value
-      arr[i + 2] = iter;    // B value
-      arr[i + 3] = 2555;  // A value
+      const iter = this.escapeAlgorithm(i / 4) * colorScale;
+      arr[i] = iter; // R value
+      arr[i + 1] = iter; // G value
+      arr[i + 2] = iter; // B value
+      arr[i + 3] = 255; // A value
     }
     return {
       arr,
       width: this.width,
-      height: this.height
-    }
+      height: this.height,
+    };
   }
 }
 

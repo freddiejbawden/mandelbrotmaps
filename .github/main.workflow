@@ -6,4 +6,4 @@ workflow "New workflow" {
 action "ESLint" {
   uses = "stefanoeb/eslint-action@master"
   args = "index.js src/**.js"
-}
+ }

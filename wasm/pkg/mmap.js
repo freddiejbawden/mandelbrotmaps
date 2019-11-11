@@ -1,5 +1,7 @@
 import * as wasm from './mmap_bg.wasm';
 
+function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
+
 let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 
 let cachegetUint8Memory = null;
@@ -118,9 +120,7 @@ export class Mandelbrot {
     }
 }
 
-export const __wbg_log_4311e14956b0ab98 = function(arg0) {
-    console.log(arg0 >>> 0);
-};
+export const __wbg_log_d32de19c7ed89d4d = typeof console.log == 'function' ? console.log : notDefined('console.log');
 
 export const __wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm(arg0, arg1));
