@@ -1,3 +1,3 @@
-import RustMulithreaded from './RustMultithreaded'
+import RustMulithreaded from './RustMultithreaded';
 
-export default RustMulithreaded
+export default RustMulithreaded;

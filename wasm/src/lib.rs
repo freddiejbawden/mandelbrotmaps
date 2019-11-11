@@ -25,6 +25,7 @@ extern "C" {
     // `log` in JS.
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_u32(a: u32);
+
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_f32(a: f32);
 }
@@ -188,14 +189,12 @@ impl Mandelbrot {
   }
   pub fn render(&mut self, pixel_size: f32, width: u32, height: u32, centre_coords_x: f32, centre_coords_y: f32, max_i: u32) -> *const u8 {
     self.update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
-    log_u32(self.width);
-    log_u32(self.height);
-    
     self.arr = Vec::new();
     let w = *&self.width as f32;
     let h = *&self.height as f32;
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
     self.fractal_limit_y = self.centre_coords.1 - (h/2.0)*self.pixel_size;
+    log_f32(self.fractal_limit_y);
     let _color_scale = 255.0/(self.max_i as f32);
     for i in 0..(self.width*self.height) {
       let iter = ((self.escape_algorithm(i) as f32) * _color_scale) as u8;

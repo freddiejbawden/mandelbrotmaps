@@ -1,3 +1,3 @@
-import JSMultithreaded from './JSMultithreaded'
+import JSMultithreaded from './JSMultithreaded';
 
 export default JSMultithreaded;
