@@ -25,10 +25,24 @@ class MandelbrotViewer extends React.Component {
     this.updatePixelSize = this.updatePixelSize.bind(this);
     this.zoomTimeout = undefined;
     this.renderer = new Renderer(
-      props.renderMode, 
-      window.innerWidth, 
+      props.renderMode,
+      window.innerWidth,
       window.innerHeight,
-      parseInt(this.props.maxi,10));
+      parseInt(props.maxi, 10),
+    );
+  }
+
+  async componentDidMount() {
+    await this.loadWasm();
+    window.addEventListener('resize', this.updateDimensions);
+    window.performance.mark('fractal_rendered_start');
+    this.drawFractal();
+    window.performance.mark('fractal_rendered_end');
+    window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
+  }
+
+  componentDidUpdate() {
+    this.drawFractal();
   }
 
   loadWasm = async () => {
@@ -45,21 +59,6 @@ class MandelbrotViewer extends React.Component {
     }
   };
 
-  
-
-  async componentDidMount() {
-    await this.loadWasm();
-    window.addEventListener('resize', this.updateDimensions);
-    window.performance.mark('fractal_rendered_start');
-    this.drawFractal();
-    window.performance.mark('fractal_rendered_end');
-    window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
-  }
-
-  componentDidUpdate() {
-    this.drawFractal();
-  }
-
   updateIter(iter) {
     let i;
     if (!iter) {
@@ -67,7 +66,7 @@ class MandelbrotViewer extends React.Component {
     } else {
       i = iter;
     }
-    this.renderer.max_i = parseInt(i,10);
+    this.renderer.max_i = parseInt(i, 10);
     this.drawFractal();
   }
 
@@ -143,9 +142,11 @@ class MandelbrotViewer extends React.Component {
     }
   }
 
-  async handleDragEnd() {
+  async handleDragEnd(e) {
     if (this.dragging) {
       const timerStart = Date.now();
+      console.log('drag end');
+      console.log(this.deltaX, this.deltaY);
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;
       this.renderer.centreCoords[1] += -1 * this.deltaY * this.renderer.pixelSize;
       let xRect;

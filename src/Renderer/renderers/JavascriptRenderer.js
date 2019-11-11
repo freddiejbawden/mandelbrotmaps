@@ -43,7 +43,7 @@ class MandelbrotRenderer {
 
   renderRange(xRect, yRect, dX, dY, arr) {
     this.calculateFractalLimit();
-    const colorScale = 255 / this.max_i;
+    const colorScale = 255 / this.maxIter;
     const newArr = new Uint8ClampedArray(this.width * this.height * 4);
     for (let i = 0; i < newArr.length; i += 4) {
       const coords = this.calculatePosition(i / 4);
@@ -51,6 +51,7 @@ class MandelbrotRenderer {
         (xRect && xRect.pointInBounds(coords[0], coords[1]))
           || (yRect && yRect.pointInBounds(coords[0], coords[1]))) {
         const iter = this.escapeAlgorithm(i / 4) * colorScale;
+
         newArr[i] = iter; // R value
         newArr[i + 1] = iter; // G value
         newArr[i + 2] = iter; // B value
