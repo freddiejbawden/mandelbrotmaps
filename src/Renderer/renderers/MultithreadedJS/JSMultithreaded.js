@@ -16,11 +16,20 @@ class JSMultithreaded {
     this.arr = new Uint8ClampedArray(this.height * this.width * 4);
   }
 
-  async renderRange(xRect, yRect, dX, dY, width, height, centreCoords) {
+  update(pixelSize, width, height, centreCoords, maxIter) {
+    this.pixelSize = pixelSize;
+    this.width = width;
+    this.height = height;
+    this.centreCoords = centreCoords;
+    this.maxIter = maxIter;
+  }
+
+  async renderRange(pixelSize, width, height, centreCoords, maxIter, xRect, yRect, dX, dY) {
     return new Promise((res) => {
-      const newArr = new Uint8ClampedArray(height * width * 4);
+      this.update(pixelSize, width, height, centreCoords, maxIter)
+      const newArr = new Uint8ClampedArray(this.height * this.width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
-      this.pixelSplit = (height * width) / nThreadsFree;
+      this.pixelSplit = this.height / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
@@ -40,8 +49,8 @@ class JSMultithreaded {
               res(
                 {
                   arr: this.arr,
-                  height,
-                  width,
+                  height: this.height,
+                  width: this.width,
                 },
               );
             }
@@ -49,18 +58,19 @@ class JSMultithreaded {
         };
         w.postMessage({
           id: roundID,
+          workerID: idGenerator(),
           renderer: 'js',
           type: 'partial',
-          startPixel: Math.floor(i * this.pixelSplit),
-          endPixel: Math.floor((i + 1) * this.pixelSplit),
-          arrSize: this.pixelSplit * 4,
+          startRow: Math.floor(i * this.pixelSplit),
+          endRow: Math.floor((i + 1) * this.pixelSplit),
+          arrSize: ((this.width * this.height) / nThreadsFree) * 4,
           pixelSize: this.pixelSize,
-          width,
-          height,
+          width: this.width,
+          height: this.height,
           fractalLimitX: this.fractalLimitX,
           fractalLimitY: this.fractalLimitY,
           maxIter: this.maxIter,
-          centreCoords,
+          centreCoords: this.centreCoords,
           oldArr: this.arr,
           xRect,
           yRect,

@@ -48,8 +48,22 @@ class Renderer {
         this.centreCoords,
         this.maxIter,
       );
+      const newArr = await jsRender.renderRange(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
+        xRect,
+        yRect,
+        dX,
+        dY,
+        arr,
+        0,
+        this.height,
+      );
       return {
-        arr: await jsRender.renderRange(xRect, yRect, dX, dY, arr, 0, this.width * this.height),
+        arr: newArr,
         width: this.width,
         height: this.height,
       };
@@ -73,6 +87,11 @@ class Renderer {
     }
     if (this.mode === Mode.JAVASCRIPTMT) {
       const a = await this.jsMTRender.renderRange(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
         xRect,
         yRect,
         dX,
