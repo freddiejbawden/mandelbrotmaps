@@ -49,6 +49,7 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "intl-pluralrules": "^1.0.3",
+    "jest": "^24.9.0",
     "lighthouse": "^5.5.0",
     "whitespace": "^2.1.0"
   }

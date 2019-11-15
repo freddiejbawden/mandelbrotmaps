@@ -45,7 +45,7 @@ class MandelbrotRenderer {
     this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }
 
-  renderRange(xRect, yRect, dX, dY, arr) {
+  renderRange(xRect, yRect, dX, dY, arr, renderRect) {
     this.calculateFractalLimit();
     const colorScale = 255 / this.maxIter;
     const newArr = new Uint8ClampedArray(this.width * this.height * 4);
