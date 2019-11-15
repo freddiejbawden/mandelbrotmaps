@@ -166,12 +166,12 @@ class MandelbrotViewer extends React.Component {
       if (this.deltaX > 0) {
         xRect = new Rectangle(0, 0, this.deltaX, this.height);
       } else {
-        xRect = new Rectangle(this.width + this.deltaX, 0, this.width, this.height);
+        xRect = new Rectangle(this.width + this.deltaX, 0, Math.abs(this.deltaX), this.height);
       }
       if (this.deltaY > 0) {
         yRect = new Rectangle(0, 0, this.width, this.deltaY, this.deltaY);
       } else {
-        yRect = new Rectangle(0, this.height + this.deltaY, this.width, this.height);
+        yRect = new Rectangle(0, this.height + this.deltaY, this.width, Math.abs(this.deltaY));
       }
       const result = await this.renderer.renderRange(
         xRect,
@@ -205,7 +205,6 @@ class MandelbrotViewer extends React.Component {
           />
         </div>
         <canvas
-          draggable="true"
           onMouseDown={(e) => this.handleDragStart(e)}
           onMouseMove={(e) => this.handleDrag(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
@@ -220,6 +219,6 @@ class MandelbrotViewer extends React.Component {
 }
 MandelbrotViewer.propTypes = {
   renderMode: PropTypes.number.isRequired,
-  maxi: PropTypes.string.isRequired,
+  maxi: PropTypes.number.isRequired,
 };
 export default MandelbrotViewer;

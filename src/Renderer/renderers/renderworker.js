@@ -82,10 +82,10 @@ const renderJSRange = (e) => {
         arr[i + 3] = 255; // A value
       } else {
         // copy
-        const oldArrPos = ((coords[1] - e.data.dY) * e.data.width) + (coords[0] - e.data.dX);
-        arr[i] = oldArr[oldArrPos * 4]; // R value
-        arr[i + 1] = oldArr[oldArrPos * 4 + 1]; // G value
-        arr[i + 2] = oldArr[oldArrPos * 4 + 2]; // B value
+        const oldArrPos = (((coords[1] - e.data.dY) * e.data.width) + (coords[0] - e.data.dX)) * 4;
+        arr[i] = oldArr[oldArrPos]; // R value
+        arr[i + 1] = oldArr[oldArrPos + 1]; // G value
+        arr[i + 2] = oldArr[oldArrPos + 2]; // B value
         arr[i + 3] = 255; // A value
       }
     }
@@ -96,7 +96,7 @@ const renderJSRange = (e) => {
       id: e.data.id,
     });
   } catch (err) {
-    // TODO: feeback error
+    // TODO: feedback error
     // eslint-disable-next-line no-console
     console.log(err);
   }

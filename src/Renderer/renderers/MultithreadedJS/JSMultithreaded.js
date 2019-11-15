@@ -25,7 +25,6 @@ class JSMultithreaded {
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
-          console.log('spinning up');
           const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }

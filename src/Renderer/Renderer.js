@@ -49,7 +49,7 @@ class Renderer {
         this.maxIter,
       );
       return {
-        arr: await jsRender.renderRange(xRect, yRect, dX, dY, arr),
+        arr: await jsRender.renderRange(xRect, yRect, dX, dY, arr, 0, this.width * this.height),
         width: this.width,
         height: this.height,
       };

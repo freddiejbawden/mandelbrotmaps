@@ -21,6 +21,10 @@ class MandelbrotRenderer {
     return [x, y];
   }
 
+  calculatePixelNum(x, y) {
+    return y * this.width + x;
+  }
+
   escapeAlgorithm(pixelNum) {
     const pixelPos = this.calculatePosition(pixelNum);
     const fractalPos = this.pixelsToCoord(...pixelPos);
@@ -45,7 +49,56 @@ class MandelbrotRenderer {
     this.calculateFractalLimit();
     const colorScale = 255 / this.maxIter;
     const newArr = new Uint8ClampedArray(this.width * this.height * 4);
-    for (let i = 0; i < newArr.length; i += 4) {
+    // Render new sections
+    for (let x = xRect.l; x < (xRect.l + xRect.w); x += 1) {
+      for (let y = xRect.t; y < (xRect.t + xRect.h); y += 1) {
+        const i = this.calculatePixelNum(x, y);
+        const iter = this.escapeAlgorithm(i) * colorScale;
+        newArr[i * 4] = iter; // R value
+        newArr[i * 4 + 1] = iter; // G value
+        newArr[i * 4 + 2] = iter; // B value
+        newArr[i * 4 + 3] = 255; // A value
+      }
+    }
+    for (let x = yRect.l; x < (yRect.l + yRect.w); x += 1) {
+      for (let y = yRect.t; y < (yRect.t + yRect.h); y += 1) {
+        const i = this.calculatePixelNum(x, y);
+        const iter = this.escapeAlgorithm(i) * colorScale;
+        newArr[i * 4] = iter; // R value
+        newArr[i * 4 + 1] = iter; // G value
+        newArr[i * 4 + 2] = iter; // B value
+        newArr[i * 4 + 3] = 255; // A value
+      }
+    }
+    // Copy old sections
+    let xStart;
+    let xEnd;
+    let yStart;
+    let yEnd;
+    if (dY > 0) {
+      yStart = yRect.t + yRect.h;
+      yEnd = this.height;
+    } else {
+      yStart = 0;
+      yEnd = this.height - yRect.h;
+    }
+    if (dX > 0) {
+      xStart = xRect.l + xRect.w;
+      xEnd = this.width;
+    } else {
+      xStart = 0;
+      xEnd = this.width - xRect.w;
+    }
+    for (let y = yStart; y < yEnd; y += 1) {
+      const startNum = this.calculatePixelNum(xStart, y);
+      const oldArrStart = ((y - dY) * this.width) + (xStart - dX);
+      const oldArrEnd = ((y - dY) * this.width) + (xEnd - dX);
+
+      const toCopy = arr.slice(oldArrStart * 4, oldArrEnd * 4);
+      newArr.set(toCopy, startNum * 4);
+    }
+    return newArr;
+    /* for (let i = 0; i < (endPixel - startPixel) * 4; i += 4) {
       const coords = this.calculatePosition(i / 4);
       if (
         (xRect && xRect.pointInBounds(coords[0], coords[1]))
@@ -64,7 +117,7 @@ class MandelbrotRenderer {
         newArr[i + 2] = arr[oldArrPos * 4 + 2]; // B value
         newArr[i + 3] = 255; // A value
       }
-    }
+    } */
     return newArr;
   }
 
