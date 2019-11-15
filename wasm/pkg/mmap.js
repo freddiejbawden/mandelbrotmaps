@@ -156,18 +156,20 @@ export class Mandelbrot {
         return Mandelbrot.__wrap(ret);
     }
     /**
-    * @param {any} xRect
-    * @param {any} yRect
-    * @param {number} deltaX
-    * @param {number} deltaY
+    * @param {any} x_rect
+    * @param {any} y_rect
+    * @param {number} delta_x
+    * @param {number} delta_y
+    * @param {number} start_row
+    * @param {number} end_row
     * @param {number} width
     * @param {number} height
     * @param {number} centre_coords_x
     * @param {number} centre_coords_y
     * @returns {number}
     */
-    render_range(xRect, yRect, deltaX, deltaY, width, height, centre_coords_x, centre_coords_y) {
-        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(xRect), addHeapObject(yRect), deltaX, deltaY, width, height, centre_coords_x, centre_coords_y);
+    render_range(x_rect, y_rect, delta_x, delta_y, start_row, end_row, width, height, centre_coords_x, centre_coords_y) {
+        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(x_rect), addHeapObject(y_rect), delta_x, delta_y, start_row, end_row, width, height, centre_coords_x, centre_coords_y);
         return ret;
     }
     /**
@@ -176,7 +178,7 @@ export class Mandelbrot {
     */
     escape_algorithm(pixel_num) {
         const ret = wasm.mandelbrot_escape_algorithm(this.ptr, pixel_num);
-        return ret >>> 0;
+        return ret;
     }
     /**
     * @param {number} pixel_size
@@ -219,8 +221,23 @@ export class Mandelbrot {
     }
 }
 
-export const __wbg_pointInBounds_de90712800e2fa23 = function(arg0, arg1, arg2) {
-    const ret = getObject(arg0).pointInBounds(arg1 >>> 0, arg2 >>> 0);
+export const __wbg_getWidth_1ae57a7e6157a6d6 = function(arg0) {
+    const ret = getObject(arg0).getWidth();
+    return ret;
+};
+
+export const __wbg_getLeft_ab549f1b5875807a = function(arg0) {
+    const ret = getObject(arg0).getLeft();
+    return ret;
+};
+
+export const __wbg_getTop_9e6975569e1a0019 = function(arg0) {
+    const ret = getObject(arg0).getTop();
+    return ret;
+};
+
+export const __wbg_getHeight_37735ff51b725345 = function(arg0) {
+    const ret = getObject(arg0).getHeight();
     return ret;
 };
 

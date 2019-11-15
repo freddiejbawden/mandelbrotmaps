@@ -20,5 +20,21 @@ class Rectangle {
     }
     return true;
   }
+
+  getWidth() {
+    return this.w;
+  }
+
+  getHeight() {
+    return this.h;
+  }
+
+  getLeft() {
+    return this.l;
+  }
+
+  getTop() {
+    return this.t;
+  }
 }
 export default Rectangle;

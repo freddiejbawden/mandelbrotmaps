@@ -37,11 +37,15 @@ class WASMRenderer {
   async renderRange(xRect, yRect, dX, dY, width, height, centreCoordsX, centreCoordsY) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
+      console.log(dX, dY);
+
       const arrPointer = this.wasm_renderer.render_range(
         xRect,
         yRect,
         dX,
         dY,
+        0,
+        this.height,
         width,
         height,
         centreCoordsX,
