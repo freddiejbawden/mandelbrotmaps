@@ -1,6 +1,5 @@
 import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
-import Rectangle from '../../utils/Rectangle';
 
 /* eslint no-restricted-globals:0 */
 const renderJS = (data) => {
@@ -28,6 +27,7 @@ const renderJS = (data) => {
       id: data.id,
     });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
   }
 };
@@ -66,7 +66,6 @@ const renderJSRange = (data) => {
       data.centreCoords,
       data.max_i,
     );
-    console.log(`${data.workerID}: ${data.startRow}, ${data.endRow}`);
     const arr = mr.renderRange(
       data.xRect,
       data.yRect,

@@ -180,7 +180,6 @@ class MandelbrotViewer extends React.Component {
         this.deltaY,
         this.arr,
       );
-      console.log(this.deltaX, this.deltaY);
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;

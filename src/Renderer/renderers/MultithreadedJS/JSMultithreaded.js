@@ -26,7 +26,7 @@ class JSMultithreaded {
 
   async renderRange(pixelSize, width, height, centreCoords, maxIter, xRect, yRect, dX, dY) {
     return new Promise((res) => {
-      this.update(pixelSize, width, height, centreCoords, maxIter)
+      this.update(pixelSize, width, height, centreCoords, maxIter);
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
       this.pixelSplit = this.height / nThreadsFree;

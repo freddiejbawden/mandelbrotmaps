@@ -91,6 +91,7 @@ class JSRenderer {
       }
       return newArr;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(`Err: ${err}`);
       return [];
     }
