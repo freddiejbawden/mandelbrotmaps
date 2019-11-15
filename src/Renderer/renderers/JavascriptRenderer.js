@@ -9,6 +9,14 @@ class JSRenderer {
     this.maxIter = (maxIter) || 200;
   }
 
+  update(pixelSize, width, height, centreCoords, maxIter) {
+    this.pixelSize = pixelSize;
+    this.width = width;
+    this.height = height;
+    this.centreCoords = centreCoords;
+    this.maxIter = maxIter;
+  }
+
   pixelsToCoord(x, y) {
     const coordX = this.fractalLimitX + this.pixelSize * x;
     const coordY = this.fractalLimitY + this.pixelSize * y;

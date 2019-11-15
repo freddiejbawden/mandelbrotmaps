@@ -49,11 +49,6 @@ class Renderer {
         this.maxIter,
       );
       const newArr = await jsRender.renderRange(
-        this.pixelSize,
-        this.width,
-        this.height,
-        this.centreCoords,
-        this.maxIter,
         xRect,
         yRect,
         dX,
