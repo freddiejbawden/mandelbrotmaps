@@ -53,26 +53,18 @@ const renderWasm = async (e) => {
 };
 
 const renderWasmRange = async (e) => {
-  let xRectReconstructed;
-  let yRectReconstructed;
-  console.log(`t: ${e.data.xRect.t}`);
-  try {
-    xRectReconstructed = new Rectangle(
-      e.data.xRect.l,
-      e.data.xRect.t,
-      e.data.xRect.w,
-      e.data.xRect.h,
-    );
-    yRectReconstructed = new Rectangle(
-      e.data.yRect.l,
-      e.data.yRect.t,
-      e.data.yRect.w,
-      e.data.yRect.h,
-    );
-  } catch (err) {
-    console.log(err);
-  }
-
+  const xRectReconstructed = new Rectangle(
+    e.data.xRect.l,
+    e.data.xRect.t,
+    e.data.xRect.w,
+    e.data.xRect.h,
+  );
+  const yRectReconstructed = new Rectangle(
+    e.data.yRect.l,
+    e.data.yRect.t,
+    e.data.yRect.w,
+    e.data.yRect.h,
+  );
   wasmRenderer.renderRange(
     xRectReconstructed,
     yRectReconstructed,
@@ -86,16 +78,13 @@ const renderWasmRange = async (e) => {
     e.data.centreCoords[0],
     e.data.centreCoords[1],
   ).then((fractal) => {
-    console.log(`${e.data.workerID} done!`);
-    console.log(fractal.arr.slice(0, 8));
     postMessage({
       success: true,
       fractal,
       offset: e.data.startRow * e.data.width * 4,
       id: e.data.id,
     });
-  }).catch((err) => {
-    console.log(err);
+  }).catch(() => {
     postMessage({
       success: false,
       fractal: {

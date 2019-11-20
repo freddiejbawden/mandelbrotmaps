@@ -42,7 +42,6 @@ class WASMRenderer {
         if (!this.wasm_renderer) {
           await this.loadWasm();
         }
-        console.log(arr.slice(0, 8));
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
           yRect,
@@ -56,8 +55,6 @@ class WASMRenderer {
           centreCoordsX,
           centreCoordsY,
         );
-        console.log('c');
-
         const fractalArr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
         res({
           arr: fractalArr,
@@ -65,8 +62,6 @@ class WASMRenderer {
           height,
         });
       } catch (e) {
-        console.error(e);
-        console.trace();
         rej(e);
       }
     });

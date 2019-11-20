@@ -85,7 +85,6 @@ class JSRenderer {
         // render xRect
         const offset = this.calculatePixelNum(0, y) - startingPixelNum;
         if (y >= yRect.t && y < (yRect.t + yRect.h)) {
-          console.log('b');
           const row = this.renderRow(y, 0, this.width);
           newArr.set(row, offset * 4);
         } else {

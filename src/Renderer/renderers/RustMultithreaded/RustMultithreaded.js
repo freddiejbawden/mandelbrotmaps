@@ -78,7 +78,6 @@ class RustMultithreaded {
   }
 
   async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
-    console.log(xRect.getWidth());
     return new Promise((res) => {
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
       const nThreadsFree = 1; // navigator.hardwareConcurrency;
@@ -95,7 +94,6 @@ class RustMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
-            console.log(`${e.data.workerID} done`);
             newArr.set(e.data.fractal.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {

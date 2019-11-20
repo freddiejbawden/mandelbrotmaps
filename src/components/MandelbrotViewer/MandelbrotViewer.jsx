@@ -157,7 +157,6 @@ class MandelbrotViewer extends React.Component {
 
   async handleDragEnd() {
     if (this.dragging) {
-      console.log('dragend')
       this.dragging = false;
       const timerStart = Date.now();
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;

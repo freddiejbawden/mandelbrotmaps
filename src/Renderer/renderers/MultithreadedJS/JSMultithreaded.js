@@ -45,7 +45,6 @@ class JSMultithreaded {
             newArr.set(e.data.fractal.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
-              console.log('done');
               res({
                 arr: newArr,
                 width,

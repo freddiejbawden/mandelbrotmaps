@@ -97,7 +97,6 @@ class Renderer {
         this.centreCoords,
       );
       this.prev_arr = fractal.arr;
-      console.log(fractal);
       return fractal;
     }
     if (this.mode === Mode.RUSTMT) {
@@ -121,6 +120,7 @@ class Renderer {
   }
 
   render() {
+    // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
         const jsRender = new JavascriptRenderer(
