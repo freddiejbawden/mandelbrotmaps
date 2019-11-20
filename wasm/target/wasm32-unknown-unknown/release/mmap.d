@@ -1,1 +1,1 @@
-/Users/frederickbawden/Documents/Uni/vanilla-js/wasm/target/wasm32-unknown-unknown/release/mmap.wasm: /Users/frederickbawden/Documents/Uni/vanilla-js/wasm/src/lib.rs /Users/frederickbawden/Documents/Uni/vanilla-js/wasm/src/utils.rs
+/Users/frederickbawden/Documents/Uni/mandelbrot-maps/wasm/target/wasm32-unknown-unknown/release/mmap.wasm: /Users/frederickbawden/Documents/Uni/mandelbrot-maps/wasm/src/lib.rs /Users/frederickbawden/Documents/Uni/mandelbrot-maps/wasm/src/utils.rs
