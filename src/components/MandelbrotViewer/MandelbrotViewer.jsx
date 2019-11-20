@@ -25,6 +25,7 @@ class MandelbrotViewer extends React.Component {
     this.updateCentreCoords = this.updateCentreCoords.bind(this);
     this.updatePixelSize = this.updatePixelSize.bind(this);
     this.zoomTimeout = undefined;
+    this.activeTouches = {};
     this.renderer = new Renderer(
       props.renderMode,
       window.innerWidth,
@@ -68,6 +69,10 @@ class MandelbrotViewer extends React.Component {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
   };
+
+  addTouch({ identifier, pageX, pageY }) {
+    this.activeTouches[identifier] = { pageX, pageY };
+  }
 
   updateIter(iter) {
     let i;
@@ -187,6 +192,36 @@ class MandelbrotViewer extends React.Component {
     }
   }
 
+  handleTouchStart(e) {
+    const touches = e.changedTouches;
+    if (touches.length > 0) {
+      this.dragging = true;
+    }
+    for (let i = 0; i < touches.length; i += 1) {
+      this.addTouch(touches[i]);
+    }
+  }
+
+  handleTouchMove(evt) {
+    const touches = evt.changedTouches;
+    for (let i = 0; i < touches.length; i += 1) {
+      if (this.dragging) {
+        const startTouch = this.activeTouches[touches[i].identifier];
+        this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
+        this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
+        this.updateImagePos();
+      }
+    }
+  }
+
+  handleTouchEnd(evt) {
+    const touches = evt.changedTouches;
+    for (let i = 0; i < touches.length; i += 1) {
+      delete this.activeTouches[touches[i].identifier];
+    }
+    this.handleDragEnd();
+  }
+
   render() {
     const s = this.state;
     return (
@@ -203,6 +238,9 @@ class MandelbrotViewer extends React.Component {
           />
         </div>
         <canvas
+          onTouchStart={(e) => this.handleTouchStart(e)}
+          onTouchMove={(e) => this.handleTouchMove(e)}
+          onTouchEnd={(e) => this.handleTouchEnd(e)}
           onMouseDown={(e) => this.handleDragStart(e)}
           onMouseMove={(e) => this.handleDrag(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
