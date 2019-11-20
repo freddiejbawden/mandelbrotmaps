@@ -70,10 +70,62 @@ class RustMultithreaded {
           pixelSize,
           width,
           height,
-          fractalLimitX: 0,
-          fractalLimitY: 0,
           maxIter,
           centreCoords,
+        });
+      }
+    });
+  }
+
+  async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
+    console.log(xRect.getWidth());
+    return new Promise((res) => {
+      const newArr = new Uint8ClampedArray(this.height * this.width * 4);
+      const nThreadsFree = 1; // navigator.hardwareConcurrency;
+      this.pixelSplit = this.height / nThreadsFree;
+      this.remaining_threads = nThreadsFree;
+      const roundID = idGenerator();
+      if (this.workers.length < nThreadsFree) {
+        for (let i = this.workers.length; i < nThreadsFree; i += 1) {
+          const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
+          this.workers.push(w);
+        }
+      }
+      for (let i = 0; i < nThreadsFree; i += 1) {
+        const w = this.workers[i];
+        w.onmessage = (e) => {
+          if (e.data.id === roundID) {
+            console.log(`${e.data.workerID} done`);
+            newArr.set(e.data.fractal.arr, e.data.offset);
+            this.remaining_threads -= 1;
+            if (this.remaining_threads === 0) {
+              this.arr = newArr;
+              res(
+                {
+                  arr: this.arr,
+                  height: this.height,
+                  width: this.width,
+                },
+              );
+            }
+          }
+        };
+        w.postMessage({
+          id: roundID,
+          workerID: idGenerator(),
+          renderer: 'wasm',
+          type: 'partial',
+          startRow: Math.floor(i * this.pixelSplit),
+          endRow: Math.floor((i + 1) * this.pixelSplit),
+          pixelSize,
+          width,
+          height,
+          centreCoords,
+          oldArr,
+          xRect,
+          yRect,
+          dX,
+          dY,
         });
       }
     });

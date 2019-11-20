@@ -34,27 +34,39 @@ class WASMRenderer {
     }
   }
 
-  async renderRange(xRect, yRect, dX, dY, width, height, centreCoordsX, centreCoordsY) {
+  async renderRange(xRect, yRect, dX, dY, arr, startRow, endRow,
+    width, height, centreCoordsX, centreCoordsY) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
-      console.log(dX, dY);
-
-      const arrPointer = this.wasm_renderer.render_range(
-        xRect,
-        yRect,
-        dX,
-        dY,
-        0,
-        this.height,
-        width,
-        height,
-        centreCoordsX,
-        centreCoordsY,
-      );
       try {
-        const arr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
-        res(arr);
+        if (!this.wasm_renderer) {
+          await this.loadWasm();
+        }
+        console.log(arr.slice(0, 8));
+        const arrPointer = await this.wasm_renderer.render_range(
+          xRect,
+          yRect,
+          dX,
+          dY,
+          arr,
+          startRow,
+          endRow,
+          width,
+          height,
+          centreCoordsX,
+          centreCoordsY,
+        );
+        console.log('c');
+
+        const fractalArr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
+        res({
+          arr: fractalArr,
+          width,
+          height,
+        });
       } catch (e) {
+        console.error(e);
+        console.trace();
         rej(e);
       }
     });

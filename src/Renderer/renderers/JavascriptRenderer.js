@@ -67,7 +67,7 @@ class JSRenderer {
     return row;
   }
 
-  renderRange(xRect, yRect, dX, dY, arr, startRow, endRow) {
+  renderRange(xRect, yRect, dX, dY, oldArr, startRow, endRow) {
     try {
       this.calculateFractalLimit();
       const startingPixelNum = this.calculatePixelNum(0, startRow);
@@ -85,6 +85,7 @@ class JSRenderer {
         // render xRect
         const offset = this.calculatePixelNum(0, y) - startingPixelNum;
         if (y >= yRect.t && y < (yRect.t + yRect.h)) {
+          console.log('b');
           const row = this.renderRow(y, 0, this.width);
           newArr.set(row, offset * 4);
         } else {
@@ -93,11 +94,15 @@ class JSRenderer {
           const startNum = this.calculatePixelNum(xStart, y) - startingPixelNum;
           const oldArrStart = ((y - dY) * this.width) + (xStart - dX);
           const oldArrEnd = ((y - dY) * this.width) + (xEnd - dX);
-          const toCopy = arr.slice(oldArrStart * 4, oldArrEnd * 4);
+          const toCopy = oldArr.slice(oldArrStart * 4, oldArrEnd * 4);
           newArr.set(toCopy, startNum * 4);
         }
       }
-      return newArr;
+      return {
+        arr: newArr,
+        width: this.width,
+        height: this.height,
+      };
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(`Err: ${err}`);

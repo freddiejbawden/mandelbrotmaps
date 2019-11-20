@@ -1,6 +1,8 @@
 import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
+import Rectangle from '../../utils/Rectangle';
 
+const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200);
 /* eslint no-restricted-globals:0 */
 const renderJS = (data) => {
   try {
@@ -33,13 +35,6 @@ const renderJS = (data) => {
 };
 
 const renderWasm = async (e) => {
-  const wasmRenderer = new WASMRenderer(
-    e.data.pixelSize,
-    e.data.width,
-    e.data.height,
-    e.data.centreCoords,
-    e.data.max_i,
-  );
   wasmRenderer.renderFromTo(
     e.data.startPixel,
     e.data.endPixel,
@@ -57,7 +52,64 @@ const renderWasm = async (e) => {
   });
 };
 
-const renderJSRange = (data) => {
+const renderWasmRange = async (e) => {
+  let xRectReconstructed;
+  let yRectReconstructed;
+  console.log(`t: ${e.data.xRect.t}`);
+  try {
+    xRectReconstructed = new Rectangle(
+      e.data.xRect.l,
+      e.data.xRect.t,
+      e.data.xRect.w,
+      e.data.xRect.h,
+    );
+    yRectReconstructed = new Rectangle(
+      e.data.yRect.l,
+      e.data.yRect.t,
+      e.data.yRect.w,
+      e.data.yRect.h,
+    );
+  } catch (err) {
+    console.log(err);
+  }
+
+  wasmRenderer.renderRange(
+    xRectReconstructed,
+    yRectReconstructed,
+    e.data.dX,
+    e.data.dY,
+    e.data.oldArr,
+    e.data.startRow,
+    e.data.endRow,
+    e.data.width,
+    e.data.height,
+    e.data.centreCoords[0],
+    e.data.centreCoords[1],
+  ).then((fractal) => {
+    console.log(`${e.data.workerID} done!`);
+    console.log(fractal.arr.slice(0, 8));
+    postMessage({
+      success: true,
+      fractal,
+      offset: e.data.startRow * e.data.width * 4,
+      id: e.data.id,
+    });
+  }).catch((err) => {
+    console.log(err);
+    postMessage({
+      success: false,
+      fractal: {
+        arr: [],
+        width: e.data.width,
+        height: e.data.height,
+      },
+      offset: e.data.startRow * e.data.width * 4,
+      id: e.data.id,
+    });
+  });
+};
+
+const renderJSRange = async (data) => {
   try {
     const mr = new JSRenderer(
       data.pixelSize,
@@ -66,7 +118,7 @@ const renderJSRange = (data) => {
       data.centreCoords,
       data.max_i,
     );
-    const arr = mr.renderRange(
+    const fractal = await mr.renderRange(
       data.xRect,
       data.yRect,
       data.dX,
@@ -77,7 +129,7 @@ const renderJSRange = (data) => {
     );
     postMessage({
       success: true,
-      arr,
+      fractal,
       offset: data.startRow * data.width * 4,
       id: data.id,
     });
@@ -92,12 +144,17 @@ const renderJSRange = (data) => {
   }
 };
 
+
 addEventListener('message', async (e) => {
   if (e.data.type === 'partial') {
-    renderJSRange(e.data);
+    if (e.data.renderer === 'wasm') {
+      renderWasmRange(e);
+    } else {
+      renderJSRange(e.data);
+    }
   } else if (e.data.renderer === 'js') {
     renderJS(e.data);
   } else {
-    renderWasm(e.data);
+    renderWasm(e);
   }
 });

@@ -1,5 +1,22 @@
 import * as wasm from './mmap_bg.wasm';
 
+let cachegetUint8Memory = null;
+function getUint8Memory() {
+    if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
+        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachegetUint8Memory;
+}
+
+let WASM_VECTOR_LEN = 0;
+
+function passArray8ToWasm(arg) {
+    const ptr = wasm.__wbindgen_malloc(arg.length * 1);
+    getUint8Memory().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
 const heap = new Array(32);
 
 heap.fill(undefined);
@@ -17,6 +34,8 @@ function addHeapObject(obj) {
     return idx;
 }
 
+function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
+
 function getObject(idx) { return heap[idx]; }
 
 function dropObject(idx) {
@@ -30,8 +49,6 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
-
-let WASM_VECTOR_LEN = 0;
 
 let cachedTextEncoder = new TextEncoder('utf-8');
 
@@ -47,14 +64,6 @@ const encodeString = (typeof cachedTextEncoder.encodeInto === 'function'
         written: buf.length
     };
 });
-
-let cachegetUint8Memory = null;
-function getUint8Memory() {
-    if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
-        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
-    }
-    return cachegetUint8Memory;
-}
 
 function passStringToWasm(arg) {
 
@@ -156,10 +165,17 @@ export class Mandelbrot {
         return Mandelbrot.__wrap(ret);
     }
     /**
+    * @param {Uint8Array} new_arr
+    */
+    set_arr(new_arr) {
+        wasm.mandelbrot_set_arr(this.ptr, passArray8ToWasm(new_arr), WASM_VECTOR_LEN);
+    }
+    /**
     * @param {any} x_rect
     * @param {any} y_rect
     * @param {number} delta_x
     * @param {number} delta_y
+    * @param {Uint8Array} old_arr
     * @param {number} start_row
     * @param {number} end_row
     * @param {number} width
@@ -168,8 +184,8 @@ export class Mandelbrot {
     * @param {number} centre_coords_y
     * @returns {number}
     */
-    render_range(x_rect, y_rect, delta_x, delta_y, start_row, end_row, width, height, centre_coords_x, centre_coords_y) {
-        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(x_rect), addHeapObject(y_rect), delta_x, delta_y, start_row, end_row, width, height, centre_coords_x, centre_coords_y);
+    render_range(x_rect, y_rect, delta_x, delta_y, old_arr, start_row, end_row, width, height, centre_coords_x, centre_coords_y) {
+        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(x_rect), addHeapObject(y_rect), delta_x, delta_y, passArray8ToWasm(old_arr), WASM_VECTOR_LEN, start_row, end_row, width, height, centre_coords_x, centre_coords_y);
         return ret;
     }
     /**
@@ -220,6 +236,10 @@ export class Mandelbrot {
         return ret;
     }
 }
+
+export const __wbg_log_4d3324346d2991e3 = typeof console.log == 'function' ? console.log : notDefined('console.log');
+
+export const __wbg_log_4311e14956b0ab98 = typeof console.log == 'function' ? console.log : notDefined('console.log');
 
 export const __wbg_getWidth_1ae57a7e6157a6d6 = function(arg0) {
     const ret = getObject(arg0).getWidth();

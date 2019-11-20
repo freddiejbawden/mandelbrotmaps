@@ -24,7 +24,7 @@ class JSMultithreaded {
     this.maxIter = maxIter;
   }
 
-  async renderRange(pixelSize, width, height, centreCoords, maxIter, xRect, yRect, dX, dY) {
+  async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
     return new Promise((res) => {
       this.update(pixelSize, width, height, centreCoords, maxIter);
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
@@ -42,17 +42,15 @@ class JSMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
-            newArr.set(e.data.arr, e.data.offset);
+            newArr.set(e.data.fractal.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
-              this.arr = newArr;
-              res(
-                {
-                  arr: this.arr,
-                  height: this.height,
-                  width: this.width,
-                },
-              );
+              console.log('done');
+              res({
+                arr: newArr,
+                width,
+                height,
+              });
             }
           }
         };
@@ -71,7 +69,7 @@ class JSMultithreaded {
           fractalLimitY: this.fractalLimitY,
           maxIter: this.maxIter,
           centreCoords: this.centreCoords,
-          oldArr: this.arr,
+          oldArr,
           xRect,
           yRect,
           dX,

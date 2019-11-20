@@ -30,6 +30,9 @@ extern "C" {
 
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_f32(a: f32);
+
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u8(a: u8);
 }
 #[wasm_bindgen(raw_module = "./../../src/utils/Rectangle.js")]
 pub extern "C" {
@@ -54,29 +57,6 @@ pub extern "C" {
     fn getHeight(this: &Rectangle) -> i32;
 
 }
-
-/* #[wasm_bindgen] 
-pub struct Rectangle {
-  l: i32,
-  t: i32,
-  w: i32,
-  h: i32
-} */
-
-/* #[wasm_bindgen]
-impl Rectangle {
-  pub fn new(l: i32, t: i32, w: i32, h: i32) -> Rectangle {
-    return Rectangle {
-      l,
-      t,
-      w,
-      h
-    }
-  }
-  pub fn pointInBounds(&self, x: i32, y: i32) -> bool {
-    return x >= self.l && x <= self.l+self.w && y >= self.t && y <= self.t+self.h;
-  }
-} */
 
 #[wasm_bindgen]
 pub struct Mandelbrot {
@@ -153,10 +133,14 @@ impl Mandelbrot {
       arr
     }
   }
-
- 
-  pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f32, centre_coords_y: f32) -> *const u8 {
+  pub fn set_arr(&mut self, new_arr : Vec<u8>) {
+    log_u8(new_arr[0]);
+    self.arr = new_arr.to_vec();
+  }
+  pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f32, centre_coords_y: f32) -> *const u8 {
     self.update(self.pixel_size, width, height, centre_coords_x, centre_coords_y, self.max_i);
+    log_u32(0);
+
     let w = *&self.width as f32;
     let h = *&self.height as f32;
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
@@ -175,13 +159,15 @@ impl Mandelbrot {
       if y >= y_rect.getTop() && y <= (y_rect.getTop() + y_rect.getHeight()) {
         let row = self.render_row(y, 0, self.width);
         new_arr.extend(&row);
+        log_u32(10);
       } else {
+        log_u32(20);
         // compute re rendered slice 
         let mut re_rendered = self.render_row(y, x_rect.getLeft(), x_rect.getLeft() + x_rect.getWidth());
         let y_offset = (y - delta_y) * (self.width as i32);
         let old_arr_start = ((y_offset + (x_start - delta_x)) * 4) as usize;
         let old_arr_end = ((y_offset + (x_end - delta_x)) * 4) as usize;
-        let old_arr_slice = &self.arr[old_arr_start..old_arr_end];
+        let old_arr_slice = &old_arr[old_arr_start..old_arr_end];
         if x_rect.getLeft() == 0 {
           // put the re rendered portion first;
           new_arr.append(&mut re_rendered);
