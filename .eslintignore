@@ -2,4 +2,3 @@ node_modules/**
 build/**
 wasm/**
 **/*.test.js
-**/mmap.js

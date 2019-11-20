@@ -16,7 +16,9 @@ const AppRouter = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/:renderMode?/:iterations?" children={<App id="app" />} />
+        <Route path="/:renderMode?/:iterations?">
+          <App id="app" />
+        </Route>
       </Switch>
     </Router>
   );

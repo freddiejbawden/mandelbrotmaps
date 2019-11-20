@@ -36,10 +36,92 @@ class Renderer {
       this.centreCoords,
       this.maxIter,
     );
+    this.mtTimer = undefined;
+    this.prev_arr = undefined;
+  }
+
+  async renderRange(xRect, yRect, dX, dY) {
+    if (this.mode === Mode.JAVASCRIPT) {
+      const jsRender = new JavascriptRenderer(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
+      );
+      const clamped = new Uint8ClampedArray(this.prev_arr);
+      const fractal = await jsRender.renderRange(
+        xRect,
+        yRect,
+        dX,
+        dY,
+        clamped,
+        0,
+        this.height,
+      );
+      this.prev_arr = fractal.arr;
+      return fractal;
+    }
+    if (this.mode === Mode.WASM) {
+      const clamped = new Uint8ClampedArray(this.prev_arr);
+      const fractal = await this.wasm_render.renderRange(
+        xRect,
+        yRect,
+        dX,
+        dY,
+        clamped,
+        0,
+        this.height,
+        this.width,
+        this.height,
+        this.centreCoords[0],
+        this.centreCoords[1],
+      );
+      this.prev_arr = fractal.arr;
+      return fractal;
+    }
+    if (this.mode === Mode.JAVASCRIPTMT) {
+      const fractal = await this.jsMTRender.renderRange(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
+        this.prev_arr,
+        xRect,
+        yRect,
+        dX,
+        dY,
+        this.width,
+        this.height,
+        this.centreCoords,
+      );
+      this.prev_arr = fractal.arr;
+      return fractal;
+    }
+    if (this.mode === Mode.RUSTMT) {
+      const clamped = new Uint8ClampedArray(this.prev_arr);
+      const fractal = await this.wasmMTRenderer.renderRange(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
+        clamped,
+        xRect,
+        yRect,
+        dX,
+        dY,
+      );
+      this.prev_arr = fractal.arr;
+      return fractal;
+    }
+    return [];
   }
 
   render() {
-    const renderPromise = new Promise((resolve, reject) => {
+    // eslint-disable-next-line no-async-promise-executor
+    const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
         const jsRender = new JavascriptRenderer(
           this.pixelSize,
@@ -48,8 +130,9 @@ class Renderer {
           this.centreCoords,
           this.maxIter,
         );
-        const arr = jsRender.render();
-        resolve(arr);
+        const fractal = await jsRender.render();
+        this.prev_arr = fractal.arr;
+        resolve(fractal);
       } else if (this.mode === Mode.WASM) {
         this.wasm_render.render(
           this.pixelSize,
@@ -65,8 +148,9 @@ class Renderer {
           this.height,
           this.centreCoords,
           this.maxIter,
-        ).then((arr) => {
-          resolve(arr);
+        ).then((fractal) => {
+          this.prev_arr = fractal.arr;
+          resolve(fractal);
         }).catch((e) => reject(e));
       } else if (this.mode === Mode.RUSTMT) {
         this.wasmMTRenderer.render(
