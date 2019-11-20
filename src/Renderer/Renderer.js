@@ -140,7 +140,10 @@ class Renderer {
           this.height,
           this.centreCoords,
           this.maxIter,
-        ).then((arr) => resolve(arr));
+        ).then((fractal) => {
+          this.prev_arr = fractal.arr;
+          resolve(fractal);
+        });
       } else if (this.mode === Mode.JAVASCRIPTMT) {
         this.jsMTRender.render(
           this.pixelSize,
@@ -159,8 +162,9 @@ class Renderer {
           this.height,
           this.centreCoords,
           this.maxIter,
-        ).then((arr) => {
-          resolve(arr);
+        ).then((fractal) => {
+          this.prev_arr = fractal.arr;
+          resolve(fractal);
         });
       } else {
         reject(new Error(`Render Mode ${this.mode} is not valid`));

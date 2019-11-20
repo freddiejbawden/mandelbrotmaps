@@ -139,8 +139,6 @@ impl Mandelbrot {
   }
   pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f32, centre_coords_y: f32) -> *const u8 {
     self.update(self.pixel_size, width, height, centre_coords_x, centre_coords_y, self.max_i);
-    log_u32(0);
-
     let w = *&self.width as f32;
     let h = *&self.height as f32;
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
@@ -159,9 +157,7 @@ impl Mandelbrot {
       if y >= y_rect.getTop() && y <= (y_rect.getTop() + y_rect.getHeight()) {
         let row = self.render_row(y, 0, self.width);
         new_arr.extend(&row);
-        log_u32(10);
       } else {
-        log_u32(20);
         // compute re rendered slice 
         let mut re_rendered = self.render_row(y, x_rect.getLeft(), x_rect.getLeft() + x_rect.getWidth());
         let y_offset = (y - delta_y) * (self.width as i32);
