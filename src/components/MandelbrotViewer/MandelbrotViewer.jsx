@@ -254,17 +254,14 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleScroll(e) {
-    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(e.deltaY);
-    if (newCanvasZoom < 0.5) {
-      newCanvasZoom = this.canvasZoom;
-    }
-    const centreX = this.width / 2;
-    const centreY = this.height / 2;
+    const newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(e.deltaY);
+    const centreX = this.mouseX;
+    const centreY = this.mouseY;
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
     clearTimeout(this.zoomTimeout);
     this.zoomTimeout = setTimeout(() => {
-      this.renderer.pixelSize /= newCanvasZoom;
+      this.renderer.zoomOnPoint(this.canvasZoom, this.mouseX, this.mouseY);
       this.originX = 0;
       this.originY = 0;
       this.canvasZoom = 0;
