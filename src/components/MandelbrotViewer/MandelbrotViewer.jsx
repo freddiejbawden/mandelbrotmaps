@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Timer from '../Timer';
 import Settings from '../Settings';
 import './MandelbrotViewer.css';
 import Renderer from '../../Renderer';
@@ -20,12 +19,14 @@ class MandelbrotViewer extends React.Component {
     this.deltaY = 0;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.showCentreMarker = false;
     // Set up hooks for Setting Component
     this.updateDimensions = this.updateDimensions.bind(this);
     this.updateIter = this.updateIter.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateCentreCoords = this.updateCentreCoords.bind(this);
     this.updatePixelSize = this.updatePixelSize.bind(this);
+    this.updateCentreMarker = this.updateCentreMarker.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.canvasZoom = 1;
@@ -85,6 +86,11 @@ class MandelbrotViewer extends React.Component {
     this.activeTouches[identifier] = { pageX, pageY };
   }
 
+  updateCentreMarker() {
+    this.showCentreMarker = !this.showCentreMarker;
+    this.drawFractal();
+  }
+
   updateIter(iter) {
     let i;
     if (!iter) {
@@ -142,7 +148,9 @@ class MandelbrotViewer extends React.Component {
     fractalContext.translate(this.originX, this.originY);
     fractalContext.drawImage(newCanvas, 0, 0);
     fractalContext.setTransform(1, 0, 0, 1, 0, 0);
-    fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
+    if (this.showCentreMarker) {
+      fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
+    }
   }
 
   putImage(arr, width, height) {
@@ -260,8 +268,9 @@ class MandelbrotViewer extends React.Component {
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
     clearTimeout(this.zoomTimeout);
+    const mouse = [this.mouseX, this.mouseY];
     this.zoomTimeout = setTimeout(() => {
-      this.renderer.zoomOnPoint(this.canvasZoom, this.mouseX, this.mouseY);
+      this.renderer.zoomOnPoint(this.canvasZoom, mouse[0], mouse[1]);
       this.originX = 0;
       this.originY = 0;
       this.canvasZoom = 0;
@@ -276,13 +285,15 @@ class MandelbrotViewer extends React.Component {
     return (
       <div className="mandelbrot-viewer-container">
         <div className="info-panel">
-          <Timer time={this.time} ref={this.timer} />
           <Settings
+            time={this.time}
+            timer={this.timer}
             selectedRenderMode={s.renderMode}
             updatePixelSize={this.updatePixelSize}
             updateCentreCoords={this.updateCentreCoords}
             updateIter={this.updateIter}
             updateRenderMethod={this.updateRenderMethod}
+            updateCentreMarker={this.updateCentreMarker}
             axi={s.maxIter}
           />
         </div>
