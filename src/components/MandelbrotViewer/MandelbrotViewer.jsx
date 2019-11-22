@@ -121,7 +121,6 @@ class MandelbrotViewer extends React.Component {
       this.canvasZoom = 1;
       this.putImage(fractal.arr, fractal.width, fractal.height);
       this.timer.current.updateTime(Date.now() - timerStart);
-      console.log('dispatch');
       document.dispatchEvent(this.zoomDoneEvent);
     }).catch((err) => {
       // TODO: alert user
@@ -142,7 +141,7 @@ class MandelbrotViewer extends React.Component {
     fractalContext.scale(this.canvasZoom, this.canvasZoom);
     fractalContext.translate(this.originX, this.originY);
     fractalContext.drawImage(newCanvas, 0, 0);
-    fractalContext.setTransform(1, 0, 0, 1, 0 , 0);
+    fractalContext.setTransform(1, 0, 0, 1, 0, 0);
     fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
   }
 
@@ -214,9 +213,7 @@ class MandelbrotViewer extends React.Component {
       };
 
       if (this.rendering) {
-        console.log('waiting for zoom done');
         document.addEventListener('zoom_done', () => {
-          console.log('zoom done');
           renderRange();
         });
       } else {
@@ -225,7 +222,6 @@ class MandelbrotViewer extends React.Component {
     }
   }
 
-  
 
   handleTouchStart(e) {
     const touches = e.changedTouches;
@@ -266,7 +262,6 @@ class MandelbrotViewer extends React.Component {
     const centreY = this.height / 2;
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
-    console.log(this.originX, this.originY);
     clearTimeout(this.zoomTimeout);
     this.zoomTimeout = setTimeout(() => {
       this.renderer.pixelSize /= newCanvasZoom;

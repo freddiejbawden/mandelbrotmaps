@@ -57,7 +57,6 @@ class Renderer {
     const oldY = oldFractalLimitY + pixY * this.pixelSize;
     this.centreCoords[0] += -1 * (newX - oldX);
     this.centreCoords[1] += -1 * (newY - oldY);
-    console.log(this.centreCoords);
     this.pixelSize = newPixelSize;
   }
 
