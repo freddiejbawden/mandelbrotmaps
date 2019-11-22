@@ -28,6 +28,13 @@ class MandelbrotViewer extends React.Component {
     this.updatePixelSize = this.updatePixelSize.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
+    this.canvasZoom = 1;
+    this.originX = 0;
+    this.originY = 0;
+    this.canvasOffsetX = 0;
+    this.canvasOffsetY = 0;
+    this.rendering = false;
+    this.zoomDoneEvent = new Event('zoom_done');
     this.renderer = new Renderer(
       props.renderMode,
       window.innerWidth,
@@ -41,7 +48,7 @@ class MandelbrotViewer extends React.Component {
     await this.loadWasm();
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
-    document.addEventListener("keydown", (e) => this.handleKeyPress(e));
+    document.addEventListener('wheel', (e) => this.handleScroll(e));
     requestAnimationFrame(() => this.drawFractal());
     window.performance.mark('fractal_rendered_end');
     window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
@@ -105,10 +112,17 @@ class MandelbrotViewer extends React.Component {
   }
 
   drawFractal() {
+    this.rendering = true;
     const timerStart = Date.now();
     this.renderer.render().then((fractal) => {
+      this.rendering = false;
+      this.canvasOffsetX = 0;
+      this.canvasOffsetY = 0;
+      this.canvasZoom = 1;
       this.putImage(fractal.arr, fractal.width, fractal.height);
       this.timer.current.updateTime(Date.now() - timerStart);
+      console.log('dispatch');
+      document.dispatchEvent(this.zoomDoneEvent);
     }).catch((err) => {
       // TODO: alert user
       // eslint-disable-next-line no-alert
@@ -116,29 +130,29 @@ class MandelbrotViewer extends React.Component {
     });
   }
 
+  updateCanvas() {
+    const fractalContext = this.fractal.current.getContext('2d');
+    // define a reference canvas for the image
+    const newCanvas = document.createElement('canvas');
+    newCanvas.setAttribute('width', this.imageData.width);
+    newCanvas.setAttribute('height', this.imageData.height);
+    fractalContext.fillRect(0, 0, this.width, this.height);
+
+    newCanvas.getContext('2d').putImageData(this.imageData, this.deltaX, this.deltaY);
+    fractalContext.scale(this.canvasZoom, this.canvasZoom);
+    fractalContext.translate(this.originX, this.originY);
+    fractalContext.drawImage(newCanvas, 0, 0);
+    fractalContext.setTransform(1, 0, 0, 1, 0 , 0);
+    fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
+  }
+
   putImage(arr, width, height) {
     const fractalContext = this.fractal.current.getContext('2d');
     fractalContext.canvas.width = window.innerWidth;
     fractalContext.canvas.height = window.innerHeight;
     this.imageData = fractalContext.createImageData(width, height);
-    this.arr = arr;
     this.imageData.data.set(arr);
-    fractalContext.putImageData(this.imageData, 0, 0);
-    fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
-  }
-
-  updateImagePos() {
-    if (!this.imageData) return;
-    const fractalContext = this.fractal.current.getContext('2d');
-    fractalContext.fillStyle = '#000000';
-    fractalContext.fillRect(0, 0, this.width, this.height);
-    fractalContext.putImageData(this.imageData, this.deltaX, this.deltaY);
-    fractalContext.fillRect(
-      (this.width) / 2 - 5 + this.deltaX,
-      (this.height / 2) - 5 + this.deltaY,
-      10,
-      10,
-    );
+    this.updateCanvas();
   }
 
   updateDimensions() {
@@ -162,7 +176,7 @@ class MandelbrotViewer extends React.Component {
     if (this.dragging) {
       this.deltaX += e.movementX;
       this.deltaY += e.movementY;
-      this.updateImagePos();
+      this.updateCanvas();
     }
   }
 
@@ -184,19 +198,34 @@ class MandelbrotViewer extends React.Component {
       } else {
         yRect = new Rectangle(0, this.height + this.deltaY, this.width, Math.abs(this.deltaY));
       }
-      const result = await this.renderer.renderRange(
-        xRect,
-        yRect,
-        this.deltaX,
-        this.deltaY,
-      );
-      this.dragging = false;
-      this.deltaX = 0;
-      this.deltaY = 0;
-      this.putImage(result.arr, result.width, result.height);
-      this.timer.current.updateTime(Date.now() - timerStart);
+
+      const renderRange = async () => {
+        const result = await this.renderer.renderRange(
+          xRect,
+          yRect,
+          this.deltaX,
+          this.deltaY,
+        );
+        this.dragging = false;
+        this.deltaX = 0;
+        this.deltaY = 0;
+        this.putImage(result.arr, result.width, result.height);
+        this.timer.current.updateTime(Date.now() - timerStart);
+      };
+
+      if (this.rendering) {
+        console.log('waiting for zoom done');
+        document.addEventListener('zoom_done', () => {
+          console.log('zoom done');
+          renderRange();
+        });
+      } else {
+        renderRange();
+      }
     }
   }
+
+  
 
   handleTouchStart(e) {
     const touches = e.changedTouches;
@@ -228,14 +257,26 @@ class MandelbrotViewer extends React.Component {
     this.handleDragEnd();
   }
 
-  handleKeyPress(e) {
-    if (e.key === '=') {
-      this.renderer.zoomOnPoint(0.05, this.mouseX, this.mouseY);
-      requestAnimationFrame(() => this.drawFractal());
-    } else if (e.key === '-') {
-      this.renderer.zoomOnPoint(-0.05, this.mouseX, this.mouseY);
-      requestAnimationFrame(() => this.drawFractal());
+  handleScroll(e) {
+    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(e.deltaY);
+    if (newCanvasZoom < 0.5) {
+      newCanvasZoom = this.canvasZoom;
     }
+    const centreX = this.width / 2;
+    const centreY = this.height / 2;
+    this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
+    this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
+    console.log(this.originX, this.originY);
+    clearTimeout(this.zoomTimeout);
+    this.zoomTimeout = setTimeout(() => {
+      this.renderer.pixelSize /= newCanvasZoom;
+      this.originX = 0;
+      this.originY = 0;
+      this.canvasZoom = 0;
+      this.drawFractal();
+    }, 300);
+    this.canvasZoom = newCanvasZoom;
+    this.updateCanvas();
   }
 
   render() {
