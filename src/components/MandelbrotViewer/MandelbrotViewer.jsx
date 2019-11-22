@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Timer from '../Timer';
 import Settings from '../Settings';
 import './MandelbrotViewer.css';
 import Renderer from '../../Renderer';
@@ -227,8 +226,9 @@ class MandelbrotViewer extends React.Component {
     return (
       <div className="mandelbrot-viewer-container">
         <div className="info-panel">
-          <Timer time={this.time} ref={this.timer} />
           <Settings
+            time={this.time}
+            timer={this.timer}
             selectedRenderMode={s.renderMode}
             updatePixelSize={this.updatePixelSize}
             updateCentreCoords={this.updateCentreCoords}

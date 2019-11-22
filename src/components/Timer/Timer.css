@@ -1,9 +1,7 @@
 .timer-container {
   width: 200px;
-  height: auto;
   border: 1 solid red;
   background-color: azure;
-  margin: 10px;
   padding: 10px;
   line-height: 1.5rem;
 }
