@@ -53,7 +53,6 @@ class JSMultithreaded {
             }
           }
         };
-        console.log(maxIter);
         w.postMessage({
           id: roundID,
           workerID: idGenerator(),
