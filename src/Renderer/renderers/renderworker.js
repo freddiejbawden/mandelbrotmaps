@@ -42,7 +42,7 @@ const renderWasm = async (e) => {
     e.data.width,
     e.data.height,
     e.data.centreCoords,
-    e.data.max_i,
+    e.data.maxIter,
   ).then((arr) => {
     postMessage({
       arr,
@@ -75,6 +75,7 @@ const renderWasmRange = async (e) => {
     e.data.endRow,
     e.data.width,
     e.data.height,
+    e.data.maxIter,
     e.data.centreCoords[0],
     e.data.centreCoords[1],
   ).then((fractal) => {
@@ -105,7 +106,7 @@ const renderJSRange = async (data) => {
       data.width,
       data.height,
       data.centreCoords,
-      data.max_i,
+      data.maxIter,
     );
     const fractal = await mr.renderRange(
       data.xRect,

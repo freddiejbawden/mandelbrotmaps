@@ -94,6 +94,7 @@ class Renderer {
         this.height,
         this.width,
         this.height,
+        this.maxIter,
         this.centreCoords[0],
         this.centreCoords[1],
       );
