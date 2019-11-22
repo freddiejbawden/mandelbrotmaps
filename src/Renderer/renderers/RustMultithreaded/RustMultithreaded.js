@@ -118,6 +118,7 @@ class RustMultithreaded {
           pixelSize,
           width,
           height,
+          maxIter,
           centreCoords,
           oldArr,
           xRect,
