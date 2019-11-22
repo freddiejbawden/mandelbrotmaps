@@ -7,7 +7,8 @@ import RustMultithreaded from './renderers/RustMultithreaded';
 class Renderer {
   constructor(renderMethod, width, height, maxIter) {
     this.mode = renderMethod;
-    this.pixelSize = 0.003;
+    this.pixelSize = 0.004;
+    this.zoomLevel = 0;
     this.width = width;
     this.height = height;
     this.centreCoords = [-1, 0];
@@ -38,6 +39,25 @@ class Renderer {
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;
+  }
+
+  /* Adapted from https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate */
+  zoomOnPoint(canvasZoom, pixX, pixY) {
+    const newPixelSize = this.pixelSize / canvasZoom;
+    const newFractalLimitX = this.centreCoords[0] - (this.width / 2) * newPixelSize;
+    const newFractalLimitY = this.centreCoords[1] - (this.height / 2) * newPixelSize;
+    // calculate the pixel pos in the new zoom level
+    const newX = newFractalLimitX + pixX * newPixelSize;
+    const newY = newFractalLimitY + pixY * newPixelSize;
+
+    const oldFractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
+    const oldFractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
+    // calculate the pixel pos in the new zoom level
+    const oldX = oldFractalLimitX + pixX * this.pixelSize;
+    const oldY = oldFractalLimitY + pixY * this.pixelSize;
+    this.centreCoords[0] += -1 * (newX - oldX);
+    this.centreCoords[1] += -1 * (newY - oldY);
+    this.pixelSize = newPixelSize;
   }
 
   async renderRange(xRect, yRect, dX, dY) {
@@ -74,6 +94,7 @@ class Renderer {
         this.height,
         this.width,
         this.height,
+        this.maxIter,
         this.centreCoords[0],
         this.centreCoords[1],
       );

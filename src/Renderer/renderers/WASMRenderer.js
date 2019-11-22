@@ -35,13 +35,14 @@ class WASMRenderer {
   }
 
   async renderRange(xRect, yRect, dX, dY, arr, startRow, endRow,
-    width, height, centreCoordsX, centreCoordsY) {
+    width, height, maxIter, centreCoordsX, centreCoordsY) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
         if (!this.wasm_renderer) {
           await this.loadWasm();
         }
+        await this.wasm_renderer.set_max_i(maxIter);
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
           yRect,
@@ -81,7 +82,7 @@ class WASMRenderer {
         height,
         centreCoords[0],
         centreCoords[1],
-        maxIter || 200,
+        maxIter,
       );
       try {
         const arr = new Uint8Array(this.memory.buffer, arrPointer, (e - s) * 4);
