@@ -261,23 +261,24 @@ class MandelbrotViewer extends React.Component {
     this.handleDragEnd();
   }
 
+  resetZoomAndRender(mouse) {
+    this.renderer.zoomOnPoint(this.canvasZoom, mouse[0], mouse[1]);
+    this.originX = 0;
+    this.originY = 0;
+    this.canvasZoom = 0;
+    this.drawFractal();
+  }
+
   zoom(direction) {
-    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(direction);
-    if (newCanvasZoom < 0 || newCanvasZoom > 10) {
-      newCanvasZoom = this.canvasZoom;
-    }
+    const newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(direction);
     const centreX = this.mouseX;
     const centreY = this.mouseY;
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
-    clearTimeout(this.zoomTimeout);
     const mouse = [this.mouseX, this.mouseY];
+    clearTimeout(this.zoomTimeout);
     this.zoomTimeout = setTimeout(() => {
-      this.renderer.zoomOnPoint(this.canvasZoom, mouse[0], mouse[1]);
-      this.originX = 0;
-      this.originY = 0;
-      this.canvasZoom = 0;
-      this.drawFractal();
+      this.resetZoomAndRender(mouse);
     }, 300);
     this.canvasZoom = newCanvasZoom;
     this.updateCanvas();
