@@ -1,12 +1,41 @@
-.settings-container {
+.options-container {
   width: 200px;
-  height: auto;
   border: 1 solid red;
   background-color: azure;
-  margin: 10px;
 
   padding: 10px;
   line-height: 1.5rem;
+}
+.options-container > div {
+  margin-bottom: 10px;
+}
+.settings-container {
+  margin: 10px;
+  transition: height 0.3s;
+  height: auto;
+}
+
+.settings-boxes {
+  display: flex;
+  flex-direction: column;
+  height: 1000px;
+  transition: height 0.3s;
+  overflow: hidden;
+  transition-timing-function: ease-in-out;
+
+}
+.settings-collapsed {
+  transition: height 0.5s;
+  transition-timing-function: ease-in-out;
+  height: 0;
+
+}
+
+.settings-container > div  {
+  margin-bottom: 10px;
+}
+.settings-container > div > div {
+  margin-bottom: 10px;
 }
 @keyframes spin {
   from {transform:rotate(0deg);}
@@ -18,4 +47,20 @@
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
 
+}
+.settings-min-max {
+  width: 0; 
+  height: 0; 
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent; 
+  border-left:10px solid grey;
+  transition: transform 0.3s;
+  animation-timing-function: ease-in-out;
+  transform: rotate(90deg); 
+}
+.settings-min-max-collapse {
+  transition: transform 0.3s;
+  transform: rotate(0deg);
+  animation-timing-function: ease-in-out;
+  transition-delay: 0.2s;
 }
