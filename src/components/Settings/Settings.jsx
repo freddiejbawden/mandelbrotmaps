@@ -42,22 +42,23 @@ export default class Settings extends Component {
   }
 
   toggle() {
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const s = this.state;
     this.setState({
-      collapsed: !this.state.collapsed,
+      collapsed: !s.collapsed,
     }, () => {
-      console.log('updated');
     });
   }
+
 
   render() {
     const p = this.props;
     const s = this.state;
     const contentsClasses = (s.collapsed) ? 'settings-boxes settings-collapsed' : 'settings-boxes';
     const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
-    console.log(contentsClasses);
     return (
       <div className="settings-container">
-        <div onClick={() => this.toggle()} className={arrowClasses} />
+        <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
           <Timer time={p.time} ref={p.timer} />
           <div className="options-container ">
@@ -80,7 +81,7 @@ export default class Settings extends Component {
             </div>
             <div>
               <span>Enable Centre Marker </span>
-              <input type="checkbox" name="centremarker" />
+              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
           </div>
         </div>
@@ -99,6 +100,7 @@ Settings.propTypes = {
   time: PropTypes.string,
   // eslint-disable-next-line react/forbid-prop-types
   timer: PropTypes.object.isRequired,
+  updateCentreMarker: PropTypes.func.isRequired,
 };
 Settings.defaultProps = {
   selectedRenderMode: '0',

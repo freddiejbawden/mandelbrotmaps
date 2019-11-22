@@ -17,12 +17,14 @@ class MandelbrotViewer extends React.Component {
     this.dragging = false;
     this.deltaX = 0;
     this.deltaY = 0;
+    this.showCentreMarker = false;
     // Set up hooks for Setting Component
     this.updateDimensions = this.updateDimensions.bind(this);
     this.updateIter = this.updateIter.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateCentreCoords = this.updateCentreCoords.bind(this);
     this.updatePixelSize = this.updatePixelSize.bind(this);
+    this.updateCentreMarker = this.updateCentreMarker.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.renderer = new Renderer(
@@ -119,7 +121,14 @@ class MandelbrotViewer extends React.Component {
     this.arr = arr;
     this.imageData.data.set(arr);
     fractalContext.putImageData(this.imageData, 0, 0);
-    fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
+    if (this.showCentreMarker) {
+      fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
+    }
+  }
+
+  updateCentreMarker() {
+    this.showCentreMarker = !this.showCentreMarker;
+    this.drawFractal();
   }
 
   updateImagePos() {
@@ -234,6 +243,7 @@ class MandelbrotViewer extends React.Component {
             updateCentreCoords={this.updateCentreCoords}
             updateIter={this.updateIter}
             updateRenderMethod={this.updateRenderMethod}
+            updateCentreMarker={this.updateCentreMarker}
             axi={s.maxIter}
           />
         </div>
