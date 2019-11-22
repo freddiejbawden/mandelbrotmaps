@@ -261,8 +261,11 @@ class MandelbrotViewer extends React.Component {
     this.handleDragEnd();
   }
 
-  handleScroll(e) {
-    const newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(e.deltaY);
+  zoom(direction) {
+    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(direction);
+    if (newCanvasZoom < 0 || newCanvasZoom > 10) {
+      newCanvasZoom = this.canvasZoom;
+    }
     const centreX = this.mouseX;
     const centreY = this.mouseY;
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
@@ -278,6 +281,10 @@ class MandelbrotViewer extends React.Component {
     }, 300);
     this.canvasZoom = newCanvasZoom;
     this.updateCanvas();
+  }
+
+  handleScroll(e) {
+    this.zoom(e.deltaY);
   }
 
   render() {
