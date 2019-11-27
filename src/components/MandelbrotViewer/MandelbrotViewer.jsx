@@ -50,6 +50,8 @@ class MandelbrotViewer extends React.Component {
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
     document.addEventListener('wheel', (e) => this.handleScroll(e));
+    document.addEventListener('scroll', (e) => e.preventDefault());
+
     requestAnimationFrame(() => this.drawFractal());
     window.performance.mark('fractal_rendered_end');
     window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
@@ -232,6 +234,7 @@ class MandelbrotViewer extends React.Component {
 
 
   handleTouchStart(e) {
+    e.preventDefault();
     const touches = e.changedTouches;
     if (touches.length > 0) {
       this.dragging = true;
@@ -242,18 +245,20 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleTouchMove(evt) {
+    evt.preventDefault();
     const touches = evt.changedTouches;
     for (let i = 0; i < touches.length; i += 1) {
       if (this.dragging) {
         const startTouch = this.activeTouches[touches[i].identifier];
         this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
         this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
-        this.updateImagePos();
+        this.updateCanvas();
       }
     }
   }
 
   handleTouchEnd(evt) {
+    evt.preventDefault();
     const touches = evt.changedTouches;
     for (let i = 0; i < touches.length; i += 1) {
       delete this.activeTouches[touches[i].identifier];
@@ -288,7 +293,9 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleScroll(e) {
-    this.zoom(e.deltaY);
+    if (e.deltaY > 5) {
+      this.zoom(e.deltaY);
+    }
   }
 
   render() {
