@@ -78,7 +78,6 @@ class JSMultithreaded {
     });
   }
 
-
   async render(pixelSize, width, height, centreCoords, maxIter) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
@@ -100,9 +99,6 @@ class JSMultithreaded {
             this.arr.set(e.data.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
-              console.log(performance.getEntriesByType("measure").map((x) => [x.name, x.duration]));
-              performance.clearMarks();
-              performance.clearMeasures();
               res(
                 {
                   arr: this.arr,
