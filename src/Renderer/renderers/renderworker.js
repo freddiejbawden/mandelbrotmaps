@@ -25,6 +25,7 @@ const renderJS = (data) => {
     }
     postMessage({
       arr,
+      workerID: data.workerID,
       offset: data.startPixel * 4,
       id: data.id,
     });
@@ -119,6 +120,7 @@ const renderJSRange = async (data) => {
     );
     postMessage({
       success: true,
+      workerID: data.workerID,
       fractal,
       offset: data.startRow * data.width * 4,
       id: data.id,

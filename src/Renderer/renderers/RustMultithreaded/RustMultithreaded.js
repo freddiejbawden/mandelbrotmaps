@@ -76,7 +76,7 @@ class RustMultithreaded {
       }
     });
   }
-
+  /*
   async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
     return new Promise((res) => {
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
@@ -84,6 +84,7 @@ class RustMultithreaded {
       this.pixelSplit = this.height / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
+      console.log(`dispatching ${roundID}`);
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
           const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
@@ -94,7 +95,9 @@ class RustMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
-            newArr.set(e.data.fractal.arr, e.data.offset);
+            if (e.data.fractal.arr <= newArr.length) {
+              newArr.set(e.data.fractal.arr, e.data.offset);
+            }
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
               this.arr = newArr;
@@ -129,5 +132,6 @@ class RustMultithreaded {
       }
     });
   }
+  */
 }
 export default RustMultithreaded;

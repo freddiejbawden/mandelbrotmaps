@@ -96,9 +96,13 @@ class JSMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
+            window.performance.measure(`${this.remaining_threads}_time`, `${e.data.workerID}_start`);
             this.arr.set(e.data.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
+              console.log(performance.getEntriesByType("measure").map((x) => [x.name, x.duration]));
+              performance.clearMarks();
+              performance.clearMeasures();
               res(
                 {
                   arr: this.arr,
@@ -109,8 +113,12 @@ class JSMultithreaded {
             }
           }
         };
+        const workerID = idGenerator();
+        window.performance.mark(`${workerID}_start`);
+
         w.postMessage({
           id: roundID,
+          workerID,
           renderer: 'js',
           startPixel: Math.floor(i * this.pixelSplit),
           endPixel: Math.floor((i + 1) * this.pixelSplit),
