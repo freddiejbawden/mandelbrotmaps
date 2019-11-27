@@ -78,7 +78,6 @@ class JSMultithreaded {
     });
   }
 
-
   async render(pixelSize, width, height, centreCoords, maxIter) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
@@ -96,6 +95,7 @@ class JSMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
+            window.performance.measure(`${this.remaining_threads}_time`, `${e.data.workerID}_start`);
             this.arr.set(e.data.arr, e.data.offset);
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
@@ -109,8 +109,12 @@ class JSMultithreaded {
             }
           }
         };
+        const workerID = idGenerator();
+        window.performance.mark(`${workerID}_start`);
+
         w.postMessage({
           id: roundID,
+          workerID,
           renderer: 'js',
           startPixel: Math.floor(i * this.pixelSplit),
           endPixel: Math.floor((i + 1) * this.pixelSplit),

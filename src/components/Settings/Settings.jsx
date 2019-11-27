@@ -50,6 +50,11 @@ export default class Settings extends Component {
     });
   }
 
+  resetFractal() {
+    const p = this.props;
+    p.updateCentreCoords(-1, 0);
+    p.updatePixelSize(0.003);
+  }
 
   render() {
     const p = this.props;
@@ -83,6 +88,7 @@ export default class Settings extends Component {
               <span>Enable Centre Marker </span>
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
+            <button type="button" onClick={() => this.resetFractal()}>Reset Fractal</button>
           </div>
         </div>
 

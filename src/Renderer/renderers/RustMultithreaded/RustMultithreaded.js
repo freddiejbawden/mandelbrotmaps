@@ -94,7 +94,9 @@ class RustMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
-            newArr.set(e.data.fractal.arr, e.data.offset);
+            if (e.data.fractal.arr <= newArr.length) {
+              newArr.set(e.data.fractal.arr, e.data.offset);
+            }
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
               this.arr = newArr;
