@@ -36,7 +36,6 @@ class MandelbrotViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
-    this.zoomDoneEvent = new Event('zoom_done');
     this.renderer = new Renderer(
       props.renderMode,
       window.innerWidth,
@@ -130,7 +129,6 @@ class MandelbrotViewer extends React.Component {
         this.putImage(fractal.arr, fractal.width, fractal.height);
         this.dirty = false;
         this.timer.current.updateTime(Date.now() - timerStart);
-        document.dispatchEvent(this.zoomDoneEvent);
       }).catch((err) => {
         // TODO: alert user
         // eslint-disable-next-line no-alert
@@ -142,7 +140,6 @@ class MandelbrotViewer extends React.Component {
   updateCanvas() {
     const fractalContext = this.fractal.current.getContext('2d');
     // define a reference canvas for the image
-    console.log('update');
     const newCanvas = document.createElement('canvas');
     newCanvas.setAttribute('width', this.imageData.width);
     newCanvas.setAttribute('height', this.imageData.height);
@@ -158,13 +155,15 @@ class MandelbrotViewer extends React.Component {
   }
 
   putImage(arr, width, height) {
-    console.log('put image');
-    const fractalContext = this.fractal.current.getContext('2d');
-    fractalContext.canvas.width = window.innerWidth;
-    fractalContext.canvas.height = window.innerHeight;
-    this.imageData = fractalContext.createImageData(width, height);
-    this.imageData.data.set(arr);
-    this.updateCanvas();
+    if (!this.dragging || !this.dirty) {
+      console.log('putimage');
+      const fractalContext = this.fractal.current.getContext('2d');
+      fractalContext.canvas.width = window.innerWidth;
+      fractalContext.canvas.height = window.innerHeight;
+      this.imageData = fractalContext.createImageData(width, height);
+      this.imageData.data.set(arr);
+      requestAnimationFrame(() => this.updateCanvas());
+    }
   }
 
   updateDimensions() {
@@ -188,7 +187,7 @@ class MandelbrotViewer extends React.Component {
     if (this.dragging) {
       this.deltaX += e.movementX;
       this.deltaY += e.movementY;
-      this.updateCanvas();
+      requestAnimationFrame(() => this.updateCanvas());
     }
   }
 
@@ -212,7 +211,6 @@ class MandelbrotViewer extends React.Component {
       }
 
       const renderRange = async () => {
-        console.log("calling render range");
         const result = await this.renderer.renderRange(
           xRect,
           yRect,
@@ -279,6 +277,9 @@ class MandelbrotViewer extends React.Component {
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
+    this.mouseX = (this.mouseX) ? this.mouseX : this.width / 2;
+    this.mouseY = (this.mouseY) ? this.mouseY : this.height / 2;
+
     const centreX = this.mouseX;
     const centreY = this.mouseY;
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
@@ -289,7 +290,7 @@ class MandelbrotViewer extends React.Component {
       this.resetZoomAndRender(mouse);
     }, 300);
     this.canvasZoom = newCanvasZoom;
-    this.updateCanvas();
+    requestAnimationFrame(() => this.updateCanvas());
   }
 
   handleScroll(e) {
