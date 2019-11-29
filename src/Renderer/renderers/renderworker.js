@@ -81,7 +81,6 @@ const renderWasmRange = async (e) => {
       e.data.centreCoords[0],
       e.data.centreCoords[1],
     ).then((fractal) => {
-      console.log(fractal);
       postMessage({
         success: true,
         fractal,
@@ -101,6 +100,7 @@ const renderWasmRange = async (e) => {
       });
     });
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
   }
 };
@@ -133,7 +133,6 @@ const renderJSRange = async (data) => {
   } catch (err) {
     // TODO: feedback error
     // eslint-disable-next-line no-console
-    console.log(`${data.workerID}: ${err}`);
     postMessage({
       success: false,
       err,
@@ -143,7 +142,6 @@ const renderJSRange = async (data) => {
 
 
 addEventListener('message', async (e) => {
-  console.log(`Worker ${e.data.workerID} got message`);
   if (e.data.type === 'partial') {
     if (e.data.renderer === 'wasm') {
       renderWasmRange(e);

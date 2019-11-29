@@ -134,7 +134,6 @@ impl Mandelbrot {
     }
   }
   pub fn set_arr(&mut self, new_arr : Vec<u8>) {
-    log_u8(new_arr[0]);
     self.arr = new_arr.to_vec();
   }
   pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f64, centre_coords_y: f64) -> *const u8 {
@@ -177,7 +176,6 @@ impl Mandelbrot {
     }
    
     self.arr = new_arr.to_vec();
-    log_i32(self.arr.len() as i32);
     return self.arr.as_ptr();
   }
   pub fn escape_algorithm(&self, pixel_num: i32) -> i32 {
