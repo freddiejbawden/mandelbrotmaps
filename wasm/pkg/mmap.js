@@ -239,6 +239,8 @@ export class Mandelbrot {
 
 export const __wbg_log_4d3324346d2991e3 = typeof console.log == 'function' ? console.log : notDefined('console.log');
 
+export const __wbg_log_f514957e1fd60c0f = typeof console.log == 'function' ? console.log : notDefined('console.log');
+
 export const __wbg_getWidth_1ae57a7e6157a6d6 = function(arg0) {
     const ret = getObject(arg0).getWidth();
     return ret;

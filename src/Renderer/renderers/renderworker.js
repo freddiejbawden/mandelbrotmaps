@@ -54,50 +54,55 @@ const renderWasm = async (e) => {
 };
 
 const renderWasmRange = async (e) => {
-  const xRectReconstructed = new Rectangle(
-    e.data.xRect.l,
-    e.data.xRect.t,
-    e.data.xRect.w,
-    e.data.xRect.h,
-  );
-  const yRectReconstructed = new Rectangle(
-    e.data.yRect.l,
-    e.data.yRect.t,
-    e.data.yRect.w,
-    e.data.yRect.h,
-  );
-  wasmRenderer.renderRange(
-    xRectReconstructed,
-    yRectReconstructed,
-    e.data.dX,
-    e.data.dY,
-    e.data.oldArr,
-    e.data.startRow,
-    e.data.endRow,
-    e.data.width,
-    e.data.height,
-    e.data.maxIter,
-    e.data.centreCoords[0],
-    e.data.centreCoords[1],
-  ).then((fractal) => {
-    postMessage({
-      success: true,
-      fractal,
-      offset: e.data.startRow * e.data.width * 4,
-      id: e.data.id,
+  try {
+    const xRectReconstructed = new Rectangle(
+      e.data.xRect.l,
+      e.data.xRect.t,
+      e.data.xRect.w,
+      e.data.xRect.h,
+    );
+    const yRectReconstructed = new Rectangle(
+      e.data.yRect.l,
+      e.data.yRect.t,
+      e.data.yRect.w,
+      e.data.yRect.h,
+    );
+    wasmRenderer.renderRange(
+      xRectReconstructed,
+      yRectReconstructed,
+      e.data.dX,
+      e.data.dY,
+      e.data.oldArr,
+      e.data.startRow,
+      e.data.endRow,
+      e.data.width,
+      e.data.height,
+      e.data.maxIter,
+      e.data.centreCoords[0],
+      e.data.centreCoords[1],
+    ).then((fractal) => {
+      console.log(fractal);
+      postMessage({
+        success: true,
+        fractal,
+        offset: e.data.startRow * e.data.width * 4,
+        id: e.data.id,
+      });
+    }).catch(() => {
+      postMessage({
+        success: false,
+        fractal: {
+          arr: [],
+          width: e.data.width,
+          height: e.data.height,
+        },
+        offset: e.data.startRow * e.data.width * 4,
+        id: e.data.id,
+      });
     });
-  }).catch(() => {
-    postMessage({
-      success: false,
-      fractal: {
-        arr: [],
-        width: e.data.width,
-        height: e.data.height,
-      },
-      offset: e.data.startRow * e.data.width * 4,
-      id: e.data.id,
-    });
-  });
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const renderJSRange = async (data) => {
@@ -138,6 +143,7 @@ const renderJSRange = async (data) => {
 
 
 addEventListener('message', async (e) => {
+  console.log(`Worker ${e.data.workerID} got message`);
   if (e.data.type === 'partial') {
     if (e.data.renderer === 'wasm') {
       renderWasmRange(e);

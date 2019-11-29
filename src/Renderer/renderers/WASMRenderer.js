@@ -56,7 +56,7 @@ class WASMRenderer {
           centreCoordsX,
           centreCoordsY,
         );
-        const fractalArr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
+        const fractalArr = new Uint8Array(this.memory.buffer, arrPointer, (endRow - startRow) * width * 4);
         res({
           arr: fractalArr,
           width,
