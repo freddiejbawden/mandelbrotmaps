@@ -80,7 +80,7 @@ class RustMultithreaded {
   async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
     return new Promise((res) => {
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
-      const nThreadsFree = 1; // navigator.hardwareConcurrency;
+      const nThreadsFree = navigator.hardwareConcurrency;
       this.pixelSplit = this.height / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
@@ -94,8 +94,11 @@ class RustMultithreaded {
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
-            if (e.data.fractal.arr <= newArr.length) {
+            try {
               newArr.set(e.data.fractal.arr, e.data.offset);
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.error(err);
             }
             this.remaining_threads -= 1;
             if (this.remaining_threads === 0) {
