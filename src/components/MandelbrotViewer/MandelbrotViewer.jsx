@@ -6,6 +6,13 @@ import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
 
+
+/*
+  TODO:
+    * Fix long zoom jump issue
+    * Fix rapid move mouse after drag bug
+*/
+
 class MandelbrotViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -141,8 +148,9 @@ class MandelbrotViewer extends React.Component {
   }
 
   updateCanvas() {
-    console.log('update');
     const fractalContext = this.fractal.current.getContext('2d');
+    fractalContext.fillStyle = '#000000';
+
     // define a reference canvas for the image
     const newCanvas = document.createElement('canvas');
     newCanvas.setAttribute('width', this.imageData.width);
@@ -154,13 +162,13 @@ class MandelbrotViewer extends React.Component {
     fractalContext.drawImage(newCanvas, 0, 0);
     fractalContext.setTransform(1, 0, 0, 1, 0, 0);
     if (this.showCentreMarker) {
+      fractalContext.fillStyle = '#00ff00';
       fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
     }
   }
 
   putImage(arr, width, height) {
     if (!this.dragging || !this.dirty) {
-      console.log('put image');
       const fractalContext = this.fractal.current.getContext('2d');
       fractalContext.canvas.width = window.innerWidth;
       fractalContext.canvas.height = window.innerHeight;
