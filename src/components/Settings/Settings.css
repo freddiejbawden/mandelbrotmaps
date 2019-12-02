@@ -64,3 +64,8 @@
   animation-timing-function: ease-in-out;
   transition-delay: 0.2s;
 }
+.info-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
