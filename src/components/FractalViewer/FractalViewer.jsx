@@ -70,7 +70,6 @@ class FractalViewer extends React.Component {
     window.performance.mark('fractal_rendered_end');
     this.endTime = Date.now() - startTime;
     window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
-    
   }
 
   componentDidUpdate() {
