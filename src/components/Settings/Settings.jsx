@@ -28,7 +28,7 @@ export default class Settings extends Component {
 
   updateRenderMethod(val) {
     const p = this.props;
-    p.updateRenderMethod(val);
+    p.updateRenderMethod(parseInt(val, 10));
   }
 
   updateTimer(time) {
@@ -55,7 +55,7 @@ export default class Settings extends Component {
       <div className="settings-container">
         <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
-          <Timer time={s.time} />
+          <Timer time={parseInt(s.time, 10)} />
           <div className="options-container ">
             <strong>Settings</strong>
             <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={p.updateIter} timeout={1000} />

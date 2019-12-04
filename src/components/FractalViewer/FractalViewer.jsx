@@ -305,7 +305,6 @@ class FractalViewer extends React.Component {
   }
 
   handleScroll(e) {
-    console.log(e);
     this.zoom(e.deltaY);
   }
 
