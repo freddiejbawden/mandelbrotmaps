@@ -8,3 +8,9 @@
   width: 100%;
   display: flex;
 }
+
+@media screen and (orientation:portrait) {
+  .render-container {
+    flex-direction: column;
+  }
+}

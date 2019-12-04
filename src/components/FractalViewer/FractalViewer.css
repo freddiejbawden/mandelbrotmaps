@@ -1,5 +1,15 @@
 .mandelbrot-viewer-container {
-  height: 100%;
   width: 100%;
-  border-right: grey solid 1px;
+  height: 100%;
+
+}
+@media screen and (orientation:portrait) {
+  .mandelbrot-viewer-container{
+    border-bottom: grey solid 1px;
+  }
+}
+@media screen and (orientation:landscape) {
+  .mandelbrot-viewer-container{
+    border-right: grey solid 1px;
+  }
 }

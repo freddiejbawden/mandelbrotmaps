@@ -1,6 +1,5 @@
 .options-container {
   width: 200px;
-  border: 1 solid red;
   background-color: azure;
 
   padding: 10px;
@@ -58,6 +57,7 @@
   animation-timing-function: ease-in-out;
   transform: rotate(90deg); 
 }
+
 .settings-min-max-collapse {
   transition: transform 0.3s;
   transform: rotate(0deg);

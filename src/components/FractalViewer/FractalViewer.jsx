@@ -14,12 +14,20 @@ import idGenerator from '../../utils/IDGenerator';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
+    this.orientation = window.screen.orientation.type;
     this.position = props.position;
     this.appRef = props.appRef;
     this.fractal = React.createRef();
     this.last_arr = undefined;
-    this.width = Math.floor(window.innerWidth / 2);
-    this.height = window.innerHeight;
+    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary') {
+      console.log('portati');
+      this.width = window.innerWidth;
+      this.height = Math.floor(window.innerHeight / 2);
+    } else {
+      this.width = Math.floor(window.innerWidth / 2);
+      this.height = window.innerHeight;
+    }
+
     this.state = {};
     this.dragging = false;
     this.deltaX = 0;
@@ -42,8 +50,8 @@ class FractalViewer extends React.Component {
     this.rendering = false;
     this.renderer = new Renderer(
       parseInt(props.renderMode, 10),
-      Math.floor(window.innerWidth / 2),
-      window.innerHeight,
+      this.width,
+      this.height,
       parseInt(props.maxi, 10),
     );
   }
@@ -157,11 +165,23 @@ class FractalViewer extends React.Component {
     }
   }
 
+  updateWidthHeight() {
+    this.orientation = window.screen.orientation.type;
+    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary') {
+      this.width = window.innerWidth;
+      this.height = Math.floor(window.innerHeight / 2);
+    } else {
+      this.width = Math.floor(window.innerWidth / 2);
+      this.height = window.innerHeight;
+    }
+  }
+
   putImage(arr, width, height) {
     if (!this.dragging || !this.dirty) {
       const fractalContext = this.fractal.current.getContext('2d');
-      fractalContext.canvas.width = Math.floor(window.innerWidth / 2);
-      fractalContext.canvas.height = window.innerHeight;
+      this.updateWidthHeight();
+      fractalContext.canvas.width = this.width;
+      fractalContext.canvas.height = this.height;
       this.imageData = fractalContext.createImageData(width, height);
       this.imageData.data.set(arr);
       requestAnimationFrame(() => this.updateCanvas());
@@ -171,10 +191,9 @@ class FractalViewer extends React.Component {
   updateDimensions() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
-      this.renderer.width = Math.floor(window.innerWidth / 2);
-      this.renderer.height = window.innerHeight;
-      this.width = Math.floor(window.innerWidth / 2);
-      this.height = window.innerHeight;
+      this.updateWidthHeight();
+      this.renderer.width = this.width;
+      this.renderer.height = this.height;
       requestAnimationFrame(() => this.drawFractal());
     }, 100);
   }
@@ -258,7 +277,7 @@ class FractalViewer extends React.Component {
         const startTouch = this.activeTouches[touches[i].identifier];
         this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
         this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
-        this.updateImagePos();
+        requestAnimationFrame(() => this.updateCanvas());
       }
     }
   }
