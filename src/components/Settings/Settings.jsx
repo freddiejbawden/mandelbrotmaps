@@ -52,9 +52,11 @@ export default class Settings extends Component {
     const contentsClasses = (s.collapsed) ? 'settings-collapsed settings-boxes' : 'settings-boxes';
     const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
     const blockerClass = (s.collapsed) ? 'blocker-collapse' : 'blocker';
+    const blocker = (window.innerWidth < 300) ? (<div className={blockerClass} />) : '';
+
     return (
       <div className="settings-container">
-        <div className={blockerClass} />
+        {blocker}
         <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
           <Timer time={parseInt(s.time, 10)} />
