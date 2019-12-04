@@ -14,10 +14,11 @@ import idGenerator from '../../utils/IDGenerator';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
+    this.number = props.number;
     this.appRef = props.appRef;
     this.fractal = React.createRef();
     this.last_arr = undefined;
-    this.width = window.innerWidth;
+    this.width = Math.floor(window.innerWidth / 2);
     this.height = window.innerHeight;
     this.state = {};
     this.dragging = false;
@@ -41,7 +42,7 @@ class FractalViewer extends React.Component {
     this.rendering = false;
     this.renderer = new Renderer(
       parseInt(props.renderMode, 10),
-      window.innerWidth,
+      Math.floor(window.innerWidth / 2),
       window.innerHeight,
       parseInt(props.maxi, 10),
     );
@@ -53,7 +54,6 @@ class FractalViewer extends React.Component {
     const startTime = Date.now();
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
-    document.addEventListener('wheel', (e) => this.handleScroll(e));
     requestAnimationFrame(() => this.drawFractal());
     window.performance.mark('fractal_rendered_end');
     this.endTime = Date.now() - startTime;
@@ -132,7 +132,7 @@ class FractalViewer extends React.Component {
       }).catch((err) => {
         // TODO: alert user
         // eslint-disable-next-line no-alert
-        alert(`Error when drawing fractal ${err}`);
+        alert(`${this.props.type} Error when drawing fractal ${err}`);
       });
     }
   }
@@ -160,7 +160,7 @@ class FractalViewer extends React.Component {
   putImage(arr, width, height) {
     if (!this.dragging || !this.dirty) {
       const fractalContext = this.fractal.current.getContext('2d');
-      fractalContext.canvas.width = window.innerWidth;
+      fractalContext.canvas.width = Math.floor(window.innerWidth / 2);
       fractalContext.canvas.height = window.innerHeight;
       this.imageData = fractalContext.createImageData(width, height);
       this.imageData.data.set(arr);
@@ -171,9 +171,9 @@ class FractalViewer extends React.Component {
   updateDimensions() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
-      this.renderer.width = window.innerWidth;
+      this.renderer.width = Math.floor(window.innerWidth / 2);
       this.renderer.height = window.innerHeight;
-      this.width = window.innerWidth;
+      this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
       requestAnimationFrame(() => this.drawFractal());
     }, 100);
@@ -184,7 +184,7 @@ class FractalViewer extends React.Component {
   }
 
   handleMouseMove(e) {
-    this.mouseX = e.pageX;
+    this.mouseX = e.pageX - this.width * this.number;
     this.mouseY = e.pageY;
     if (this.dragging) {
       this.deltaX += e.movementX;
@@ -321,6 +321,7 @@ class FractalViewer extends React.Component {
           onMouseMove={(e) => this.handleMouseMove(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
           onMouseLeave={(e) => this.handleDragEnd(e)}
+          onWheel={(e) => this.handleScroll(e)}
           className="fractal"
           id="fractal"
           ref={this.fractal}
@@ -333,6 +334,9 @@ FractalViewer.propTypes = {
   renderMode: PropTypes.number.isRequired,
   maxi: PropTypes.number.isRequired,
   showCentreMarker: PropTypes.bool,
+  type: PropTypes.string.isRequired,
+  number: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };

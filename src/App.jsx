@@ -66,6 +66,20 @@ class App extends Component {
       <div className="App">
         <div className="render-container">
           <FractalViewer
+            id="fractal-viewer"
+            type="julia"
+            number={0}
+            total={2}
+            maxi={s.maxi}
+            renderMode={renderMode}
+            showCentreMarker={s.showCentreMarker}
+            appRef={this.appRef}
+          />
+          <FractalViewer
+            id="fractal-viewer"
+            type="mandelbrot"
+            number={1}
+            total={2}
             maxi={s.maxi}
             renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
