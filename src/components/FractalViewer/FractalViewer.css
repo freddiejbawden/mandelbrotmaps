@@ -1,7 +1,6 @@
 .mandelbrot-viewer-container {
   width: 100%;
   height: 100%;
-
 }
 @media screen and (orientation:portrait) {
   .mandelbrot-viewer-container{

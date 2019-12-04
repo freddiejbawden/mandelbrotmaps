@@ -7,9 +7,17 @@
 .render-container {
   width: 100%;
   display: flex;
+  flex-direction: row;
 }
 
-@media screen and (orientation:portrait) {
+.info-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 0;
+}
+
+@media screen and (max-width: 800px) and (orientation: portrait) and (min-height: 400px) {
   .render-container {
     flex-direction: column;
   }

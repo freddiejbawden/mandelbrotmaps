@@ -10,24 +10,19 @@
 }
 .settings-container {
   margin: 10px;
-  transition: height 0.3s;
-  height: auto;
+  z-index: 0;
+}
+.settings-collapsed {
+  height: 0;
 }
 
 .settings-boxes {
+  position: relative;
   display: flex;
   flex-direction: column;
-  height: 1000px;
-  transition: height 0.3s;
   overflow: hidden;
-  transition-timing-function: ease-in-out;
-
-}
-.settings-collapsed {
-  transition: height 0.5s;
-  transition-timing-function: ease-in-out;
-  height: 0;
-
+  z-index: 10;
+  transition: height 0.3s;
 }
 
 .settings-container > div  {
@@ -40,13 +35,7 @@
   from {transform:rotate(0deg);}
   to {transform:rotate(720deg);}
 }
-.spinner {
-  animation-name: spin;
-    animation-duration: 1000ms;
-    animation-iteration-count: infinite;
-    animation-timing-function: ease-in-out;
 
-}
 .settings-min-max {
   width: 0; 
   height: 0; 
@@ -64,8 +53,22 @@
   animation-timing-function: ease-in-out;
   transition-delay: 0.2s;
 }
-.info-panel {
+.blocker {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  height: 150vh;
+  width: 150vw;
+  margin: -50px;
+  background-color: black;
+  opacity: 0.5;
+}
+.blocker-collapse {
+  display: none;
+}
+@media screen and (orientation:landscape) and (max-height: 600px) {
+  .settings-boxes{
+    flex-direction: row;
+  }
+  .settings-boxes > * {
+    margin-left: 20px;
+  }
 }

@@ -11,7 +11,7 @@ export default class Settings extends Component {
     this.iterationUpdateTimer = undefined;
     this.iterations = 200;
     this.state = {
-      collapsed: false,
+      collapsed: true,
       time: props.time,
     };
     this.updateTimer = this.updateTimer.bind(this);
@@ -49,10 +49,12 @@ export default class Settings extends Component {
   render() {
     const p = this.props;
     const s = this.state;
-    const contentsClasses = (s.collapsed) ? 'settings-boxes settings-collapsed' : 'settings-boxes';
+    const contentsClasses = (s.collapsed) ? 'settings-collapsed settings-boxes' : 'settings-boxes';
     const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
+    const blockerClass = (s.collapsed) ? 'blocker-collapse' : 'blocker';
     return (
       <div className="settings-container">
+        <div className={blockerClass} />
         <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
           <Timer time={parseInt(s.time, 10)} />
@@ -77,8 +79,6 @@ export default class Settings extends Component {
             </div>
           </div>
         </div>
-
-
       </div>
     );
   }
