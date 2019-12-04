@@ -284,7 +284,7 @@ class FractalViewer extends React.Component {
 
   zoom(direction) {
     this.dirty = true;
-    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(direction);
+    let newCanvasZoom = this.canvasZoom + 0.02 * -1 * Math.sign(direction);
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
@@ -305,6 +305,7 @@ class FractalViewer extends React.Component {
   }
 
   handleScroll(e) {
+    console.log(e);
     this.zoom(e.deltaY);
   }
 
