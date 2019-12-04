@@ -68,8 +68,7 @@ class App extends Component {
           <FractalViewer
             id="fractal-viewer"
             type="julia"
-            number={0}
-            total={2}
+            position={0}
             maxi={s.maxi}
             renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
@@ -78,8 +77,7 @@ class App extends Component {
           <FractalViewer
             id="fractal-viewer"
             type="mandelbrot"
-            number={1}
-            total={2}
+            position={1}
             maxi={s.maxi}
             renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}

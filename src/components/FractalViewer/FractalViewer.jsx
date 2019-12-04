@@ -14,7 +14,7 @@ import idGenerator from '../../utils/IDGenerator';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.number = props.number;
+    this.position = props.position;
     this.appRef = props.appRef;
     this.fractal = React.createRef();
     this.last_arr = undefined;
@@ -131,7 +131,7 @@ class FractalViewer extends React.Component {
         this.appRef.current.updateTimer(Date.now() - startTime);
       }).catch((err) => {
         // TODO: alert user
-        // eslint-disable-next-line no-alert
+        // eslint-disable-next-line
         alert(`${this.props.type} Error when drawing fractal ${err}`);
       });
     }
@@ -184,7 +184,7 @@ class FractalViewer extends React.Component {
   }
 
   handleMouseMove(e) {
-    this.mouseX = e.pageX - this.width * this.number;
+    this.mouseX = e.pageX - this.width * this.position;
     this.mouseY = e.pageY;
     if (this.dragging) {
       this.deltaX += e.movementX;
@@ -335,8 +335,7 @@ FractalViewer.propTypes = {
   maxi: PropTypes.number.isRequired,
   showCentreMarker: PropTypes.bool,
   type: PropTypes.string.isRequired,
-  number: PropTypes.number.isRequired,
-  total: PropTypes.number.isRequired,
+  position: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };
