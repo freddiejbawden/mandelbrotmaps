@@ -1,14 +1,17 @@
 .mandelbrot-viewer-container {
   width: 100%;
   height: 100%;
+  border-bottom: grey solid 1px;
 }
-@media screen and (orientation:portrait) {
+@media screen and (max-width: 800px) and (orientation: portrait) and (min-height: 400px) {
   .mandelbrot-viewer-container{
     border-bottom: grey solid 1px;
+    border-right: none;
   }
 }
-@media screen and (orientation:landscape) {
+@media  screen and (max-width: 800px) and (orientation: portrait) and (min-height: 400px) {
   .mandelbrot-viewer-container{
     border-right: grey solid 1px;
+    border-bottom: none;
   }
 }

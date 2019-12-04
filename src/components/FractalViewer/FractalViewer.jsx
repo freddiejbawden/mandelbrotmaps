@@ -16,7 +16,7 @@ class FractalViewer extends React.Component {
     super(props);
 
     // if running in headless then set default
-    if (window.screen.orientation.type) {
+    if (window.screen.orientation) {
       this.orientation = window.screen.orientation.type;
     } else {
       this.orientation = 'landscape-primary';
@@ -70,6 +70,7 @@ class FractalViewer extends React.Component {
     window.performance.mark('fractal_rendered_end');
     this.endTime = Date.now() - startTime;
     window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
+    
   }
 
   componentDidUpdate() {
