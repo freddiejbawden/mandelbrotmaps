@@ -14,7 +14,13 @@ import idGenerator from '../../utils/IDGenerator';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
-    this.orientation = window.screen.orientation.type;
+
+    // if running in headless then set default
+    if (window.screen.orientation.type) {
+      this.orientation = window.screen.orientation.type;
+    } else {
+      this.orientation = 'landscape-primary';
+    }
     this.position = props.position;
     this.appRef = props.appRef;
     this.fractal = React.createRef();
@@ -164,7 +170,11 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
-    this.orientation = window.screen.orientation.type;
+    if (window.screen.orientation.type) {
+      this.orientation = window.screen.orientation.type;
+    } else {
+      this.orientation = 'landscape-primary';
+    }
     if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
       this.width = window.innerWidth;
       this.height = Math.floor(window.innerHeight / 2);
