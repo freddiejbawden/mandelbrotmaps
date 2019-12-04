@@ -26,9 +26,11 @@ class FractalViewer extends React.Component {
     this.fractal = React.createRef();
     this.last_arr = undefined;
     if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
+      this.orientation = 'portrait';
       this.width = window.innerWidth;
       this.height = Math.floor(window.innerHeight / 2);
     } else {
+      this.orientation = 'landscape';
       this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
     }
@@ -130,6 +132,7 @@ class FractalViewer extends React.Component {
   }
 
   drawFractal() {
+    this.updateWidthHeight();
     this.rendering = true;
     const startTime = Date.now();
     if (!this.dragging || !this.dirty) {
@@ -176,9 +179,11 @@ class FractalViewer extends React.Component {
       this.orientation = 'landscape-primary';
     }
     if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
+      this.orientation = 'portrait';
       this.width = window.innerWidth;
       this.height = Math.floor(window.innerHeight / 2);
     } else {
+      this.orientation = 'landscape';
       this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
     }
@@ -187,14 +192,16 @@ class FractalViewer extends React.Component {
   }
 
   putImage(arr, width, height) {
-    if (!this.dragging || !this.dirty) {
-      const fractalContext = this.fractal.current.getContext('2d');
-      this.updateWidthHeight();
-      fractalContext.canvas.width = this.width;
-      fractalContext.canvas.height = this.height;
-      this.imageData = fractalContext.createImageData(width, height);
-      this.imageData.data.set(arr);
-      requestAnimationFrame(() => this.updateCanvas());
+    if (width && height) {
+      if (!this.dragging || !this.dirty) {
+        const fractalContext = this.fractal.current.getContext('2d');
+        this.updateWidthHeight();
+        fractalContext.canvas.width = this.width;
+        fractalContext.canvas.height = this.height;
+        this.imageData = fractalContext.createImageData(width, height);
+        this.imageData.data.set(arr);
+        requestAnimationFrame(() => this.updateCanvas());
+      }
     }
   }
 
@@ -202,6 +209,8 @@ class FractalViewer extends React.Component {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
       this.updateWidthHeight();
+      this.renderer.width = this.width;
+      this.renderer.height = this.height;
       requestAnimationFrame(() => this.drawFractal());
     }, 100);
   }
@@ -211,8 +220,13 @@ class FractalViewer extends React.Component {
   }
 
   handleMouseMove(e) {
-    this.mouseX = e.pageX - this.width * this.position;
-    this.mouseY = e.pageY;
+    if (this.orientation === 'portrait') {
+      this.mouseX = e.pageX;
+      this.mouseY = e.pageY - this.height * this.position;
+    } else {
+      this.mouseX = e.pageX - this.width * this.position;
+      this.mouseY = e.page;
+    }
     if (this.dragging) {
       this.deltaX += e.movementX;
       this.deltaY += e.movementY;
@@ -246,6 +260,9 @@ class FractalViewer extends React.Component {
           this.deltaX,
           this.deltaY,
         );
+        if (result === []) {
+          this.drawFractal();
+        }
         if (this.renderID === roundID) {
           this.putImage(result.arr, result.width, result.height);
         }
