@@ -79,9 +79,11 @@ class RustMultithreaded {
 
   async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
     return new Promise((res) => {
-      const newArr = new Uint8ClampedArray(this.height * this.width * 4);
+      this.width = width;
+      this.height = height;
+      const newArr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
-      this.pixelSplit = this.height / nThreadsFree;
+      this.pixelSplit = height / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {

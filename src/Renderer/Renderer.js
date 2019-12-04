@@ -162,7 +162,7 @@ class Renderer {
           this.centreCoords,
           this.maxIter,
         ).then((fractal) => {
-          this.prev_arr = fractal.arr;
+          this.prev_arr = fractal.arr.slice(0);
           resolve(fractal);
         });
       } else if (this.mode === Mode.JAVASCRIPTMT) {

@@ -10,11 +10,11 @@ export default class Settings extends Component {
     super(props);
     this.iterationUpdateTimer = undefined;
     this.iterations = 200;
-    this.updateX = this.updateX.bind(this);
-    this.updateY = this.updateY.bind(this);
     this.state = {
-      collapsed: false,
+      collapsed: true,
+      time: props.time,
     };
+    this.updateTimer = this.updateTimer.bind(this);
   }
 
   updateIterations(i) {
@@ -28,17 +28,13 @@ export default class Settings extends Component {
 
   updateRenderMethod(val) {
     const p = this.props;
-    p.updateRenderMethod(val);
+    p.updateRenderMethod(parseInt(val, 10));
   }
 
-  updateX(val) {
-    const p = this.props;
-    p.updateCentreCoords(val, undefined);
-  }
-
-  updateY(val) {
-    const p = this.props;
-    p.updateCentreCoords(undefined, val);
+  updateTimer(time) {
+    this.setState({
+      time,
+    });
   }
 
   toggle() {
@@ -50,28 +46,23 @@ export default class Settings extends Component {
     });
   }
 
-  resetFractal() {
-    const p = this.props;
-    p.updateCentreCoords(-1, 0);
-    p.updatePixelSize(0.003);
-  }
-
   render() {
     const p = this.props;
     const s = this.state;
-    const contentsClasses = (s.collapsed) ? 'settings-boxes settings-collapsed' : 'settings-boxes';
+    const contentsClasses = (s.collapsed) ? 'settings-collapsed settings-boxes' : 'settings-boxes';
     const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
+    const blockerClass = (s.collapsed) ? 'blocker-collapse' : 'blocker';
+    const blocker = (window.innerWidth < 300) ? (<div className={blockerClass} />) : '';
+
     return (
       <div className="settings-container">
+        {blocker}
         <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
-          <Timer time={p.time} ref={p.timer} />
+          <Timer time={parseInt(s.time, 10)} />
           <div className="options-container ">
             <strong>Settings</strong>
             <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={p.updateIter} timeout={1000} />
-            <DelayedInput label="Pixel Size" type="number" defaultValue={0.003} callback={p.updatePixelSize} timeout={500} />
-            <DelayedInput label="Centre X" type="number" defaultValue={-1} callback={this.updateX} timeout={500} />
-            <DelayedInput label="Centre Y" type="number" defaultValue={0} callback={this.updateY} timeout={500} />
             <div>
               <div>Render Method</div>
               <select
@@ -88,11 +79,8 @@ export default class Settings extends Component {
               <span>Enable Centre Marker </span>
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
-            <button type="button" onClick={() => this.resetFractal()}>Reset Fractal</button>
           </div>
         </div>
-
-
       </div>
     );
   }
@@ -100,15 +88,11 @@ export default class Settings extends Component {
 Settings.propTypes = {
   updateIter: PropTypes.func.isRequired,
   updateRenderMethod: PropTypes.func.isRequired,
-  updateCentreCoords: PropTypes.func.isRequired,
-  updatePixelSize: PropTypes.func.isRequired,
-  selectedRenderMode: PropTypes.string,
+  selectedRenderMode: PropTypes.number,
   time: PropTypes.string,
-  // eslint-disable-next-line react/forbid-prop-types
-  timer: PropTypes.object.isRequired,
   updateCentreMarker: PropTypes.func.isRequired,
 };
 Settings.defaultProps = {
-  selectedRenderMode: '0',
+  selectedRenderMode: 0,
   time: '0',
 };

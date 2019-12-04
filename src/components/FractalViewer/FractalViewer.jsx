@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Settings from '../Settings';
-import './MandelbrotViewer.css';
+import './FractalViewer.css';
 import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
-
 
 /*
   TODO:
@@ -13,14 +11,29 @@ import idGenerator from '../../utils/IDGenerator';
     * Fix rapid move mouse after drag bug
 */
 
-class MandelbrotViewer extends React.Component {
+class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
+
+    // if running in headless then set default
+    if (window.screen.orientation) {
+      this.orientation = window.screen.orientation.type;
+    } else {
+      this.orientation = 'landscape-primary';
+    }
+    this.position = props.position;
+    this.appRef = props.appRef;
     this.fractal = React.createRef();
-    this.timer = React.createRef();
     this.last_arr = undefined;
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
+      this.orientation = 'portrait';
+      this.width = window.innerWidth;
+      this.height = Math.floor(window.innerHeight / 2);
+    } else {
+      this.orientation = 'landscape';
+      this.width = Math.floor(window.innerWidth / 2);
+      this.height = window.innerHeight;
+    }
     this.state = {};
     this.dragging = false;
     this.deltaX = 0;
@@ -30,14 +43,9 @@ class MandelbrotViewer extends React.Component {
     this.dirty = false;
     this.callBackMouse = undefined;
     this.renderID = undefined;
-    this.showCentreMarker = false;
+    this.showCentreMarker = props.showCentreMarker;
     // Set up hooks for Setting Component
     this.updateDimensions = this.updateDimensions.bind(this);
-    this.updateIter = this.updateIter.bind(this);
-    this.updateRenderMethod = this.updateRenderMethod.bind(this);
-    this.updateCentreCoords = this.updateCentreCoords.bind(this);
-    this.updatePixelSize = this.updatePixelSize.bind(this);
-    this.updateCentreMarker = this.updateCentreMarker.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.canvasZoom = 1;
@@ -47,9 +55,9 @@ class MandelbrotViewer extends React.Component {
     this.canvasOffsetY = 0;
     this.rendering = false;
     this.renderer = new Renderer(
-      props.renderMode,
-      window.innerWidth,
-      window.innerHeight,
+      parseInt(props.renderMode, 10),
+      this.width,
+      this.height,
       parseInt(props.maxi, 10),
     );
   }
@@ -57,15 +65,21 @@ class MandelbrotViewer extends React.Component {
   async componentDidMount() {
     this.fractal.current.focus();
     await this.loadWasm();
+    const startTime = Date.now();
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
-    document.addEventListener('wheel', (e) => this.handleScroll(e));
     requestAnimationFrame(() => this.drawFractal());
     window.performance.mark('fractal_rendered_end');
+    this.endTime = Date.now() - startTime;
     window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
   }
 
   componentDidUpdate() {
+    const p = this.props;
+    if (p.showCentreMarker !== this.showCentreMarker) {
+      this.showCentreMarker = p.showCentreMarker;
+    }
+    this.renderer.mode = p.renderMode;
     requestAnimationFrame(() => this.drawFractal());
   }
 
@@ -112,24 +126,15 @@ class MandelbrotViewer extends React.Component {
     requestAnimationFrame(() => this.drawFractal());
   }
 
-  updateRenderMethod(renderMode) {
-    this.renderer.mode = parseInt(renderMode, 10);
-    requestAnimationFrame(() => this.drawFractal());
-  }
-
   updatePixelSize(px) {
     this.renderer.pixelSize = px;
     requestAnimationFrame(() => this.drawFractal());
   }
 
-  updateCentreCoords(x, y) {
-    this.renderer.updateCentreCoords(x, y);
-    requestAnimationFrame(() => this.drawFractal());
-  }
-
   drawFractal() {
+    this.updateWidthHeight();
     this.rendering = true;
-    const timerStart = Date.now();
+    const startTime = Date.now();
     if (!this.dragging || !this.dirty) {
       this.renderer.render().then((fractal) => {
         this.rendering = false;
@@ -138,11 +143,11 @@ class MandelbrotViewer extends React.Component {
         this.canvasZoom = 1;
         this.putImage(fractal.arr, fractal.width, fractal.height);
         this.dirty = false;
-        this.timer.current.updateTime(Date.now() - timerStart);
+        this.appRef.current.updateTimer(Date.now() - startTime);
       }).catch((err) => {
         // TODO: alert user
-        // eslint-disable-next-line no-alert
-        alert(`Error when drawing fractal ${err}`);
+        // eslint-disable-next-line
+        alert(`${this.props.type} Error when drawing fractal ${err}`);
       });
     }
   }
@@ -167,24 +172,45 @@ class MandelbrotViewer extends React.Component {
     }
   }
 
+  updateWidthHeight() {
+    if (window.screen.orientation.type) {
+      this.orientation = window.screen.orientation.type;
+    } else {
+      this.orientation = 'landscape-primary';
+    }
+    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
+      this.orientation = 'portrait';
+      this.width = window.innerWidth;
+      this.height = Math.floor(window.innerHeight / 2);
+    } else {
+      this.orientation = 'landscape';
+      this.width = Math.floor(window.innerWidth / 2);
+      this.height = window.innerHeight;
+    }
+    this.renderer.width = this.width;
+    this.renderer.height = this.height;
+  }
+
   putImage(arr, width, height) {
-    if (!this.dragging || !this.dirty) {
-      const fractalContext = this.fractal.current.getContext('2d');
-      fractalContext.canvas.width = window.innerWidth;
-      fractalContext.canvas.height = window.innerHeight;
-      this.imageData = fractalContext.createImageData(width, height);
-      this.imageData.data.set(arr);
-      requestAnimationFrame(() => this.updateCanvas());
+    if (width && height) {
+      if (!this.dragging || !this.dirty) {
+        const fractalContext = this.fractal.current.getContext('2d');
+        this.updateWidthHeight();
+        fractalContext.canvas.width = this.width;
+        fractalContext.canvas.height = this.height;
+        this.imageData = fractalContext.createImageData(width, height);
+        this.imageData.data.set(arr);
+        requestAnimationFrame(() => this.updateCanvas());
+      }
     }
   }
 
   updateDimensions() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
-      this.renderer.width = window.innerWidth;
-      this.renderer.height = window.innerHeight;
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
+      this.updateWidthHeight();
+      this.renderer.width = this.width;
+      this.renderer.height = this.height;
       requestAnimationFrame(() => this.drawFractal());
     }, 100);
   }
@@ -194,8 +220,13 @@ class MandelbrotViewer extends React.Component {
   }
 
   handleMouseMove(e) {
-    this.mouseX = e.pageX;
-    this.mouseY = e.pageY;
+    if (this.orientation === 'portrait') {
+      this.mouseX = e.pageX;
+      this.mouseY = e.pageY - this.height * this.position;
+    } else {
+      this.mouseX = e.pageX - this.width * this.position;
+      this.mouseY = e.page;
+    }
     if (this.dragging) {
       this.deltaX += e.movementX;
       this.deltaY += e.movementY;
@@ -206,7 +237,6 @@ class MandelbrotViewer extends React.Component {
   async handleDragEnd() {
     if (this.dragging) {
       this.dragging = false;
-      const timerStart = Date.now();
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;
       this.renderer.centreCoords[1] += -1 * this.deltaY * this.renderer.pixelSize;
       let xRect;
@@ -230,9 +260,11 @@ class MandelbrotViewer extends React.Component {
           this.deltaX,
           this.deltaY,
         );
+        if (result === []) {
+          this.drawFractal();
+        }
         if (this.renderID === roundID) {
           this.putImage(result.arr, result.width, result.height);
-          this.timer.current.updateTime(Date.now() - timerStart);
         }
       };
 
@@ -270,7 +302,7 @@ class MandelbrotViewer extends React.Component {
         const startTouch = this.activeTouches[touches[i].identifier];
         this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
         this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
-        this.updateImagePos();
+        requestAnimationFrame(() => this.updateCanvas());
       }
     }
   }
@@ -296,7 +328,7 @@ class MandelbrotViewer extends React.Component {
 
   zoom(direction) {
     this.dirty = true;
-    let newCanvasZoom = this.canvasZoom + 0.02 * Math.sign(direction);
+    let newCanvasZoom = this.canvasZoom + 0.02 * -1 * Math.sign(direction);
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
@@ -321,22 +353,10 @@ class MandelbrotViewer extends React.Component {
   }
 
   render() {
-    const s = this.state;
+    const p = this.props;
+    this.renderer.maxIter = p.maxi;
     return (
       <div className="mandelbrot-viewer-container">
-        <div className="info-panel">
-          <Settings
-            time={this.time}
-            timer={this.timer}
-            selectedRenderMode={s.renderMode}
-            updatePixelSize={this.updatePixelSize}
-            updateCentreCoords={this.updateCentreCoords}
-            updateIter={this.updateIter}
-            updateRenderMethod={this.updateRenderMethod}
-            updateCentreMarker={this.updateCentreMarker}
-            axi={s.maxIter}
-          />
-        </div>
         <canvas
           onTouchStart={(e) => this.handleTouchStart(e)}
           onTouchMove={(e) => this.handleTouchMove(e)}
@@ -345,6 +365,7 @@ class MandelbrotViewer extends React.Component {
           onMouseMove={(e) => this.handleMouseMove(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
           onMouseLeave={(e) => this.handleDragEnd(e)}
+          onWheel={(e) => this.handleScroll(e)}
           className="fractal"
           id="fractal"
           ref={this.fractal}
@@ -353,8 +374,17 @@ class MandelbrotViewer extends React.Component {
     );
   }
 }
-MandelbrotViewer.propTypes = {
+FractalViewer.propTypes = {
   renderMode: PropTypes.number.isRequired,
   maxi: PropTypes.number.isRequired,
+  showCentreMarker: PropTypes.bool,
+  type: PropTypes.string.isRequired,
+  position: PropTypes.number.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  appRef: PropTypes.object.isRequired,
 };
-export default MandelbrotViewer;
+
+FractalViewer.defaultProps = {
+  showCentreMarker: false,
+};
+export default FractalViewer;

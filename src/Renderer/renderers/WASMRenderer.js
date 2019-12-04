@@ -56,7 +56,7 @@ class WASMRenderer {
           centreCoordsX,
           centreCoordsY,
         );
-        const fractalArr = new Uint8Array(
+        const fractalArr = new Uint8ClampedArray(
           this.memory.buffer,
           arrPointer,
           (endRow - startRow) * width * 4,
@@ -89,7 +89,7 @@ class WASMRenderer {
         maxIter,
       );
       try {
-        const arr = new Uint8Array(this.memory.buffer, arrPointer, (e - s) * 4);
+        const arr = new Uint8ClampedArray(this.memory.buffer, arrPointer, (e - s) * 4);
         res(arr);
       } catch (err) {
         rej(err);
@@ -110,7 +110,7 @@ class WASMRenderer {
       maxIter,
     );
     try {
-      const arr = new Uint8Array(this.memory.buffer, arrPointer, width * height * 4);
+      const arr = new Uint8ClampedArray(this.memory.buffer, arrPointer, width * height * 4);
       return {
         arr,
         width,
