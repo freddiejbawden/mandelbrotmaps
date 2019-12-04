@@ -42,16 +42,11 @@
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent; 
   border-left:10px solid grey;
-  transition: transform 0.3s;
-  animation-timing-function: ease-in-out;
   transform: rotate(90deg); 
 }
 
 .settings-min-max-collapse {
-  transition: transform 0.3s;
   transform: rotate(0deg);
-  animation-timing-function: ease-in-out;
-  transition-delay: 0.2s;
 }
 .blocker {
   position: absolute;
