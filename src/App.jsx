@@ -10,6 +10,7 @@ import { disableBodyScroll } from 'body-scroll-lock';
 import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
+import NerdBar from './components/NerdBar';
 
 const AppRouter = () => {
   disableBodyScroll(document.querySelector('#app'));
@@ -31,6 +32,16 @@ class App extends Component {
       time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
+      stats: {
+        renderTime: {
+          label: 'Render Time',
+          value: (`${200}ms`),
+        },
+        iterations: {
+          label: 'Iterations',
+          value: props.maxi,
+        },
+      },
     };
     this.appRef = React.createRef();
     this.updateMaxIterations = this.updateMaxIterations.bind(this);
@@ -45,8 +56,12 @@ class App extends Component {
   }
 
   updateMaxIterations(iter) {
+    const s = this.state;
+    const stats = s.stats;
+    stats.iterations.value = iter;
     this.setState({
       maxi: parseInt(iter, 10),
+      stats,
     });
   }
 
@@ -95,6 +110,9 @@ class App extends Component {
             ref={this.appRef}
           />
         </div>
+        <NerdBar
+          stats={s.stats}
+        />
       </div>
     );
   }
