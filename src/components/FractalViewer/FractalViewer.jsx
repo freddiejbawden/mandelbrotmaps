@@ -225,7 +225,7 @@ class FractalViewer extends React.Component {
       this.mouseY = e.pageY - this.height * this.position;
     } else {
       this.mouseX = e.pageX - this.width * this.position;
-      this.mouseY = e.page;
+      this.mouseY = e.pageY;
     }
     if (this.dragging) {
       this.deltaX += e.movementX;
