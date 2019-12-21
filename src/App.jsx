@@ -10,6 +10,7 @@ import { disableBodyScroll } from 'body-scroll-lock';
 import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
+import NerdBar from './components/NerdBar';
 
 const AppRouter = () => {
   disableBodyScroll(document.querySelector('#app'));
@@ -31,11 +32,35 @@ class App extends Component {
       time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
+      stats: {
+        renderTime: {
+          label: 'Render Time',
+          value: (`${200}ms`),
+        },
+        iterations: {
+          label: 'Iterations',
+          value: props.maxi,
+        },
+      },
     };
     this.appRef = React.createRef();
     this.updateMaxIterations = this.updateMaxIterations.bind(this);
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
+    this.updateRenderTime = this.updateRenderTime.bind(this);
+  }
+
+  updateRenderTime(time) {
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        renderTime: {
+          ...prevState.stats.renderTime,
+          value: `${time}ms`,
+        },
+      },
+    }));
   }
 
   updateRenderMethod(newRenderMode) {
@@ -45,9 +70,16 @@ class App extends Component {
   }
 
   updateMaxIterations(iter) {
-    this.setState({
-      maxi: parseInt(iter, 10),
-    });
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        iterations: {
+          ...prevState.stats.iterations,
+          value: `${iter}`,
+        },
+      },
+    }));
   }
 
   updateCentreMarker() {
@@ -62,6 +94,7 @@ class App extends Component {
     const s = this.state;
     // Fall back to JS
     const renderMode = parseInt(s.renderMode || 1, 10);
+    const iterations = parseInt(s.stats.iterations.value || 200, 10);
     return (
       <div className="App">
         <div className="render-container">
@@ -69,19 +102,22 @@ class App extends Component {
             id="fractal-viewer"
             type="julia"
             position={0}
-            maxi={s.maxi}
+            maxi={iterations}
             renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
+            updateRenderTime={this.updateRenderTime}
+
           />
           <FractalViewer
             id="fractal-viewer"
             type="mandelbrot"
             position={1}
-            maxi={s.maxi}
+            maxi={iterations}
             renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
+            updateRenderTime={this.updateRenderTime}
           />
         </div>
         <div className="info-panel">
@@ -95,6 +131,9 @@ class App extends Component {
             ref={this.appRef}
           />
         </div>
+        <NerdBar
+          stats={s.stats}
+        />
       </div>
     );
   }
