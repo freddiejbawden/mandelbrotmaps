@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import './Nerdbar.css';
 
@@ -9,10 +8,9 @@ const Nerdbar = (props) => {
   let i = 0;
   Object.keys(p.stats).forEach((key) => {
     const stat = p.stats[key];
+    const content = `${stat.label}: ${stat.value}`;
     stats.push(
-      <span key={i}>
-        {stat.label}: {stat.value}
-      </span>,
+      <span key={i}>{content}</span>,
     );
     i += 1;
   });
@@ -21,13 +19,6 @@ const Nerdbar = (props) => {
       {stats}
     </div>
   );
-};
-
-Nerdbar.propTypes = {
-  stats: PropTypes.object,
-};
-Nerdbar.defaultProps = {
-  data: [],
 };
 
 export default Nerdbar;

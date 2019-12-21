@@ -44,7 +44,6 @@ class FractalViewer extends React.Component {
     this.callBackMouse = undefined;
     this.renderID = undefined;
     this.showCentreMarker = props.showCentreMarker;
-    // Set up hooks for Setting Component
     this.updateDimensions = this.updateDimensions.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
@@ -54,6 +53,9 @@ class FractalViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
+    this.updateRenderTime = props.updateRenderTime;
+    this.renderMode = props.renderMode;
+    this.maxi = props.maxi;
     this.renderer = new Renderer(
       parseInt(props.renderMode, 10),
       this.width,
@@ -68,10 +70,24 @@ class FractalViewer extends React.Component {
     const startTime = Date.now();
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
-    requestAnimationFrame(() => this.drawFractal());
-    window.performance.mark('fractal_rendered_end');
-    this.endTime = Date.now() - startTime;
-    window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
+    requestAnimationFrame(() => {
+      this.drawFractal();
+      window.performance.mark('fractal_rendered_end');
+      this.endTime = Date.now() - startTime;
+      window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
+    });
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (this.renderMode !== nextProps.renderMode) {
+      this.renderMode = nextProps.renderMode;
+      return true;
+    }
+    if (this.renderer.maxIter !== nextProps.maxi) {
+      this.renderer.maxIter = nextProps.maxi;
+      return true;
+    }
+    return false;
   }
 
   componentDidUpdate() {
@@ -143,7 +159,7 @@ class FractalViewer extends React.Component {
         this.canvasZoom = 1;
         this.putImage(fractal.arr, fractal.width, fractal.height);
         this.dirty = false;
-        this.appRef.current.updateTimer(Date.now() - startTime);
+        this.updateRenderTime(Date.now() - startTime);
       }).catch((err) => {
         // TODO: alert user
         // eslint-disable-next-line
@@ -380,6 +396,7 @@ FractalViewer.propTypes = {
   showCentreMarker: PropTypes.bool,
   type: PropTypes.string.isRequired,
   position: PropTypes.number.isRequired,
+  updateRenderTime: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };
