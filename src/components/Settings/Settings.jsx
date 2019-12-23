@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import './Settings.css';
 import DelayedInput from '../DelayedInput';
 import RenderMode from '../../utils/RenderMode';
-import Timer from '../Timer';
 
 export default class Settings extends Component {
   constructor(props) {
@@ -12,9 +11,7 @@ export default class Settings extends Component {
     this.iterations = 200;
     this.state = {
       collapsed: true,
-      time: props.time,
     };
-    this.updateTimer = this.updateTimer.bind(this);
   }
 
   updateIterations(i) {
@@ -29,12 +26,6 @@ export default class Settings extends Component {
   updateRenderMethod(val) {
     const p = this.props;
     p.updateRenderMethod(parseInt(val, 10));
-  }
-
-  updateTimer(time) {
-    this.setState({
-      time,
-    });
   }
 
   toggle() {
@@ -59,7 +50,6 @@ export default class Settings extends Component {
         {blocker}
         <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
         <div className={contentsClasses}>
-          <Timer time={parseInt(s.time, 10)} />
           <div className="options-container ">
             <strong>Settings</strong>
             <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={p.updateIter} timeout={1000} />
@@ -93,12 +83,10 @@ Settings.propTypes = {
   updateIter: PropTypes.func.isRequired,
   updateRenderMethod: PropTypes.func.isRequired,
   selectedRenderMode: PropTypes.number,
-  time: PropTypes.string,
   updateCentreMarker: PropTypes.func.isRequired,
   updateNerdBar: PropTypes.func.isRequired,
 
 };
 Settings.defaultProps = {
   selectedRenderMode: 0,
-  time: '0',
 };
