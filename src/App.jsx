@@ -45,6 +45,14 @@ class App extends Component {
           label: 'Zoom',
           value: '1x',
         },
+        re: {
+          label: 'Re',
+          value: -1,
+        },
+        im: {
+          label: 'Im',
+          value: 0,
+        },
       },
     };
     this.appRef = React.createRef();
@@ -53,6 +61,24 @@ class App extends Component {
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateRenderTime = this.updateRenderTime.bind(this);
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
+    this.updateCoords = this.updateCoords.bind(this);
+  }
+
+  updateCoords(re, im) {
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        re: {
+          label: 'Re',
+          value: re,
+        },
+        im: {
+          label: 'Im',
+          value: im,
+        },
+      },
+    }));
   }
 
   updateRenderTime(time) {
@@ -126,7 +152,7 @@ class App extends Component {
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
-
+            updateCoords={this.updateCoords}
           />
           <FractalViewer
             id="fractal-viewer"
@@ -138,6 +164,7 @@ class App extends Component {
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
+            updateCoords={this.updateCoords}
           />
         </div>
         <div className="info-panel">

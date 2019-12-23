@@ -4,6 +4,8 @@ import './FractalViewer.css';
 import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
+import round from '../../utils/Round';
+
 
 /*
   TODO:
@@ -55,6 +57,7 @@ class FractalViewer extends React.Component {
     this.rendering = false;
     this.updateRenderTime = props.updateRenderTime;
     this.updateZoomLevel = props.updateZoomLevel;
+    this.updateCoords = props.updateCoords;
     this.zoomLevel = 1;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
@@ -237,6 +240,13 @@ class FractalViewer extends React.Component {
     this.dragging = true;
   }
 
+  mouseToWorld() {
+    const limits = this.renderer.calculateFractalLimit();
+    const re = limits.fractalLimitX + (this.renderer.pixelSize / this.canvasZoom) * this.mouseX;
+    const im = limits.fractalLimitY + (this.renderer.pixelSize / this.canvasZoom) * this.mouseY;
+    return { re, im };
+  }
+
   handleMouseMove(e) {
     if (this.orientation === 'portrait') {
       this.mouseX = e.pageX;
@@ -245,6 +255,8 @@ class FractalViewer extends React.Component {
       this.mouseX = e.pageX - this.width * this.position;
       this.mouseY = e.pageY;
     }
+    const coords = this.mouseToWorld();
+    this.updateCoords(coords.re.toFixed(5), coords.im.toFixed(5));
     if (this.dragging) {
       this.deltaX += e.movementX;
       this.deltaY += e.movementY;
@@ -351,7 +363,7 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    this.updateZoomLevel(Math.round(this.zoomLevel * 100) / 100);
+    this.updateZoomLevel(round(this.zoomLevel, 2));
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
@@ -405,6 +417,7 @@ FractalViewer.propTypes = {
   position: PropTypes.number.isRequired,
   updateRenderTime: PropTypes.func.isRequired,
   updateZoomLevel: PropTypes.func.isRequired,
+  updateCoords: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };
