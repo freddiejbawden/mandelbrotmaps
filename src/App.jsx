@@ -53,6 +53,10 @@ class App extends Component {
           label: 'Im',
           value: 0,
         },
+        focus: {
+          label: 'Focus',
+          value: 'mandelbrot',
+        },
       },
     };
     this.appRef = React.createRef();
@@ -62,6 +66,7 @@ class App extends Component {
     this.updateRenderTime = this.updateRenderTime.bind(this);
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
+    this.updateFocus = this.updateFocus.bind(this);
   }
 
   updateCoords(re, im) {
@@ -70,11 +75,11 @@ class App extends Component {
       stats: {
         ...prevState.stats,
         re: {
-          label: 'Re',
+          ...prevState.stats.re,
           value: re,
         },
         im: {
-          label: 'Im',
+          ...prevState.stats.im,
           value: im,
         },
       },
@@ -89,6 +94,19 @@ class App extends Component {
         renderTime: {
           ...prevState.stats.renderTime,
           value: `${time}ms`,
+        },
+      },
+    }));
+  }
+
+  updateFocus(focus) {
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        focus: {
+          ...prevState.stats.focus,
+          value: focus,
         },
       },
     }));
@@ -153,6 +171,9 @@ class App extends Component {
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
+            updateFocus={this.updateFocus}
+            onMouseOver={() => this.updateFocus('Julia')}
+            onFocus={() => this.updateFocus('Julia')}
           />
           <FractalViewer
             id="fractal-viewer"
@@ -165,6 +186,9 @@ class App extends Component {
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
+            updateFocus={this.updateFocus}
+            onMouseOver={() => this.updateFocus('Mandelbrot')}
+            onFocus={() => this.updateFocus('Mandelbrot')}
           />
         </div>
         <div className="info-panel">
