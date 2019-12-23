@@ -32,6 +32,7 @@ class App extends Component {
       time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
+      showNerdBar: false,
       stats: {
         renderTime: {
           label: 'Render Time',
@@ -53,6 +54,10 @@ class App extends Component {
           label: 'Im',
           value: 0,
         },
+        focus: {
+          label: 'Focus',
+          value: 'mandelbrot',
+        },
       },
     };
     this.appRef = React.createRef();
@@ -62,6 +67,8 @@ class App extends Component {
     this.updateRenderTime = this.updateRenderTime.bind(this);
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
+    this.updateFocus = this.updateFocus.bind(this);
+    this.updateNerdBar = this.updateNerdBar.bind(this);
   }
 
   updateCoords(re, im) {
@@ -70,11 +77,11 @@ class App extends Component {
       stats: {
         ...prevState.stats,
         re: {
-          label: 'Re',
+          ...prevState.stats.re,
           value: re,
         },
         im: {
-          label: 'Im',
+          ...prevState.stats.im,
           value: im,
         },
       },
@@ -89,6 +96,19 @@ class App extends Component {
         renderTime: {
           ...prevState.stats.renderTime,
           value: `${time}ms`,
+        },
+      },
+    }));
+  }
+
+  updateFocus(focus) {
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        focus: {
+          ...prevState.stats.focus,
+          value: focus,
         },
       },
     }));
@@ -126,6 +146,10 @@ class App extends Component {
     }));
   }
 
+  updateNerdBar() {
+    this.setState((prevState) => ({ showNerdBar: !prevState.showNerdBar }));
+  }
+
   updateCentreMarker() {
     const s = this.state;
     const oldVal = s.showCentreMarker;
@@ -153,6 +177,9 @@ class App extends Component {
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
+            updateFocus={this.updateFocus}
+            onMouseOver={() => this.updateFocus('Julia')}
+            onFocus={() => this.updateFocus('Julia')}
           />
           <FractalViewer
             id="fractal-viewer"
@@ -165,6 +192,9 @@ class App extends Component {
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
+            updateFocus={this.updateFocus}
+            onMouseOver={() => this.updateFocus('Mandelbrot')}
+            onFocus={() => this.updateFocus('Mandelbrot')}
           />
         </div>
         <div className="info-panel">
@@ -175,11 +205,13 @@ class App extends Component {
             maxi={s.maxi}
             updateCentreMarker={this.updateCentreMarker}
             updateRenderMethod={this.updateRenderMethod}
+            updateNerdBar={this.updateNerdBar}
             ref={this.appRef}
           />
         </div>
         <NerdBar
           stats={s.stats}
+          showNerdBar={s.showNerdBar}
         />
       </div>
     );

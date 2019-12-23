@@ -58,6 +58,8 @@ class FractalViewer extends React.Component {
     this.updateRenderTime = props.updateRenderTime;
     this.updateZoomLevel = props.updateZoomLevel;
     this.updateCoords = props.updateCoords;
+    this.updateFocus = props.updateFocus;
+    this.type = props.type;
     this.zoomLevel = 1;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
@@ -317,6 +319,7 @@ class FractalViewer extends React.Component {
 
   handleTouchStart(e) {
     const touches = e.changedTouches;
+    this.updateFocus(this.type);
     if (touches.length > 0) {
       this.dragging = true;
     }
@@ -332,6 +335,10 @@ class FractalViewer extends React.Component {
         const startTouch = this.activeTouches[touches[i].identifier];
         this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
         this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
+        this.mouseX = this.deltaX + this.width / 2;
+        this.mouseY = this.deltaY + this.height / 2;
+        const coords = this.mouseToWorld();
+        this.updateCoords(coords.re.toFixed(5), coords.im.toFixed(5));
         requestAnimationFrame(() => this.updateCanvas());
       }
     }
@@ -397,6 +404,7 @@ class FractalViewer extends React.Component {
           onTouchMove={(e) => this.handleTouchMove(e)}
           onTouchEnd={(e) => this.handleTouchEnd(e)}
           onMouseDown={(e) => this.handleDragStart(e)}
+          onMouseEnter={() => this.updateFocus(this.type)}
           onMouseMove={(e) => this.handleMouseMove(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
           onMouseLeave={(e) => this.handleDragEnd(e)}
@@ -418,6 +426,7 @@ FractalViewer.propTypes = {
   updateRenderTime: PropTypes.func.isRequired,
   updateZoomLevel: PropTypes.func.isRequired,
   updateCoords: PropTypes.func.isRequired,
+  updateFocus: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };
