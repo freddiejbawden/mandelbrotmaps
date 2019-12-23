@@ -41,6 +41,10 @@ class App extends Component {
           label: 'Iterations',
           value: props.maxi,
         },
+        zoomLevel: {
+          label: 'Zoom',
+          value: '1x',
+        },
       },
     };
     this.appRef = React.createRef();
@@ -48,6 +52,7 @@ class App extends Component {
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
     this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateRenderTime = this.updateRenderTime.bind(this);
+    this.updateZoomLevel = this.updateZoomLevel.bind(this);
   }
 
   updateRenderTime(time) {
@@ -58,6 +63,19 @@ class App extends Component {
         renderTime: {
           ...prevState.stats.renderTime,
           value: `${time}ms`,
+        },
+      },
+    }));
+  }
+
+  updateZoomLevel(zoom) {
+    this.setState((prevState) => ({
+      ...prevState,
+      stats: {
+        ...prevState.stats,
+        zoomLevel: {
+          ...prevState.stats.zoomLevel,
+          value: `${zoom}x`,
         },
       },
     }));
@@ -107,6 +125,7 @@ class App extends Component {
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
+            updateZoomLevel={this.updateZoomLevel}
 
           />
           <FractalViewer
@@ -118,6 +137,7 @@ class App extends Component {
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
+            updateZoomLevel={this.updateZoomLevel}
           />
         </div>
         <div className="info-panel">
