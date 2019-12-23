@@ -12,7 +12,9 @@
   align-items: center;
   font-family: monospace;
   flex-wrap: wrap;
-
+}
+.nerd-bar-hide {
+  height: 0;
 }
 .nerd-bar-container > span {
   color: #EBFCFD;

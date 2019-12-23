@@ -6,6 +6,7 @@ const Nerdbar = (props) => {
   const stats = [];
   const p = props;
   let i = 0;
+  const className = (p.showNerdBar) ? 'nerd-bar-container' : 'nerd-bar-hide';
   Object.keys(p.stats).forEach((key) => {
     const stat = p.stats[key];
     const content = `${stat.label}: ${stat.value}`;
@@ -15,7 +16,7 @@ const Nerdbar = (props) => {
     i += 1;
   });
   return (
-    <div className="nerd-bar-container ">
+    <div className={className}>
       {stats}
     </div>
   );

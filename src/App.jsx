@@ -32,6 +32,7 @@ class App extends Component {
       time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
+      showNerdBar: false,
       stats: {
         renderTime: {
           label: 'Render Time',
@@ -67,6 +68,7 @@ class App extends Component {
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
+    this.updateNerdBar = this.updateNerdBar.bind(this);
   }
 
   updateCoords(re, im) {
@@ -144,6 +146,10 @@ class App extends Component {
     }));
   }
 
+  updateNerdBar() {
+    this.setState((prevState) => ({ showNerdBar: !prevState.showNerdBar }));
+  }
+
   updateCentreMarker() {
     const s = this.state;
     const oldVal = s.showCentreMarker;
@@ -199,11 +205,13 @@ class App extends Component {
             maxi={s.maxi}
             updateCentreMarker={this.updateCentreMarker}
             updateRenderMethod={this.updateRenderMethod}
+            updateNerdBar={this.updateNerdBar}
             ref={this.appRef}
           />
         </div>
         <NerdBar
           stats={s.stats}
+          showNerdBar={s.showNerdBar}
         />
       </div>
     );

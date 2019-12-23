@@ -79,6 +79,10 @@ export default class Settings extends Component {
               <span>Enable Centre Marker </span>
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
+            <div>
+              <span>Enable Nerd Bar </span>
+              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateNerdBar()} />
+            </div>
           </div>
         </div>
       </div>
@@ -91,6 +95,8 @@ Settings.propTypes = {
   selectedRenderMode: PropTypes.number,
   time: PropTypes.string,
   updateCentreMarker: PropTypes.func.isRequired,
+  updateNerdBar: PropTypes.func.isRequired,
+
 };
 Settings.defaultProps = {
   selectedRenderMode: 0,
