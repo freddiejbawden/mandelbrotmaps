@@ -285,6 +285,7 @@ class FractalViewer extends React.Component {
       }
       const roundID = idGenerator();
       this.renderID = roundID;
+      const startTime = Date.now();
       const renderRange = async () => {
         const result = await this.renderer.renderRange(
           xRect,
@@ -313,6 +314,7 @@ class FractalViewer extends React.Component {
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;
+      this.updateRenderTime(Date.now() - startTime);
     }
   }
 

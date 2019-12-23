@@ -199,7 +199,6 @@ class App extends Component {
         </div>
         <div className="info-panel">
           <Settings
-            time={s.time}
             updateIter={this.updateMaxIterations}
             selectedRenderMode={s.renderMode}
             maxi={s.maxi}
