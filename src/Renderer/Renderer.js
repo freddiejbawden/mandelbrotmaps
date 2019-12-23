@@ -43,6 +43,12 @@ class Renderer {
     this.prev_arr = undefined;
   }
 
+  calculateFractalLimit() {
+    const fractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
+    const fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
+    return { fractalLimitX, fractalLimitY };
+  }
+
   /* Adapted from https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate */
   zoomOnPoint(canvasZoom, pixX, pixY) {
     const newPixelSize = this.pixelSize / canvasZoom;
