@@ -54,6 +54,8 @@ class FractalViewer extends React.Component {
     this.canvasOffsetY = 0;
     this.rendering = false;
     this.updateRenderTime = props.updateRenderTime;
+    this.updateZoomLevel = props.updateZoomLevel;
+    this.zoomLevel = 1;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
     this.renderer = new Renderer(
@@ -345,6 +347,11 @@ class FractalViewer extends React.Component {
   zoom(direction) {
     this.dirty = true;
     let newCanvasZoom = this.canvasZoom + 0.02 * -1 * Math.sign(direction);
+    if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
+      return;
+    }
+    this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
+    this.updateZoomLevel(Math.round(this.zoomLevel * 100) / 100);
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
@@ -397,6 +404,7 @@ FractalViewer.propTypes = {
   type: PropTypes.string.isRequired,
   position: PropTypes.number.isRequired,
   updateRenderTime: PropTypes.func.isRequired,
+  updateZoomLevel: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
 };
