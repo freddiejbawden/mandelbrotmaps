@@ -11,6 +11,7 @@ import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
 import NerdBar from './components/NerdBar';
+import FractalType from './utils/FractalType';
 
 const AppRouter = () => {
   disableBodyScroll(document.querySelector('#app'));
@@ -69,6 +70,7 @@ class App extends Component {
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
     this.updateNerdBar = this.updateNerdBar.bind(this);
+    this.updateJuliaPoint = this.updateJuliaPoint.bind(this);
   }
 
   updateCoords(re, im) {
@@ -158,6 +160,10 @@ class App extends Component {
     });
   }
 
+  updateJuliaPoint(juliaPoint) {
+    this.setState(() => ({ juliaPoint }));
+  }
+
   render() {
     const s = this.state;
     // Fall back to JS
@@ -168,7 +174,7 @@ class App extends Component {
         <div className="render-container">
           <FractalViewer
             id="fractal-viewer"
-            type="julia"
+            type={FractalType.MANDELBROT}
             position={0}
             maxi={iterations}
             renderMode={renderMode}
@@ -178,12 +184,13 @@ class App extends Component {
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
+            updateJuliaPoint={this.updateJuliaPoint}
             onMouseOver={() => this.updateFocus('Julia')}
             onFocus={() => this.updateFocus('Julia')}
           />
           <FractalViewer
             id="fractal-viewer"
-            type="mandelbrot"
+            type={FractalType.JULIA}
             position={1}
             maxi={iterations}
             renderMode={renderMode}
@@ -195,6 +202,7 @@ class App extends Component {
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Mandelbrot')}
             onFocus={() => this.updateFocus('Mandelbrot')}
+            juliaPoint={s.juliaPoint}
           />
         </div>
         <div className="info-panel">
