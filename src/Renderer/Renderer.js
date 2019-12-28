@@ -13,7 +13,7 @@ class Renderer {
     this.zoomLevel = 0;
     this.width = width;
     this.height = height;
-    this.centreCoords = [-1, 0];
+    this.centreCoords = [0, 0];
     this.maxIter = parseInt(maxIter, 10);
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
