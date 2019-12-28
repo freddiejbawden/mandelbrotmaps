@@ -1,4 +1,5 @@
-import FractalType from "../../utils/FractalType";
+/* eslint-disable prefer-destructuring */
+import FractalType from '../../utils/FractalType';
 
 class JSRenderer {
   constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {

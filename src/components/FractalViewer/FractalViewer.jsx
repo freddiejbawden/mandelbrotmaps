@@ -62,6 +62,8 @@ class FractalViewer extends React.Component {
     this.updateJuliaPoint = props.updateJuliaPoint;
     this.type = props.type;
     this.zoomLevel = 1;
+    this.juliaShiftX = 0;
+    this.juliaShiftY = 0;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
     this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 10);
@@ -193,7 +195,7 @@ class FractalViewer extends React.Component {
     newCanvas.setAttribute('width', this.imageData.width);
     newCanvas.setAttribute('height', this.imageData.height);
     fractalContext.fillRect(0, 0, this.width, this.height);
-    newCanvas.getContext('2d').putImageData(this.imageData, this.deltaX, this.deltaY);
+    newCanvas.getContext('2d').putImageData(this.imageData, this.deltaX / this.canvasZoom, this.deltaY / this.canvasZoom);
     fractalContext.scale(this.canvasZoom, this.canvasZoom);
     fractalContext.translate(this.originX, this.originY);
     fractalContext.drawImage(newCanvas, 0, 0);
@@ -203,7 +205,13 @@ class FractalViewer extends React.Component {
       fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
     }
     if (this.type === FractalType.MANDELBROT) {
-      this.juliaPin.render(fractalContext);
+      const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
+      const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
+      this.juliaPin.render(
+        fractalContext,
+        jRX + this.deltaX,
+        jRY + this.deltaY,
+      );
     }
   }
 
@@ -294,14 +302,24 @@ class FractalViewer extends React.Component {
   async handleDragEnd() {
     if (this.dragging) {
       this.dragging = false;
+      this.deltaX = this.deltaX / this.canvasZoom;
+      this.deltaY = this.deltaY / this.canvasZoom;
       if (this.draggingPin) {
-        console.log('update Julia');
+        this.juliaPin.move(this.juliaPin.x - this.deltaX, this.juliaPin.y - this.deltaY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         this.updateJuliaPoint([worldJulia.x, worldJulia.y]);
+        this.deltaX = 0;
+        this.deltaY = 0;
         this.updateCanvas();
         this.draggingPin = false;
         return;
       }
+      const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
+      const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
+      this.juliaPin.move(
+        this.juliaPin.x + jRX + this.deltaX * this.canvasZoom,
+        this.juliaPin.y + jRY + this.deltaY * this.canvasZoom,
+      );
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;
       this.renderer.centreCoords[1] += -1 * this.deltaY * this.renderer.pixelSize;
       let xRect;
@@ -343,7 +361,6 @@ class FractalViewer extends React.Component {
       } else {
         await renderRange();
       }
-
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;
@@ -390,6 +407,9 @@ class FractalViewer extends React.Component {
   resetZoomAndRender() {
     if (!this.dragging || !this.dirty) {
       this.renderer.zoomOnPoint(this.canvasZoom, this.callBackMouse[0], this.callBackMouse[1]);
+      const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
+      const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
+      this.juliaPin.move(this.juliaPin.x + jRX, this.juliaPin.y + jRY);
       this.dirty = true;
       this.originX = 0;
       this.originY = 0;
@@ -414,14 +434,19 @@ class FractalViewer extends React.Component {
 
     const centreX = this.mouseX;
     const centreY = this.mouseY;
+
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
     this.callBackMouse = [this.mouseX, this.mouseY];
     clearTimeout(this.zoomTimeout);
     this.zoomTimeout = setTimeout(() => {
+      this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
+      this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
       this.resetZoomAndRender();
     }, 1000);
     this.canvasZoom = newCanvasZoom;
+    this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
+    this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
     requestAnimationFrame(() => this.updateCanvas());
   }
 
