@@ -66,7 +66,7 @@ class FractalViewer extends React.Component {
     this.juliaShiftY = 0;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
-    this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 10);
+    this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
     this.draggingPin = false;
     this.renderer = new Renderer(
       props.type,
@@ -261,7 +261,7 @@ class FractalViewer extends React.Component {
   handleClick() {
     if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
       this.draggingPin = true;
-      this.updateCanvas();
+      requestAnimationFrame(() => this.updateCanvas());
     }
     this.dragging = true;
   }
@@ -290,7 +290,7 @@ class FractalViewer extends React.Component {
     if (this.dragging) {
       if (this.draggingPin) {
         this.juliaPin.move(this.mouseX, this.mouseY);
-        this.updateCanvas();
+        requestAnimationFrame(() => this.updateCanvas());
       } else {
         this.deltaX += e.movementX;
         this.deltaY += e.movementY;
@@ -310,7 +310,7 @@ class FractalViewer extends React.Component {
         this.updateJuliaPoint([worldJulia.x, worldJulia.y]);
         this.deltaX = 0;
         this.deltaY = 0;
-        this.updateCanvas();
+        requestAnimationFrame(() => this.updateCanvas());
         this.draggingPin = false;
         return;
       }
@@ -377,21 +377,30 @@ class FractalViewer extends React.Component {
     }
     for (let i = 0; i < touches.length; i += 1) {
       this.addTouch(touches[i]);
+      this.mouseX = touches[i].pageX;
+      this.mouseY = touches[i].pageY;
     }
+    console.log(this.mouseX, this.mouseY);
+    this.handleClick();
   }
 
   handleTouchMove(evt) {
     const touches = evt.changedTouches;
     for (let i = 0; i < touches.length; i += 1) {
       if (this.dragging) {
-        const startTouch = this.activeTouches[touches[i].identifier];
-        this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
-        this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
-        this.mouseX = this.deltaX + this.width / 2;
-        this.mouseY = this.deltaY + this.height / 2;
-        const coords = this.mouseToWorld();
-        this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
-        requestAnimationFrame(() => this.updateCanvas());
+        if (this.draggingPin) {
+          this.juliaPin.move(touches[i].pageX, touches[i].pageY);
+          requestAnimationFrame(() => this.updateCanvas());
+        } else {
+          const startTouch = this.activeTouches[touches[i].identifier];
+          this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
+          this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
+          this.mouseX = this.deltaX + this.width / 2;
+          this.mouseY = this.deltaY + this.height / 2;
+          const coords = this.mouseToWorld();
+          this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
+          requestAnimationFrame(() => this.updateCanvas());
+        }
       }
     }
   }
