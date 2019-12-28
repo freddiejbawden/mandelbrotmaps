@@ -74,7 +74,7 @@ class FractalViewer extends React.Component {
       this.width,
       this.height,
       parseInt(props.maxi, 10),
-      this.juliaPoint,
+      [-1, 0],
     );
   }
 
@@ -306,12 +306,11 @@ class FractalViewer extends React.Component {
       this.deltaY = this.deltaY / this.canvasZoom;
       if (this.draggingPin) {
         this.juliaPin.move(this.juliaPin.x - this.deltaX, this.juliaPin.y - this.deltaY);
-        const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
-        this.updateJuliaPoint([worldJulia.x, worldJulia.y]);
         this.deltaX = 0;
+        const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         this.deltaY = 0;
-        requestAnimationFrame(() => this.updateCanvas());
         this.draggingPin = false;
+        this.updateJuliaPoint([worldJulia.x, worldJulia.y]);
         return;
       }
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
