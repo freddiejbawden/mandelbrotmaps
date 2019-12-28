@@ -24,7 +24,12 @@ class JuliaPin {
   render(fc, dX, dY) {
     const fractalContext = fc;
     fractalContext.fillStyle = '#ff0000';
-    fractalContext.fillRect(this.x + dX - this.size / 4, this.y + dY - this.size / 4, this.size / 2, this.size / 2);
+    fractalContext.fillRect(
+      this.x + dX - this.size / 4,
+      this.y + dY - this.size / 4,
+      this.size / 2,
+      this.size / 2,
+    );
   }
 }
 

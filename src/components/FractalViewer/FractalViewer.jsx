@@ -379,7 +379,6 @@ class FractalViewer extends React.Component {
       this.mouseX = touches[i].pageX;
       this.mouseY = touches[i].pageY;
     }
-    console.log(this.mouseX, this.mouseY);
     this.handleClick();
   }
 
