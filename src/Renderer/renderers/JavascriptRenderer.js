@@ -1,5 +1,9 @@
+/* eslint-disable prefer-destructuring */
+import FractalType from '../../utils/FractalType';
+
 class JSRenderer {
-  constructor(pixelSize, width, height, centreCoords, maxIter) {
+  constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+    this.type = type;
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
@@ -7,6 +11,7 @@ class JSRenderer {
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
     this.maxIter = (maxIter) || 200;
+    this.juliaPoint = juliaPoint || [0, 0];
   }
 
   update(pixelSize, width, height, centreCoords, maxIter) {
@@ -34,18 +39,26 @@ class JSRenderer {
   }
 
   escapeAlgorithm(pixelNum) {
-    const pixelPos = this.calculatePosition(pixelNum);
-    const fractalPos = this.pixelsToCoord(...pixelPos);
+    let fractalPos;
     let x = 0;
     let y = 0;
     let i = 0;
+    const pixelPos = this.calculatePosition(pixelNum);
+    if (this.type === FractalType.MANDELBROT) {
+      fractalPos = this.pixelsToCoord(...pixelPos);
+    } else {
+      const startingPos = this.pixelsToCoord(...pixelPos);
+      x = startingPos[0];
+      y = startingPos[1];
+      fractalPos = this.juliaPoint;
+    }
     while (x * x + y * y < 4 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
       x = xtemp;
       i += 1;
     }
-    return (i);
+    return i;
   }
 
   calculateFractalLimit() {

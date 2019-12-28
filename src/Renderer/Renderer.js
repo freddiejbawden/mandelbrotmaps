@@ -5,7 +5,7 @@ import JSMultithreaded from './renderers/MultithreadedJS';
 import RustMultithreaded from './renderers/RustMultithreaded';
 
 class Renderer {
-  constructor(renderMethod, width, height, maxIter) {
+  constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
     this.mode = renderMethod;
     this.pixelSize = 0.004;
     this.maximumPixelSize = this.pixelSize * 2;
@@ -18,6 +18,8 @@ class Renderer {
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
     this.timer = undefined;
+    this.type = type;
+    this.juliaPoint = juliaPoint;
     this.wasm_render = new WASMRenderer(
       this.pixelSize,
       this.width,
@@ -71,11 +73,13 @@ class Renderer {
   async renderRange(xRect, yRect, dX, dY) {
     if (this.mode === Mode.JAVASCRIPT) {
       const jsRender = new JavascriptRenderer(
+        this.type,
         this.pixelSize,
         this.width,
         this.height,
         this.centreCoords,
         this.maxIter,
+        this.juliaPoint,
       );
       const clamped = new Uint8ClampedArray(this.prev_arr);
       const fractal = await jsRender.renderRange(
@@ -153,11 +157,13 @@ class Renderer {
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
         const jsRender = new JavascriptRenderer(
+          this.type,
           this.pixelSize,
           this.width,
           this.height,
           this.centreCoords,
           this.maxIter,
+          this.juliaPoint,
         );
         const fractal = await jsRender.render();
         this.prev_arr = fractal.arr;
