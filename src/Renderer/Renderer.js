@@ -52,7 +52,7 @@ class Renderer {
   }
 
   /* Adapted from https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate */
-  zoomOnPoint(canvasZoom, pixX, pixY) {
+  async zoomOnPoint(canvasZoom, pixX, pixY) {
     const newPixelSize = this.pixelSize / canvasZoom;
     const newFractalLimitX = this.centreCoords[0] - (this.width / 2) * newPixelSize;
     const newFractalLimitY = this.centreCoords[1] - (this.height / 2) * newPixelSize;
@@ -62,7 +62,7 @@ class Renderer {
 
     const oldFractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
     const oldFractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
-    // calculate the pixel pos in the new zoom level
+
     const oldX = oldFractalLimitX + pixX * this.pixelSize;
     const oldY = oldFractalLimitY + pixY * this.pixelSize;
     this.centreCoords[0] += -1 * (newX - oldX);
