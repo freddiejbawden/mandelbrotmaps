@@ -7,6 +7,7 @@ import idGenerator from '../../utils/IDGenerator';
 import round from '../../utils/Round';
 import JuliaPin from '../../JuliaPin';
 import FractalType from '../../utils/FractalType';
+import distance, { centre } from '../../utils/TouchUtils';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -43,13 +44,14 @@ class FractalViewer extends React.Component {
     this.mouseX = 0;
     this.mouseY = 0;
     this.dirty = false;
-    this.callBackMouse = undefined;
     this.renderID = undefined;
     this.showCentreMarker = props.showCentreMarker;
     this.updateDimensions = this.updateDimensions.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.canvasZoom = 1;
+    this.callBackMouse = [0, 0];
+    this.prevStepZoom = 1;
     this.originX = 0;
     this.originY = 0;
     this.canvasOffsetX = 0;
@@ -64,6 +66,7 @@ class FractalViewer extends React.Component {
     this.zoomLevel = 1;
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
+    this.previousLength = -1;
     this.renderMode = props.renderMode;
     this.maxi = props.maxi;
     this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
@@ -141,7 +144,19 @@ class FractalViewer extends React.Component {
   };
 
   addTouch({ identifier, pageX, pageY }) {
-    this.activeTouches[identifier] = { pageX, pageY };
+    let x;
+    let y;
+    if (this.orientation === 'portrait') {
+      x = pageX;
+      y = pageY - this.height * this.position;
+    } else {
+      x = pageX - this.width * this.position;
+      y = pageY;
+    }
+    this.activeTouches[identifier] = {
+      pageX: x,
+      pageY: y,
+    };
   }
 
   updateCentreMarker() {
@@ -216,7 +231,7 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
-    if (window.screen.orientation.type) {
+    if (window.screen.orientation) {
       this.orientation = window.screen.orientation.type;
     } else {
       this.orientation = 'landscape-primary';
@@ -352,9 +367,15 @@ class FractalViewer extends React.Component {
       };
 
       if (this.dirty) {
-        this.renderer.zoomOnPoint(this.canvasZoom, this.callBackMouse[0], this.callBackMouse[1]);
+        this.renderer.zoomOnPoint(
+          this.canvasZoom / this.prevStepZoom,
+          this.callBackMouse[0],
+          this.callBackMouse[1],
+        );
         this.originX = 0;
         this.originY = 0;
+        this.previousLength = -1;
+        this.prevStepZoom = 1;
         this.canvasZoom = 1;
         await this.drawFractal();
       } else {
@@ -376,30 +397,71 @@ class FractalViewer extends React.Component {
     }
     for (let i = 0; i < touches.length; i += 1) {
       this.addTouch(touches[i]);
-      this.mouseX = touches[i].pageX;
-      this.mouseY = touches[i].pageY;
+    }
+    if (Object.keys(this.activeTouches).length === 1) {
+      this.mouseX = touches[0].pageX - this.width * this.position;
+      this.mouseY = touches[0].pageY - this.width * this.position;
     }
     this.handleClick();
   }
 
+  touchPan(touches) {
+    if (this.dragging) {
+      let pageX;
+      let pageY;
+      if (this.orientation === 'portrait') {
+        pageX = touches[0].pageX;
+        pageY = touches[0].pageY - this.height * this.position;
+      } else {
+        pageX = touches[0].pageX - this.width * this.position;
+        pageY = touches[0].pageY;
+      }
+      if (this.draggingPin) {
+        this.juliaPin.move(pageX, pageY);
+        requestAnimationFrame(() => this.updateCanvas());
+      } else {
+        const startTouch = this.activeTouches[touches[0].identifier];
+        this.deltaX = Math.floor(pageX - (startTouch.pageX));
+        this.deltaY = Math.floor(pageY - startTouch.pageY);
+        this.mouseX = pageX;
+        this.mouseY = pageY;
+        const coords = this.mouseToWorld();
+        this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
+        requestAnimationFrame(() => this.updateCanvas());
+      }
+    }
+  }
+
+  touchZoom() {
+    const keys = Object.keys(this.activeTouches);
+    const touch1 = this.activeTouches[keys[0]];
+    const touch2 = this.activeTouches[keys[1]];
+    const currentLength = distance(touch1, touch2);
+    if (this.previousLength) {
+      this.centerPoint = centre(touch1, touch2);
+      this.mouseX = this.centerPoint.x;
+      this.mouseY = this.centerPoint.y;
+      if (this.previousLength === -1) {
+        this.previousLength = currentLength;
+      }
+      const magnification = Math.abs((currentLength - this.previousLength) * 0.02);
+      if (currentLength > this.previousLength) this.zoom(-1, magnification);
+      if (currentLength < this.previousLength) this.zoom(1, magnification);
+    }
+    this.previousLength = currentLength;
+  }
+
   handleTouchMove(evt) {
     const touches = evt.changedTouches;
-    for (let i = 0; i < touches.length; i += 1) {
-      if (this.dragging) {
-        if (this.draggingPin) {
-          this.juliaPin.move(touches[i].pageX, touches[i].pageY);
-          requestAnimationFrame(() => this.updateCanvas());
-        } else {
-          const startTouch = this.activeTouches[touches[i].identifier];
-          this.deltaX = Math.floor(touches[i].pageX - startTouch.pageX);
-          this.deltaY = Math.floor(touches[i].pageY - startTouch.pageY);
-          this.mouseX = this.deltaX + this.width / 2;
-          this.mouseY = this.deltaY + this.height / 2;
-          const coords = this.mouseToWorld();
-          this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
-          requestAnimationFrame(() => this.updateCanvas());
-        }
+
+    const numTouches = Object.keys(this.activeTouches).length;
+    if (numTouches === 2) {
+      for (let i = 0; i < touches.length; i += 1) {
+        this.addTouch(touches[i]);
       }
+      this.touchZoom();
+    } else if (numTouches === 1) {
+      this.touchPan(touches);
     }
   }
 
@@ -408,16 +470,24 @@ class FractalViewer extends React.Component {
     for (let i = 0; i < touches.length; i += 1) {
       delete this.activeTouches[touches[i].identifier];
     }
-    this.handleDragEnd();
+    if (Object.keys(this.activeTouches).length === 0) {
+      this.handleDragEnd();
+    }
   }
 
   resetZoomAndRender() {
     if (!this.dragging || !this.dirty) {
-      this.renderer.zoomOnPoint(this.canvasZoom, this.callBackMouse[0], this.callBackMouse[1]);
+      this.renderer.zoomOnPoint(
+        this.canvasZoom / this.prevStepZoom,
+        this.callBackMouse[0],
+        this.callBackMouse[1],
+      );
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
       this.juliaPin.move(this.juliaPin.x + jRX, this.juliaPin.y + jRY);
       this.dirty = true;
+      this.prevStepZoom = 1;
+      this.previousLength = -1;
       this.originX = 0;
       this.originY = 0;
       this.canvasZoom = 1;
@@ -425,9 +495,10 @@ class FractalViewer extends React.Component {
     }
   }
 
-  zoom(direction) {
-    this.dirty = true;
-    let newCanvasZoom = this.canvasZoom + 0.02 * -1 * Math.sign(direction);
+  zoom(direction, magnificationStep) {
+    const magnificationDelta = magnificationStep || 0.02;
+    const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
+    let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
       return;
     }
@@ -444,7 +515,19 @@ class FractalViewer extends React.Component {
 
     this.originX += centreX / newCanvasZoom - centreX / this.canvasZoom;
     this.originY += centreY / newCanvasZoom - centreY / this.canvasZoom;
+    if (
+      this.dirty
+      && (this.callBackMouse[0] !== this.mouseX || this.callBackMouse[1] !== this.mouseY)
+    ) {
+      this.renderer.zoomOnPoint(
+        newCanvasZoom / this.prevStepZoom,
+        this.callBackMouse[0],
+        this.callBackMouse[1],
+      );
+      this.prevStepZoom = newCanvasZoom;
+    }
     this.callBackMouse = [this.mouseX, this.mouseY];
+
     clearTimeout(this.zoomTimeout);
     this.zoomTimeout = setTimeout(() => {
       this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
@@ -454,6 +537,7 @@ class FractalViewer extends React.Component {
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
+    this.dirty = true;
     requestAnimationFrame(() => this.updateCanvas());
   }
 
