@@ -144,9 +144,18 @@ class FractalViewer extends React.Component {
   };
 
   addTouch({ identifier, pageX, pageY }) {
+    let x;
+    let y;
+    if (this.orientation === 'portrait') {
+      x = pageX;
+      y = pageY - this.height * this.position;
+    } else {
+      x = pageX - this.width * this.position;
+      y = pageY;
+    }
     this.activeTouches[identifier] = {
-      pageX: pageX - this.width * this.position,
-      pageY,
+      pageX: x,
+      pageY: y,
     };
   }
 
@@ -398,16 +407,24 @@ class FractalViewer extends React.Component {
 
   touchPan(touches) {
     if (this.dragging) {
-      const pageXadjust = touches[0].pageX - this.width * this.position;
+      let pageX;
+      let pageY;
+      if (this.orientation === 'portrait') {
+        pageX = touches[0].pageX;
+        pageY = touches[0].pageY - this.height * this.position;
+      } else {
+        pageX = touches[0].pageX - this.width * this.position;
+        pageY = touches[0].pageY;
+      }
       if (this.draggingPin) {
-        this.juliaPin.move(pageXadjust, touches[0].pageY);
+        this.juliaPin.move(pageX, pageY);
         requestAnimationFrame(() => this.updateCanvas());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
-        this.deltaX = Math.floor(pageXadjust - (startTouch.pageX));
-        this.deltaY = Math.floor(touches[0].pageY - startTouch.pageY);
-        this.mouseX = pageXadjust;
-        this.mouseY = touches[0].pageY;
+        this.deltaX = Math.floor(pageX - (startTouch.pageX));
+        this.deltaY = Math.floor(pageY - startTouch.pageY);
+        this.mouseX = pageX;
+        this.mouseY = pageY;
         const coords = this.mouseToWorld();
         this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
         requestAnimationFrame(() => this.updateCanvas());
