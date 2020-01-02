@@ -1,4 +1,10 @@
 /* tslint:disable */
+export enum FractalType {
+  MANDELBROT,
+  JULIA,
+}
+/**
+*/
 /**
 */
 export class Mandelbrot {
@@ -7,6 +13,11 @@ export class Mandelbrot {
 * @param {number} max_i 
 */
   set_max_i(max_i: number): void;
+/**
+* @param {number} new_point_x 
+* @param {number} new_point_y 
+*/
+  set_julia_point(new_point_x: number, new_point_y: number): void;
 /**
 * @param {number} width 
 * @param {number} height 
@@ -28,9 +39,12 @@ export class Mandelbrot {
 * @param {number} max_i 
 * @param {number} centre_coords_x 
 * @param {number} centre_coords_y 
+* @param {number} julia_point_x 
+* @param {number} julia_point_y 
+* @param {number} fractal_type 
 * @returns {Mandelbrot} 
 */
-  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number): Mandelbrot;
+  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number, julia_point_x: number, julia_point_y: number, fractal_type: number): Mandelbrot;
 /**
 * @param {Uint8Array} new_arr 
 */

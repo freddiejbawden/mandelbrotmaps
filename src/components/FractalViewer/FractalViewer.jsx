@@ -572,7 +572,7 @@ FractalViewer.propTypes = {
   renderMode: PropTypes.number.isRequired,
   maxi: PropTypes.number.isRequired,
   showCentreMarker: PropTypes.bool,
-  type: PropTypes.string.isRequired,
+  type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
   updateRenderTime: PropTypes.func.isRequired,
   updateZoomLevel: PropTypes.func.isRequired,
