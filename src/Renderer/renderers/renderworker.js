@@ -2,7 +2,7 @@ import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
 import Rectangle from '../../utils/Rectangle';
 
-const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200);
+const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200, 1);
 /* eslint no-restricted-globals:0 */
 const renderJS = (data) => {
   try {
@@ -38,6 +38,7 @@ const renderJS = (data) => {
 };
 
 const renderWasm = async (e) => {
+  wasmRenderer.setFractalType(e.data.type);
   wasmRenderer.renderFromTo(
     e.data.startPixel,
     e.data.endPixel,
@@ -46,6 +47,7 @@ const renderWasm = async (e) => {
     e.data.height,
     e.data.centreCoords,
     e.data.maxIter,
+    e.data.juliaPoint,
   ).then((arr) => {
     postMessage({
       arr,
@@ -56,6 +58,7 @@ const renderWasm = async (e) => {
 };
 
 const renderWasmRange = async (e) => {
+  wasmRenderer.setFractalType(e.data.type);
   try {
     const xRectReconstructed = new Rectangle(
       e.data.xRect.l,
@@ -82,6 +85,7 @@ const renderWasmRange = async (e) => {
       e.data.maxIter,
       e.data.centreCoords[0],
       e.data.centreCoords[1],
+      e.data.juliaPoint,
     ).then((fractal) => {
       postMessage({
         success: true,

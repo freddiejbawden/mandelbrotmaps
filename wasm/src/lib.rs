@@ -122,6 +122,9 @@ impl Mandelbrot {
   pub fn set_pixel_size(&mut self, pixel_size: f64) {
     self.pixel_size = pixel_size;
   }
+  pub fn set_fractal_type(&mut self, new_type : FractalType) {
+    self.fractal_type = new_type;
+  }
 
   pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType) -> Mandelbrot {
     utils::set_panic_hook();
@@ -143,6 +146,9 @@ impl Mandelbrot {
       arr
     }
   }
+
+
+
   pub fn set_arr(&mut self, new_arr : Vec<u8>) {
     self.arr = new_arr.to_vec();
   }

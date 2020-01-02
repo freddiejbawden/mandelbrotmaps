@@ -2,7 +2,7 @@
 import idGenerator from '../../../utils/IDGenerator';
 
 class RustMultithreaded {
-  constructor(pixelSize, width, height, centreCoords, maxIter, memory, mandelbrotWASM) {
+  constructor(pixelSize, width, height, centreCoords, maxIter, type) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
@@ -12,10 +12,9 @@ class RustMultithreaded {
     this.fractalLimitY = 0;
     this.splitHeight = this.height;
     this.remaining_threads = 0;
-    this.memory = memory;
-    this.mandelbrotWASM = mandelbrotWASM;
     this.workers = [];
     this.arr = new Uint8ClampedArray(this.height * this.width * 4);
+    this.type = type;
   }
 
   async loadWasm() {
@@ -31,7 +30,7 @@ class RustMultithreaded {
     }
   }
 
-  async render(pixelSize, width, height, centreCoords, maxIter) {
+  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
@@ -62,6 +61,7 @@ class RustMultithreaded {
           }
         };
         w.postMessage({
+          type: this.type,
           id: roundID,
           renderer: 'wasm',
           startPixel: Math.floor(i * this.pixelSplit),
@@ -72,12 +72,25 @@ class RustMultithreaded {
           height,
           maxIter,
           centreCoords,
+          juliaPoint,
         });
       }
     });
   }
 
-  async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
+  async renderRange(
+    pixelSize,
+    width,
+    height,
+    centreCoords,
+    maxIter,
+    oldArr,
+    xRect,
+    yRect,
+    dX,
+    dY,
+    juliaPoint,
+  ) {
     return new Promise((res) => {
       this.width = width;
       this.height = height;
@@ -116,10 +129,11 @@ class RustMultithreaded {
           }
         };
         w.postMessage({
+          type: this.type,
           id: roundID,
           workerID: idGenerator(),
           renderer: 'wasm',
-          type: 'partial',
+          mode: 'partial',
           startRow: Math.floor(i * this.pixelSplit),
           endRow: Math.floor((i + 1) * this.pixelSplit),
           pixelSize,
@@ -132,6 +146,7 @@ class RustMultithreaded {
           yRect,
           dX,
           dY,
+          juliaPoint,
         });
       }
     });
