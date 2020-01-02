@@ -8,11 +8,13 @@ const renderJS = (data) => {
   try {
     const arr = new Uint8ClampedArray(data.arrSize);
     const mr = new JSRenderer(
+      data.type,
       data.pixelSize,
       data.width,
       data.height,
       data.centreCoords,
       data.maxIter,
+      data.juliaPoint,
     );
     const colorScale = 255.0 / data.maxIter;
     mr.calculateFractalLimit();
@@ -108,11 +110,13 @@ const renderWasmRange = async (e) => {
 const renderJSRange = async (data) => {
   try {
     const mr = new JSRenderer(
+      data.type,
       data.pixelSize,
       data.width,
       data.height,
       data.centreCoords,
       data.maxIter,
+      data.juliaPoint,
     );
     const fractal = await mr.renderRange(
       data.xRect,
@@ -142,7 +146,7 @@ const renderJSRange = async (data) => {
 
 
 addEventListener('message', async (e) => {
-  if (e.data.type === 'partial') {
+  if (e.data.mode === 'partial') {
     if (e.data.renderer === 'wasm') {
       renderWasmRange(e);
     } else {
