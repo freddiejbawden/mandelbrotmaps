@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
 class WASMRenderer {
-  constructor(pixelSize, width, height, centreCoords, maxIter) {
+  constructor(pixelSize, width, height, centreCoords, maxIter, type) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
@@ -9,6 +9,8 @@ class WASMRenderer {
     this.memory = undefined;
     this.loadWasm = this.loadWasm.bind(this);
     this.m = undefined;
+    this.juliaPoint = this.juliaPoint || [0, 0];
+    this.type = type;
   }
 
   async loadWasm() {
@@ -23,6 +25,9 @@ class WASMRenderer {
         this.maxIter,
         this.centreCoords[0],
         this.centreCoords[1],
+        this.juliaPoint[0],
+        this.juliaPoint[1],
+        this.type,
       );
       this.memory = memory;
       return memory;
@@ -35,13 +40,15 @@ class WASMRenderer {
   }
 
   async renderRange(xRect, yRect, dX, dY, arr, startRow, endRow,
-    width, height, maxIter, centreCoordsX, centreCoordsY) {
+    width, height, maxIter, centreCoordsX, centreCoordsY, juliaPoint) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
         if (!this.wasm_renderer) {
           await this.loadWasm();
         }
+        this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
+
         await this.wasm_renderer.set_max_i(maxIter);
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
@@ -72,12 +79,13 @@ class WASMRenderer {
     });
   }
 
-  async renderFromTo(s, e, pixelSize, width, height, centreCoords, maxIter) {
+  async renderFromTo(s, e, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       if (!this.wasm_renderer) {
         await this.loadWasm();
       }
+      this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
       const arrPointer = this.wasm_renderer.render_from_to(
         s,
         e,
@@ -97,10 +105,11 @@ class WASMRenderer {
     });
   }
 
-  async render(pixelSize, width, height, centreCoords, maxIter) {
+  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
     if (!this.wasm_renderer) {
       await this.loadWasm();
     }
+    this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
     const arrPointer = this.wasm_renderer.render(
       pixelSize,
       width,

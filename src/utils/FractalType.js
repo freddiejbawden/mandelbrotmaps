@@ -1,5 +1,5 @@
 const fractals = {
-  MANDELBROT: 1, JULIA: 2,
+  MANDELBROT: 0, JULIA: 1,
 };
 const FractalType = Object.freeze(fractals);
 export default FractalType;

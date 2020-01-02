@@ -26,6 +26,7 @@ class Renderer {
       this.height,
       this.centreCoords,
       this.maxIter,
+      this.type,
     );
     this.wasmMTRenderer = new RustMultithreaded(
       this.pixelSize,
@@ -109,6 +110,7 @@ class Renderer {
         this.maxIter,
         this.centreCoords[0],
         this.centreCoords[1],
+        this.juliaPoint,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -175,6 +177,7 @@ class Renderer {
           this.height,
           this.centreCoords,
           this.maxIter,
+          this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr.slice(0);
           resolve(fractal);

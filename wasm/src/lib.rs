@@ -1,5 +1,7 @@
 mod utils;
+mod fractal_type;
 
+use fractal_type::FractalType;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -67,6 +69,8 @@ pub struct Mandelbrot {
   pixel_size: f64,
   max_i: i32,
   centre_coords: (f64, f64),
+  julia_point: (f64, f64),
+  fractal_type: FractalType,
   arr: Vec<u8>,
 }
 impl Mandelbrot {
@@ -104,6 +108,9 @@ impl Mandelbrot {
   pub fn set_max_i(&mut self, max_i: i32) {
     self.max_i = max_i;
   }
+  pub fn set_julia_point(&mut self, new_point_x : f64, new_point_y : f64) {
+    self.julia_point = (new_point_x, new_point_y);
+  }
   pub fn set_width_height(&mut self, width: i32, height: i32) {
     self.width = width;
     self.height = height
@@ -116,9 +123,10 @@ impl Mandelbrot {
     self.pixel_size = pixel_size;
   }
 
-  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64) -> Mandelbrot {
+  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType) -> Mandelbrot {
     utils::set_panic_hook();
     let centre_coords = (centre_coords_x, centre_coords_y);
+    let julia_point = (julia_point_x, julia_point_y);
     let fractal_limit_x = 0.0;
     let fractal_limit_y = 0.0;
     let arr = Vec::new();
@@ -130,6 +138,8 @@ impl Mandelbrot {
       pixel_size,
       max_i,
       centre_coords,
+      julia_point,
+      fractal_type,
       arr
     }
   }
@@ -179,13 +189,20 @@ impl Mandelbrot {
     return self.arr.as_ptr();
   }
   pub fn escape_algorithm(&self, pixel_num: i32) -> i32 {
-    let (x_fractal, y_fractal) = &self.pixels_to_coord(pixel_num);
+
     let mut x: f64 = 0.0;
     let mut y: f64 = 0.0;
     let mut i : i32 = 0;
+    let (mut fractal_x, mut fractal_y) =  &self.pixels_to_coord(pixel_num);
+    if self.fractal_type == FractalType::JULIA {
+      x = fractal_x;
+      y = fractal_y;
+      fractal_x = self.julia_point.0;
+      fractal_y = self.julia_point.1;
+    }
     while x*x + y*y < 4.0 && i < *&self.max_i {
-      let xtemp = x*x - y*y + x_fractal;
-      y = 2.0*x*y + y_fractal;
+      let xtemp = x*x - y*y + fractal_x;
+      y = 2.0*x*y + fractal_y;
       x = xtemp;
       i+=1;
     }
