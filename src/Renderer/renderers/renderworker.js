@@ -2,17 +2,19 @@ import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
 import Rectangle from '../../utils/Rectangle';
 
-const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200);
+const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200, 1);
 /* eslint no-restricted-globals:0 */
 const renderJS = (data) => {
   try {
     const arr = new Uint8ClampedArray(data.arrSize);
     const mr = new JSRenderer(
+      data.type,
       data.pixelSize,
       data.width,
       data.height,
       data.centreCoords,
       data.maxIter,
+      data.juliaPoint,
     );
     const colorScale = 255.0 / data.maxIter;
     mr.calculateFractalLimit();
@@ -36,6 +38,7 @@ const renderJS = (data) => {
 };
 
 const renderWasm = async (e) => {
+  wasmRenderer.setFractalType(e.data.type);
   wasmRenderer.renderFromTo(
     e.data.startPixel,
     e.data.endPixel,
@@ -44,6 +47,7 @@ const renderWasm = async (e) => {
     e.data.height,
     e.data.centreCoords,
     e.data.maxIter,
+    e.data.juliaPoint,
   ).then((arr) => {
     postMessage({
       arr,
@@ -54,6 +58,7 @@ const renderWasm = async (e) => {
 };
 
 const renderWasmRange = async (e) => {
+  wasmRenderer.setFractalType(e.data.type);
   try {
     const xRectReconstructed = new Rectangle(
       e.data.xRect.l,
@@ -80,6 +85,7 @@ const renderWasmRange = async (e) => {
       e.data.maxIter,
       e.data.centreCoords[0],
       e.data.centreCoords[1],
+      e.data.juliaPoint,
     ).then((fractal) => {
       postMessage({
         success: true,
@@ -108,11 +114,13 @@ const renderWasmRange = async (e) => {
 const renderJSRange = async (data) => {
   try {
     const mr = new JSRenderer(
+      data.type,
       data.pixelSize,
       data.width,
       data.height,
       data.centreCoords,
       data.maxIter,
+      data.juliaPoint,
     );
     const fractal = await mr.renderRange(
       data.xRect,
@@ -142,7 +150,7 @@ const renderJSRange = async (data) => {
 
 
 addEventListener('message', async (e) => {
-  if (e.data.type === 'partial') {
+  if (e.data.mode === 'partial') {
     if (e.data.renderer === 'wasm') {
       renderWasmRange(e);
     } else {

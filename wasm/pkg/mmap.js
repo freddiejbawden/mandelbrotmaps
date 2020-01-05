@@ -160,6 +160,12 @@ export class Mandelbrot {
         wasm.mandelbrot_set_pixel_size(this.ptr, pixel_size);
     }
     /**
+    * @param {number} new_type
+    */
+    set_fractal_type(new_type) {
+        wasm.mandelbrot_set_fractal_type(this.ptr, new_type);
+    }
+    /**
     * @param {number} width
     * @param {number} height
     * @param {number} pixel_size

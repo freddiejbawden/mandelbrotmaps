@@ -10,7 +10,14 @@ class WASMRenderer {
     this.loadWasm = this.loadWasm.bind(this);
     this.m = undefined;
     this.juliaPoint = this.juliaPoint || [0, 0];
+    this.type = type || 0;
+  }
+
+  setFractalType(type) {
     this.type = type;
+    if (this.wasm_renderer) {
+      this.wasm_renderer.set_fractal_type(type);
+    }
   }
 
   async loadWasm() {
@@ -30,6 +37,7 @@ class WASMRenderer {
         this.type,
       );
       this.memory = memory;
+      this.wasm_renderer.set_fractal_type(this.type);
       return memory;
     } catch (err) {
       // TODO: alert user

@@ -33,6 +33,10 @@ export class Mandelbrot {
 */
   set_pixel_size(pixel_size: number): void;
 /**
+* @param {number} new_type 
+*/
+  set_fractal_type(new_type: number): void;
+/**
 * @param {number} width 
 * @param {number} height 
 * @param {number} pixel_size 

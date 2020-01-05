@@ -24,7 +24,20 @@ class JSMultithreaded {
     this.maxIter = maxIter;
   }
 
-  async renderRange(pixelSize, width, height, centreCoords, maxIter, oldArr, xRect, yRect, dX, dY) {
+  async renderRange(
+    type,
+    pixelSize,
+    width,
+    height,
+    centreCoords,
+    maxIter,
+    oldArr,
+    xRect,
+    yRect,
+    dX,
+    dY,
+    juliaPoint,
+  ) {
     return new Promise((res) => {
       this.update(pixelSize, width, height, centreCoords, maxIter);
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
@@ -54,10 +67,11 @@ class JSMultithreaded {
           }
         };
         w.postMessage({
+          type,
           id: roundID,
           workerID: idGenerator(),
           renderer: 'js',
-          type: 'partial',
+          mode: 'partial',
           startRow: Math.floor(i * this.pixelSplit),
           endRow: Math.floor((i + 1) * this.pixelSplit),
           arrSize: ((this.width * this.height) / nThreadsFree) * 4,
@@ -73,12 +87,13 @@ class JSMultithreaded {
           yRect,
           dX,
           dY,
+          juliaPoint,
         });
       }
     });
   }
 
-  async render(pixelSize, width, height, centreCoords, maxIter) {
+  async render(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
@@ -113,6 +128,7 @@ class JSMultithreaded {
         window.performance.mark(`${workerID}_start`);
 
         w.postMessage({
+          type,
           id: roundID,
           workerID,
           renderer: 'js',
@@ -126,6 +142,7 @@ class JSMultithreaded {
           fractalLimitY: this.fractalLimitY,
           maxIter,
           centreCoords,
+          juliaPoint,
         });
       }
     });

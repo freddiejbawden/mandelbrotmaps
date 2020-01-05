@@ -34,6 +34,7 @@ class Renderer {
       this.height,
       this.centreCoords,
       this.maxIter,
+      this.type,
     );
     this.jsMTRender = new JSMultithreaded(
       this.pixelSize,
@@ -41,6 +42,7 @@ class Renderer {
       this.height,
       this.centreCoords,
       this.maxIter,
+      this.type,
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;
@@ -117,6 +119,7 @@ class Renderer {
     }
     if (this.mode === Mode.JAVASCRIPTMT) {
       const fractal = await this.jsMTRender.renderRange(
+        this.type,
         this.pixelSize,
         this.width,
         this.height,
@@ -127,9 +130,7 @@ class Renderer {
         yRect,
         dX,
         dY,
-        this.width,
-        this.height,
-        this.centreCoords,
+        this.juliaPoint,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -147,6 +148,7 @@ class Renderer {
         yRect,
         dX,
         dY,
+        this.juliaPoint,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -184,11 +186,13 @@ class Renderer {
         });
       } else if (this.mode === Mode.JAVASCRIPTMT) {
         this.jsMTRender.render(
+          this.type,
           this.pixelSize,
           this.width,
           this.height,
           this.centreCoords,
           this.maxIter,
+          this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -200,6 +204,7 @@ class Renderer {
           this.height,
           this.centreCoords,
           this.maxIter,
+          this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
