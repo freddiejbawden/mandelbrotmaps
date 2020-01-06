@@ -187,7 +187,6 @@ class FractalViewer extends React.Component {
   }
 
   drawFractal() {
-    console.log(this.type);
     this.updateWidthHeight();
     this.rendering = true;
     const startTime = Date.now();
