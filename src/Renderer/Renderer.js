@@ -3,6 +3,7 @@ import JavascriptRenderer from './renderers/JavascriptRenderer';
 import WASMRenderer from './renderers/WASMRenderer';
 import JSMultithreaded from './renderers/MultithreadedJS';
 import RustMultithreaded from './renderers/RustMultithreaded';
+import RenderQuality from './RenderQuality';
 
 class Renderer {
   constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
@@ -156,7 +157,8 @@ class Renderer {
     return [];
   }
 
-  render() {
+  render(level) {
+    const iterations = level || RenderQuality.MEDIUM;
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
@@ -166,7 +168,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          this.maxIter,
+          iterations,
           this.juliaPoint,
         );
         const fractal = await jsRender.render();
@@ -178,7 +180,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          this.maxIter,
+          level,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr.slice(0);
@@ -191,7 +193,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          this.maxIter,
+          level,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
@@ -203,7 +205,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          this.maxIter,
+          level,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
