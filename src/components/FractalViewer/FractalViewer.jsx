@@ -187,10 +187,11 @@ class FractalViewer extends React.Component {
   }
 
   drawFractal() {
+    console.log(this.type);
     this.updateWidthHeight();
     this.rendering = true;
     const startTime = Date.now();
-    if (!this.dirty) {
+    if (!this.dragging || !this.dirty) {
       const level = (this.mandelbrotDragging) ? RenderQuality.LOW : RenderQuality.MAX;
       this.renderer.render(level).then((fractal) => {
         this.canvasOffsetX = 0;
@@ -257,7 +258,7 @@ class FractalViewer extends React.Component {
 
   putImage(arr, width, height) {
     if (width && height) {
-      if (!this.dirty) {
+      if (!this.dragging || !this.dirty) {
         const fractalContext = this.fractal.current.getContext('2d');
         this.updateWidthHeight();
         fractalContext.canvas.width = this.width;
@@ -427,6 +428,8 @@ class FractalViewer extends React.Component {
       }
       if (this.draggingPin) {
         this.juliaPin.move(pageX, pageY);
+        const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
+        this.updateJuliaPoint([worldJulia.x, worldJulia.y], true);
         requestAnimationFrame(() => this.updateCanvas());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
