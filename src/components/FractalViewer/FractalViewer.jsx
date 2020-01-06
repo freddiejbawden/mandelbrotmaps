@@ -8,6 +8,7 @@ import round from '../../utils/Round';
 import JuliaPin from '../../JuliaPin';
 import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
+import RenderOptions from '../../Renderer/RenderOptions/RenderOptions';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -78,6 +79,7 @@ class FractalViewer extends React.Component {
       this.height,
       parseInt(props.maxi, 10),
       [-1, 0],
+      props.renderOptions,
     );
   }
 
@@ -100,6 +102,11 @@ class FractalViewer extends React.Component {
       this.renderMode = nextProps.renderMode;
       return true;
     }
+    if (this.renderer.renderOptions.shading !== nextProps.renderOptions.shading) {
+      this.renderer.renderOptions.shading = nextProps.renderOptions.shading;
+      return true;
+    }
+
     if (this.renderer.maxIter !== nextProps.maxi) {
       this.renderer.maxIter = nextProps.maxi;
       return true;
@@ -583,11 +590,14 @@ FractalViewer.propTypes = {
   appRef: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   juliaPoint: PropTypes.array,
+  // eslint-disable-next-line react/forbid-prop-types
+  renderOptions: PropTypes.object,
 };
 
 FractalViewer.defaultProps = {
   showCentreMarker: false,
   juliaPoint: [0, 0],
   updateJuliaPoint: (() => [0, 0]),
+  renderOptions: new RenderOptions(),
 };
 export default FractalViewer;

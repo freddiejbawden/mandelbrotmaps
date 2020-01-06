@@ -3,6 +3,7 @@ import JavascriptRenderer from './renderers/JavascriptRenderer';
 import WASMRenderer from './renderers/WASMRenderer';
 import JSMultithreaded from './renderers/MultithreadedJS';
 import RustMultithreaded from './renderers/RustMultithreaded';
+import RenderOptions from './RenderOptions/RenderOptions';
 
 class Renderer {
   constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
@@ -46,6 +47,7 @@ class Renderer {
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;
+    this.renderOptions = new RenderOptions();
   }
 
   calculateFractalLimit() {
@@ -83,6 +85,7 @@ class Renderer {
         this.centreCoords,
         this.maxIter,
         this.juliaPoint,
+        this.renderOptions,
       );
       const clamped = new Uint8ClampedArray(this.prev_arr);
       const fractal = await jsRender.renderRange(
@@ -168,6 +171,7 @@ class Renderer {
           this.centreCoords,
           this.maxIter,
           this.juliaPoint,
+          this.renderOptions,
         );
         const fractal = await jsRender.render();
         this.prev_arr = fractal.arr;

@@ -28,6 +28,11 @@ export default class Settings extends Component {
     p.updateRenderMethod(parseInt(val, 10));
   }
 
+  updateShading() {
+    const p = this.props;
+    p.updateShading();
+  }
+
   toggle() {
     // eslint-disable-next-line react/no-access-state-in-setstate
     const s = this.state;
@@ -70,6 +75,10 @@ export default class Settings extends Component {
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
             <div>
+              <span>Enable Shading</span>
+              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateShading()} />
+            </div>
+            <div>
               <span>Enable Nerd Bar </span>
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateNerdBar()} />
             </div>
@@ -85,6 +94,7 @@ Settings.propTypes = {
   selectedRenderMode: PropTypes.number,
   updateCentreMarker: PropTypes.func.isRequired,
   updateNerdBar: PropTypes.func.isRequired,
+  updateShading: PropTypes.func.isRequired,
 
 };
 Settings.defaultProps = {

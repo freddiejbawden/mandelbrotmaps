@@ -1,8 +1,10 @@
 /* eslint-disable prefer-destructuring */
 import FractalType from '../../utils/FractalType';
+import RenderOptions from '../RenderOptions/RenderOptions';
+import ShadingOptions from '../RenderOptions/ShadingOptions';
 
 class JSRenderer {
-  constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint, renderOptions) {
     this.type = type;
     this.pixelSize = pixelSize;
     this.width = width;
@@ -12,6 +14,7 @@ class JSRenderer {
     this.fractalLimitY = 0;
     this.maxIter = (maxIter) || 200;
     this.juliaPoint = juliaPoint || [0, 0];
+    this.renderOptions = renderOptions || new RenderOptions();
   }
 
   update(pixelSize, width, height, centreCoords, maxIter) {
@@ -72,9 +75,15 @@ class JSRenderer {
     for (let x = xStart; x < xEnd; x += 1) {
       const i = this.calculatePixelNum(x, y);
       const iter = this.escapeAlgorithm(i) * colorScale;
-      row.push(iter); // R value
-      row.push(iter);
-      row.push(iter);// B value
+      let value;
+      if (this.renderOptions.shading === ShadingOptions.NONE) {
+        value = (iter < 254) ? 0 : 255;
+      } else {
+        value = iter;
+      }
+      row.push(value); // R value
+      row.push(value);
+      row.push(value);// B value
       row.push(255); // A value
     }
     return row;
@@ -129,9 +138,15 @@ class JSRenderer {
     const colorScale = 255 / this.maxIter;
     for (let i = 0; i < arr.length; i += 4) {
       const iter = this.escapeAlgorithm(i / 4) * colorScale;
-      arr[i] = iter; // R value
-      arr[i + 1] = iter; // G value
-      arr[i + 2] = iter; // B value
+      let value;
+      if (this.renderOptions.shading === ShadingOptions.NONE) {
+        value = (iter < 254) ? 0 : 255;
+      } else {
+        value = iter;
+      }
+      arr[i] = value; // R value
+      arr[i + 1] = value; // G value
+      arr[i + 2] = value; // B value
       arr[i + 3] = 255; // A value
     }
     return {

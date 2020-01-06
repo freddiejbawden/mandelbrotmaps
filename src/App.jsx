@@ -12,6 +12,8 @@ import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
 import NerdBar from './components/NerdBar';
 import FractalType from './utils/FractalType';
+import RenderOptions from './Renderer/RenderOptions/RenderOptions';
+import ShadingOptions from './Renderer/RenderOptions/ShadingOptions';
 
 const AppRouter = () => {
   disableBodyScroll(document.querySelector('#app'));
@@ -34,6 +36,7 @@ class App extends Component {
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
       showNerdBar: false,
+      renderOptions: new RenderOptions(),
       stats: {
         renderTime: {
           label: 'Render Time',
@@ -71,6 +74,7 @@ class App extends Component {
     this.updateFocus = this.updateFocus.bind(this);
     this.updateNerdBar = this.updateNerdBar.bind(this);
     this.updateJuliaPoint = this.updateJuliaPoint.bind(this);
+    this.updateShading = this.updateShading.bind(this);
   }
 
   updateCoords(re, im) {
@@ -164,6 +168,23 @@ class App extends Component {
     this.setState(() => ({ juliaPoint }));
   }
 
+  updateShading() {
+    this.setState((prevState) => {
+      const updatedRenderOptions = prevState.renderOptions;
+      let newShade;
+      if (prevState.renderOptions.shading === 0) {
+        newShade = ShadingOptions.FULL;
+      } else {
+        newShade = ShadingOptions.NONE;
+      }
+      updatedRenderOptions.shading = newShade;
+      return ({
+        ...prevState,
+        renderOptions: updatedRenderOptions,
+      });
+    });
+  }
+
   render() {
     const s = this.state;
     // Fall back to JS
@@ -187,6 +208,7 @@ class App extends Component {
             updateJuliaPoint={this.updateJuliaPoint}
             onMouseOver={() => this.updateFocus('Julia')}
             onFocus={() => this.updateFocus('Julia')}
+            renderOptions={s.renderOptions}
           />
           <FractalViewer
             id="fractal-viewer"
@@ -203,6 +225,7 @@ class App extends Component {
             onMouseOver={() => this.updateFocus('Mandelbrot')}
             onFocus={() => this.updateFocus('Mandelbrot')}
             juliaPoint={s.juliaPoint}
+            renderOptions={s.renderOptions}
           />
         </div>
         <div className="info-panel">
@@ -213,6 +236,7 @@ class App extends Component {
             updateCentreMarker={this.updateCentreMarker}
             updateRenderMethod={this.updateRenderMethod}
             updateNerdBar={this.updateNerdBar}
+            updateShading={this.updateShading}
             ref={this.appRef}
           />
         </div>
