@@ -77,7 +77,7 @@ class JSRenderer {
       const iter = this.escapeAlgorithm(i) * colorScale;
       let value;
       if (this.renderOptions.shading === ShadingOptions.NONE) {
-        value = (iter < 254) ? 0 : 255;
+        value = (iter < this.maxIter - 1) ? 0 : 255;
       } else {
         value = iter;
       }
@@ -140,7 +140,7 @@ class JSRenderer {
       const iter = this.escapeAlgorithm(i / 4) * colorScale;
       let value;
       if (this.renderOptions.shading === ShadingOptions.NONE) {
-        value = (iter < 254) ? 0 : 255;
+        value = (iter < this.maxIter - 1) ? 0 : 255;
       } else {
         value = iter;
       }

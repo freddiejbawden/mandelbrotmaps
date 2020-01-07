@@ -161,7 +161,7 @@ class Renderer {
   }
 
   render(level) {
-    const iterations = level || RenderQuality.MEDIUM;
+    const iterations = level || RenderQuality.LOW;
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
