@@ -1,6 +1,8 @@
+import RenderOptions from '../RenderOptions/RenderOptions';
+
 /* eslint-disable import/no-unresolved */
 class WASMRenderer {
-  constructor(pixelSize, width, height, centreCoords, maxIter, type) {
+  constructor(pixelSize, width, height, centreCoords, maxIter, type, renderOptions) {
     this.pixelSize = pixelSize;
     this.width = width;
     this.height = height;
@@ -11,6 +13,7 @@ class WASMRenderer {
     this.m = undefined;
     this.juliaPoint = this.juliaPoint || [0, 0];
     this.type = type || 0;
+    this.renderOptions = renderOptions || new RenderOptions();
   }
 
   setFractalType(type) {
@@ -35,6 +38,7 @@ class WASMRenderer {
         this.juliaPoint[0],
         this.juliaPoint[1],
         this.type,
+        this.renderOptions.shading,
       );
       this.memory = memory;
       this.wasm_renderer.set_fractal_type(this.type);
@@ -48,7 +52,7 @@ class WASMRenderer {
   }
 
   async renderRange(xRect, yRect, dX, dY, arr, startRow, endRow,
-    width, height, maxIter, centreCoordsX, centreCoordsY, juliaPoint) {
+    width, height, maxIter, centreCoordsX, centreCoordsY, juliaPoint, renderOptions) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
@@ -56,7 +60,7 @@ class WASMRenderer {
           await this.loadWasm();
         }
         this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
-
+        this.wasm_renderer.set_shading(renderOptions.shading);
         await this.wasm_renderer.set_max_i(maxIter);
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
@@ -87,13 +91,24 @@ class WASMRenderer {
     });
   }
 
-  async renderFromTo(s, e, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async renderFromTo(
+    s,
+    e,
+    pixelSize,
+    width,
+    height,
+    centreCoords,
+    maxIter,
+    juliaPoint,
+    renderOptions,
+  ) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       if (!this.wasm_renderer) {
         await this.loadWasm();
       }
       this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
+      this.wasm_renderer.set_shading(renderOptions.shading);
       const arrPointer = this.wasm_renderer.render_from_to(
         s,
         e,
@@ -113,11 +128,12 @@ class WASMRenderer {
     });
   }
 
-  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint, renderOptions) {
     if (!this.wasm_renderer) {
       await this.loadWasm();
     }
     this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
+    this.wasm_renderer.set_shading(renderOptions.shading);
     const arrPointer = this.wasm_renderer.render(
       pixelSize,
       width,

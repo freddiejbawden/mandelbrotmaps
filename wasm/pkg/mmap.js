@@ -111,6 +111,9 @@ function getStringFromWasm(ptr, len) {
 export const FractalType = Object.freeze({ MANDELBROT:0,JULIA:1, });
 /**
 */
+export const ShadingOption = Object.freeze({ NONE:0,FULL:1, });
+/**
+*/
 export class Mandelbrot {
 
     static __wrap(ptr) {
@@ -166,6 +169,12 @@ export class Mandelbrot {
         wasm.mandelbrot_set_fractal_type(this.ptr, new_type);
     }
     /**
+    * @param {number} new_shading_option
+    */
+    set_shading(new_shading_option) {
+        wasm.mandelbrot_set_shading(this.ptr, new_shading_option);
+    }
+    /**
     * @param {number} width
     * @param {number} height
     * @param {number} pixel_size
@@ -175,10 +184,11 @@ export class Mandelbrot {
     * @param {number} julia_point_x
     * @param {number} julia_point_y
     * @param {number} fractal_type
+    * @param {number} shading_option
     * @returns {Mandelbrot}
     */
-    static new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type) {
-        const ret = wasm.mandelbrot_new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type);
+    static new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type, shading_option) {
+        const ret = wasm.mandelbrot_new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type, shading_option);
         return Mandelbrot.__wrap(ret);
     }
     /**

@@ -5,6 +5,12 @@ export enum FractalType {
 }
 /**
 */
+export enum ShadingOption {
+  NONE,
+  FULL,
+}
+/**
+*/
 /**
 */
 export class Mandelbrot {
@@ -37,6 +43,10 @@ export class Mandelbrot {
 */
   set_fractal_type(new_type: number): void;
 /**
+* @param {number} new_shading_option 
+*/
+  set_shading(new_shading_option: number): void;
+/**
 * @param {number} width 
 * @param {number} height 
 * @param {number} pixel_size 
@@ -46,9 +56,10 @@ export class Mandelbrot {
 * @param {number} julia_point_x 
 * @param {number} julia_point_y 
 * @param {number} fractal_type 
+* @param {number} shading_option 
 * @returns {Mandelbrot} 
 */
-  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number, julia_point_x: number, julia_point_y: number, fractal_type: number): Mandelbrot;
+  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number, julia_point_x: number, julia_point_y: number, fractal_type: number, shading_option: number): Mandelbrot;
 /**
 * @param {Uint8Array} new_arr 
 */

@@ -116,6 +116,7 @@ class Renderer {
         this.maxIter,
         this.centreCoords[0],
         this.centreCoords[1],
+        this.renderOptions,
         this.juliaPoint,
       );
       this.prev_arr = fractal.arr;
@@ -186,6 +187,7 @@ class Renderer {
           this.centreCoords,
           level,
           this.juliaPoint,
+          this.renderOptions,
         ).then((fractal) => {
           this.prev_arr = fractal.arr.slice(0);
           resolve(fractal);

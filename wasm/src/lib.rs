@@ -1,6 +1,8 @@
 mod utils;
 mod fractal_type;
+mod shading_option;
 
+use shading_option::ShadingOption;
 use fractal_type::FractalType;
 use wasm_bindgen::prelude::*;
 
@@ -71,6 +73,7 @@ pub struct Mandelbrot {
   centre_coords: (f64, f64),
   julia_point: (f64, f64),
   fractal_type: FractalType,
+  shading_option: ShadingOption,
   arr: Vec<u8>,
 }
 impl Mandelbrot {
@@ -91,9 +94,15 @@ impl Mandelbrot {
     for x in x_start..x_end {
       let pixel_num = self.calculate_pixel_num(x,y);
       let iter = ((self.escape_algorithm(pixel_num) as f64)*_color_scale) as u8;
-      row.push(iter);
-      row.push(iter);
-      row.push(iter);
+      let value;
+      if self.shading_option == ShadingOption::NONE {
+        value = if (iter as i32) <  self.max_i - 1 { 0 } else { 255 }
+      } else {
+        value = iter;
+      }
+      row.push(value);
+      row.push(value);
+      row.push(value);
       row.push(255);
     }
     return row;
@@ -126,7 +135,11 @@ impl Mandelbrot {
     self.fractal_type = new_type;
   }
 
-  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType) -> Mandelbrot {
+  pub fn set_shading(&mut self, new_shading_option : ShadingOption) {
+    self.shading_option = new_shading_option;
+  }
+
+  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType, shading_option: ShadingOption) -> Mandelbrot {
     utils::set_panic_hook();
     let centre_coords = (centre_coords_x, centre_coords_y);
     let julia_point = (julia_point_x, julia_point_y);
@@ -143,15 +156,15 @@ impl Mandelbrot {
       centre_coords,
       julia_point,
       fractal_type,
+      shading_option,
       arr
     }
   }
 
-
-
   pub fn set_arr(&mut self, new_arr : Vec<u8>) {
     self.arr = new_arr.to_vec();
   }
+
   pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f64, centre_coords_y: f64) -> *const u8 {
 
     self.update(self.pixel_size, width, height, centre_coords_x, centre_coords_y, self.max_i);
@@ -231,14 +244,20 @@ impl Mandelbrot {
     let _color_scale = 255.0/(self.max_i as f64);
     for i in 0..(self.width*self.height) {
       let iter = ((self.escape_algorithm(i) as f64) * _color_scale) as u8;
-      self.arr.push(iter);
-      self.arr.push(iter);
-      self.arr.push(iter);
+      let value;
+      if self.shading_option == ShadingOption::NONE {
+        value = if (iter as i32) <  self.max_i - 1 { 0 } else { 255 }
+      } else {
+        value = iter;
+      }
+      self.arr.push(value);
+      self.arr.push(value);
+      self.arr.push(value);
       self.arr.push(255);
     }
     return self.arr.as_ptr();
   }
-  pub fn render_from_to(&mut self, start: i32, end: i32, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32 ) -> *const u8 {
+  pub fn render_from_to(&mut self, start: i32, end: i32, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32) -> *const u8 {
     self.update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
     self.arr = Vec::new();
     let w = *&self.width as f64;
