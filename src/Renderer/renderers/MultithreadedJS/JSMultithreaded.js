@@ -37,6 +37,7 @@ class JSMultithreaded {
     dX,
     dY,
     juliaPoint,
+    renderOptions,
   ) {
     return new Promise((res) => {
       this.update(pixelSize, width, height, centreCoords, maxIter);
@@ -88,12 +89,13 @@ class JSMultithreaded {
           dX,
           dY,
           juliaPoint,
+          renderOptions,
         });
       }
     });
   }
 
-  async render(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async render(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint, renderOptions) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = navigator.hardwareConcurrency;
@@ -143,6 +145,7 @@ class JSMultithreaded {
           maxIter,
           centreCoords,
           juliaPoint,
+          renderOptions,
         });
       }
     });

@@ -136,6 +136,7 @@ class Renderer {
         dX,
         dY,
         this.juliaPoint,
+        this.renderOptions,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -154,6 +155,7 @@ class Renderer {
         dX,
         dY,
         this.juliaPoint,
+        this.renderOptions,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -201,6 +203,7 @@ class Renderer {
           this.centreCoords,
           level,
           this.juliaPoint,
+          this.renderOptions,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -213,6 +216,7 @@ class Renderer {
           this.centreCoords,
           level,
           this.juliaPoint,
+          this.renderOptions,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);

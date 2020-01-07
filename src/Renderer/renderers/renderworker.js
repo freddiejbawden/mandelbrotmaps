@@ -1,6 +1,7 @@
 import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
 import Rectangle from '../../utils/Rectangle';
+import ShadingOptions from '../RenderOptions/ShadingOptions';
 
 const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200, 1);
 /* eslint no-restricted-globals:0 */
@@ -15,14 +16,21 @@ const renderJS = (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.renderOptions,
     );
     const colorScale = 255.0 / data.maxIter;
     mr.calculateFractalLimit();
     for (let i = 0; i <= data.endPixel * 4 - data.startPixel * 4; i += 4) {
       const iter = mr.escapeAlgorithm((i / 4) + data.startPixel) * colorScale;
-      arr[i] = iter;
-      arr[i + 1] = iter;
-      arr[i + 2] = iter;
+      let value;
+      if (data.renderOptions.shading === ShadingOptions.NONE) {
+        value = (iter < data.maxIter - 1) ? 0 : 255;
+      } else {
+        value = iter;
+      }
+      arr[i] = value;
+      arr[i + 1] = value;
+      arr[i + 2] = value;
       arr[i + 3] = 255;
     }
     postMessage({
@@ -121,6 +129,7 @@ const renderJSRange = async (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.renderOptions,
     );
     const fractal = await mr.renderRange(
       data.xRect,
