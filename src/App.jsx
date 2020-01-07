@@ -37,6 +37,7 @@ class App extends Component {
       renderMode: props.renderMode,
       showNerdBar: false,
       renderOptions: new RenderOptions(),
+      mandelDragging: false,
       stats: {
         renderTime: {
           label: 'Render Time',
@@ -164,8 +165,8 @@ class App extends Component {
     });
   }
 
-  updateJuliaPoint(juliaPoint) {
-    this.setState(() => ({ juliaPoint }));
+  updateJuliaPoint(juliaPoint, mandelDragging) {
+    this.setState(() => ({ juliaPoint, mandelDragging }));
   }
 
   updateShading() {
@@ -226,6 +227,7 @@ class App extends Component {
             onFocus={() => this.updateFocus('Mandelbrot')}
             juliaPoint={s.juliaPoint}
             renderOptions={s.renderOptions}
+            mandelDragging={s.mandelDragging}
           />
         </div>
         <div className="info-panel">

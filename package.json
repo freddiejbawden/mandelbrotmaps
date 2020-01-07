@@ -25,6 +25,9 @@
     "lint": "eslint --ignore-path .eslintignore  --ext .js --ext .jsx .",
     "lintfix": "eslint --ignore-path .eslintignore  --ext .js --ext .jsx . --fix"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -51,6 +54,7 @@
     "intl-pluralrules": "^1.0.3",
     "jest": "^24.9.0",
     "lighthouse": "^5.5.0",
+    "pre-commit": "^1.2.2",
     "whitespace": "^2.1.0"
   }
 }
