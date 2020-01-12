@@ -548,7 +548,7 @@ class FractalViewer extends React.Component {
       this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
       this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
       this.resetZoomAndRender();
-    }, 1000);
+    }, 300);
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
