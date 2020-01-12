@@ -105,7 +105,7 @@ class FractalViewer extends React.Component {
       this.renderer.maxIter = nextProps.maxi;
       return true;
     }
-    if (this.type === FractalType.JULIA) {
+    if (this.type === FractalType.JULIA && !this.rendering) {
       if (nextProps.juliaPoint !== this.renderer.juliaPoint
         || nextProps.mandelDragging !== this.mandelbrotDragging) {
         this.renderer.juliaPoint = nextProps.juliaPoint;
@@ -193,6 +193,7 @@ class FractalViewer extends React.Component {
     if (!this.dragging || !this.dirty) {
       const level = (this.mandelbrotDragging) ? RenderQuality.LOW : RenderQuality.MAX;
       this.renderer.render(level).then((fractal) => {
+        this.rendering = false;
         this.canvasOffsetX = 0;
         this.canvasOffsetY = 0;
         this.canvasZoom = 1;
@@ -312,8 +313,10 @@ class FractalViewer extends React.Component {
       if (this.draggingPin) {
         this.juliaPin.move(this.mouseX, this.mouseY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
-        this.updateJuliaPoint([worldJulia.x, worldJulia.y], true);
-        requestAnimationFrame(() => this.updateCanvas());
+        if (!this.rendering) {
+          this.updateJuliaPoint([worldJulia.x, worldJulia.y], true);
+          requestAnimationFrame(() => this.updateCanvas());
+        }
       } else {
         this.deltaX += e.movementX;
         this.deltaY += e.movementY;
@@ -503,6 +506,7 @@ class FractalViewer extends React.Component {
       this.originY = 0;
       this.canvasZoom = 1;
       this.drawFractal();
+      this.dirty = false;
     }
   }
 
