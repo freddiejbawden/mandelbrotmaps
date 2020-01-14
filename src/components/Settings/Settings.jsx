@@ -70,8 +70,8 @@ export default class Settings extends Component {
               <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
             </div>
             <div>
-              <span>Enable Nerd Bar </span>
-              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateNerdBar()} />
+              <span>Enable Debug Bar </span>
+              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateDebugBar()} />
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@ Settings.propTypes = {
   updateRenderMethod: PropTypes.func.isRequired,
   selectedRenderMode: PropTypes.number,
   updateCentreMarker: PropTypes.func.isRequired,
-  updateNerdBar: PropTypes.func.isRequired,
+  updateDebugBar: PropTypes.func.isRequired,
 
 };
 Settings.defaultProps = {

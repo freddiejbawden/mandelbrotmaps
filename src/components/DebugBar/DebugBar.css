@@ -1,4 +1,4 @@
-.nerd-bar-container {
+.debug-bar-container {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -13,10 +13,10 @@
   font-family: monospace;
   flex-wrap: wrap;
 }
-.nerd-bar-hide {
+.debug-bar-hide {
   height: 0;
 }
-.nerd-bar-container > span {
+.debug-bar-container > span {
   color: #EBFCFD;
   opacity: 1;
   z-index: 2;

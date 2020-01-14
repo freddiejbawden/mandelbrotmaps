@@ -1,12 +1,12 @@
 import React from 'react';
 
-import './Nerdbar.css';
+import './DebugBar.css';
 
-const Nerdbar = (props) => {
+const DebugBar = (props) => {
   const stats = [];
   const p = props;
   let i = 0;
-  const className = (p.showNerdBar) ? 'nerd-bar-container' : 'nerd-bar-hide';
+  const className = (p.showDebugBar) ? 'debug-bar-container' : 'debug-bar-hide';
   Object.keys(p.stats).forEach((key) => {
     const stat = p.stats[key];
     const content = `${stat.label}: ${stat.value}`;
@@ -22,4 +22,4 @@ const Nerdbar = (props) => {
   );
 };
 
-export default Nerdbar;
+export default DebugBar;

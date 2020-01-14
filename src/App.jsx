@@ -10,7 +10,7 @@ import { disableBodyScroll } from 'body-scroll-lock';
 import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
-import NerdBar from './components/NerdBar';
+import DebugBar from './components/DebugBar';
 import FractalType from './utils/FractalType';
 
 const AppRouter = () => {
@@ -33,7 +33,7 @@ class App extends Component {
       time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
-      showNerdBar: false,
+      showDebugBar: false,
       mandelDragging: false,
       stats: {
         renderTime: {
@@ -70,7 +70,7 @@ class App extends Component {
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
-    this.updateNerdBar = this.updateNerdBar.bind(this);
+    this.updateDebugBar = this.updateDebugBar.bind(this);
     this.updateJuliaPoint = this.updateJuliaPoint.bind(this);
   }
 
@@ -149,8 +149,8 @@ class App extends Component {
     }));
   }
 
-  updateNerdBar() {
-    this.setState((prevState) => ({ showNerdBar: !prevState.showNerdBar }));
+  updateDebugBar() {
+    this.setState((prevState) => ({ showDebugBar: !prevState.showDebugBar }));
   }
 
   updateCentreMarker() {
@@ -214,13 +214,13 @@ class App extends Component {
             maxi={s.maxi}
             updateCentreMarker={this.updateCentreMarker}
             updateRenderMethod={this.updateRenderMethod}
-            updateNerdBar={this.updateNerdBar}
+            updateDebugBar={this.updateDebugBar}
             ref={this.appRef}
           />
         </div>
-        <NerdBar
+        <DebugBar
           stats={s.stats}
-          showNerdBar={s.showNerdBar}
+          showDebugBar={s.showDebugBar}
         />
       </div>
     );
