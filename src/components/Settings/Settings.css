@@ -11,9 +11,14 @@
 .settings-container {
   margin: 10px;
   z-index: 0;
+  display: flex;
 }
 .settings-collapsed {
+  opacity: 0;
+  transform: translateX(-20px);
   height: 0;
+  width: 0;
+  margin: 0;
 }
 
 .settings-boxes {
@@ -22,7 +27,8 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 10;
-  transition: height 0.3s;
+  transition: all 200ms;
+  margin-left: 10px;
 }
 
 .settings-container > div  {
@@ -37,28 +43,24 @@
 }
 
 .settings-min-max {
-  width: 0; 
-  height: 0; 
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent; 
-  border-left:10px solid grey;
-  transform: rotate(90deg); 
+  width: 30px; 
+  height: 30px; 
+  background-color: lightgray;
+  border-radius: 30px;
+  padding: 5px;
+  transform: rotate(0deg);
+  transition-duration: 300ms;
+}
+
+.settings-min-max:hover {
+  background-color: lightgrey;
 }
 
 .settings-min-max-collapse {
-  transform: rotate(0deg);
+  background-color: grey;
+  transform: rotate(180deg);
 }
-.blocker {
-  position: absolute;
-  height: 150vh;
-  width: 150vw;
-  margin: -50px;
-  background-color: black;
-  opacity: 0.5;
-}
-.blocker-collapse {
-  display: none;
-}
+
 @media screen and (orientation:landscape) and (max-height: 600px) {
   .settings-boxes{
     flex-direction: row;

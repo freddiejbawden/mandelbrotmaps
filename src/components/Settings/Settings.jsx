@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './Settings.css';
 import DelayedInput from '../DelayedInput';
 import RenderMode from '../../utils/RenderMode';
+import Cog from './cog.svg';
 
 export default class Settings extends Component {
   constructor(props) {
@@ -48,7 +49,9 @@ export default class Settings extends Component {
     return (
       <div className="settings-container">
         {blocker}
-        <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses} />
+        <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses}>
+          <img src={Cog} alt="Settings Cog" />
+        </div>
         <div className={contentsClasses}>
           <div className="options-container ">
             <strong>Settings</strong>
