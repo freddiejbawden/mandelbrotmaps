@@ -28,7 +28,7 @@
   z-index: 10;
   transition: all 200ms;
   margin-left: 10px;
-  min-height: 300px;
+  min-height: 10px;
 }
 
 .settings-container > div  {
