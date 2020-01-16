@@ -4,8 +4,9 @@ import './Settings.css';
 import DelayedInput from '../DelayedInput';
 import RenderMode from '../../utils/RenderMode';
 import Cog from './cog.svg';
+import { withStore } from '../../statemanagement/createStore';
 
-export default class Settings extends Component {
+class Settings extends Component {
   constructor(props) {
     super(props);
     this.iterationUpdateTimer = undefined;
@@ -13,20 +14,21 @@ export default class Settings extends Component {
     this.state = {
       collapsed: true,
     };
+    this.updateIterations = this.updateIterations.bind(this);
   }
 
   updateIterations(i) {
-    this.iterations = i;
     if (this.iterationUpdateTimer) clearTimeout(this.iterationUpdateTimer);
     const p = this.props;
     this.iterationUpdateTimer = setTimeout(() => {
-      p.updateIter(i);
-    }, 1000);
+      p.store.set('iterations', parseInt(i, 10));
+    }, 300);
   }
 
   updateRenderMethod(val) {
     const p = this.props;
-    p.updateRenderMethod(parseInt(val, 10));
+    p.store.set('renderMode', parseInt(val, 10));
+    // p.updateRenderMethod(parseInt(val, 10));
   }
 
   toggle() {
@@ -55,7 +57,7 @@ export default class Settings extends Component {
         <div className={contentsClasses}>
           <div className="options-container ">
             <strong>Settings</strong>
-            <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={p.updateIter} timeout={1000} />
+            <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={this.updateIterations} timeout={1000} />
             <div>
               <div>Render Method</div>
               <select
@@ -83,8 +85,8 @@ export default class Settings extends Component {
   }
 }
 Settings.propTypes = {
-  updateIter: PropTypes.func.isRequired,
-  updateRenderMethod: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  store: PropTypes.object.isRequired,
   selectedRenderMode: PropTypes.number,
   updateCentreMarker: PropTypes.func.isRequired,
   updateDebugBar: PropTypes.func.isRequired,
@@ -93,3 +95,5 @@ Settings.propTypes = {
 Settings.defaultProps = {
   selectedRenderMode: 0,
 };
+
+export default withStore(Settings);

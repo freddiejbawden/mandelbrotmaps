@@ -1,30 +1,11 @@
 import React, { Component } from 'react';
 import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { disableBodyScroll } from 'body-scroll-lock';
 import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
 import DebugBar from './components/DebugBar';
 import FractalType from './utils/FractalType';
-
-const AppRouter = () => {
-  disableBodyScroll(document.querySelector('#app'));
-  return (
-    <Router>
-      <Switch>
-        <Route path="/:renderMode?/:iterations?">
-          <App id="app" />
-        </Route>
-      </Switch>
-    </Router>
-  );
-};
 
 class App extends Component {
   constructor(props) {
@@ -235,4 +216,4 @@ App.defaultProps = {
   maxi: 200,
 };
 
-export default AppRouter;
+export default App;

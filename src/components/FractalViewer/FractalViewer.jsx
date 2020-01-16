@@ -9,6 +9,8 @@ import round from '../../utils/Round';
 import JuliaPin from '../../JuliaPin';
 import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
+import { withStore } from '../../statemanagement/createStore';
+
 /*
   TODO:
     * Fix long zoom jump issue
@@ -69,7 +71,6 @@ class FractalViewer extends React.Component {
     this.juliaShiftY = 0;
     this.previousLength = -1;
     this.renderMode = props.renderMode;
-    this.maxi = props.maxi;
     this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
     this.draggingPin = false;
     this.renderer = new Renderer(
@@ -97,12 +98,13 @@ class FractalViewer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    if (this.renderMode !== nextProps.renderMode) {
-      this.renderMode = nextProps.renderMode;
+    if (this.renderMode !== nextProps.store.renderMode) {
+      this.renderMode = nextProps.store.renderMode;
       return true;
     }
-    if (this.renderer.maxIter !== nextProps.maxi) {
-      this.renderer.maxIter = nextProps.maxi;
+    if (this.renderer.maxIter !== nextProps.store.iterations) {
+      this.renderer.maxIter = nextProps.store.iterations;
+      // this.drawFractal(RenderQuality.CUSTOM);
       return true;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {
@@ -191,7 +193,7 @@ class FractalViewer extends React.Component {
     this.rendering = true;
     const startTime = Date.now();
     if (!this.dragging || !this.dirty) {
-      const level = (this.mandelbrotDragging) ? RenderQuality.LOW : RenderQuality.MAX;
+      const level = (this.mandelbrotDragging) ? RenderQuality.LOW : null;
       this.renderer.render(level).then((fractal) => {
         this.rendering = false;
         this.canvasOffsetX = 0;
@@ -597,6 +599,8 @@ FractalViewer.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   juliaPoint: PropTypes.array,
   mandelDragging: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
+  store: PropTypes.object.isRequired,
 };
 
 FractalViewer.defaultProps = {
@@ -605,4 +609,4 @@ FractalViewer.defaultProps = {
   updateJuliaPoint: (() => [0, 0]),
   mandelDragging: false,
 };
-export default FractalViewer;
+export default withStore(FractalViewer);
