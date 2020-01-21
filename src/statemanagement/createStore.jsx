@@ -68,6 +68,11 @@ const createStore = (WrappedComponent) => class extends React.Component {
           value: 0,
           unit: '',
         },
+        focus: {
+          label: 'Focus',
+          value: 'Mandelbrot',
+          unit: '',
+        },
       },
     }
 

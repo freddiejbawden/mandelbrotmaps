@@ -12,39 +12,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: '200',
       maxi: props.maxi || 200,
       renderMode: props.renderMode,
-      showDebugBar: false,
-      mandelDragging: false,
-      stats: {
-        iterations: {
-          label: 'Iterations',
-          value: props.maxi,
-        },
-
-        focus: {
-          label: 'Focus',
-          value: 'mandelbrot',
-        },
-      },
     };
     this.appRef = React.createRef();
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
-    this.updateFocus = this.updateFocus.bind(this);
-  }
-
-  updateFocus(focus) {
-    this.setState((prevState) => ({
-      ...prevState,
-      stats: {
-        ...prevState.stats,
-        focus: {
-          ...prevState.stats.focus,
-          value: focus,
-        },
-      },
-    }));
   }
 
   updateRenderMethod(newRenderMode) {
@@ -61,10 +33,6 @@ class App extends Component {
     });
   }
 
-  updateJuliaPoint(juliaPoint, mandelDragging) {
-    this.setState(() => ({ juliaPoint, mandelDragging }));
-  }
-
   render() {
     const s = this.state;
     const p = this.props;
@@ -78,9 +46,6 @@ class App extends Component {
             position={0}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateFocus={this.updateFocus}
-            onMouseOver={() => this.updateFocus('Julia')}
-            onFocus={() => this.updateFocus('Julia')}
           />
           <FractalViewer
             id="fractal-viewer"
@@ -88,9 +53,6 @@ class App extends Component {
             position={1}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateFocus={this.updateFocus}
-            onMouseOver={() => this.updateFocus('Mandelbrot')}
-            onFocus={() => this.updateFocus('Mandelbrot')}
           />
         </div>
         <div className="info-panel">

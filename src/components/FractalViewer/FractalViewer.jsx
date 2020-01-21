@@ -60,7 +60,6 @@ class FractalViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
-    this.updateFocus = props.updateFocus;
     this.type = props.type;
     this.zoomLevel = 1;
     this.juliaShiftX = 0;
@@ -429,7 +428,10 @@ class FractalViewer extends React.Component {
 
   handleTouchStart(e) {
     const touches = e.changedTouches;
-    this.updateFocus(this.type);
+    const p = this.props;
+    p.store.setStat({
+      focus: this.type,
+    });
     if (touches.length > 0) {
       this.dragging = true;
     }
@@ -598,6 +600,7 @@ class FractalViewer extends React.Component {
   }
 
   render() {
+    const p = this.props;
     return (
       <div className="mandelbrot-viewer-container">
         <canvas
@@ -605,7 +608,7 @@ class FractalViewer extends React.Component {
           onTouchMove={(e) => this.handleTouchMove(e)}
           onTouchEnd={(e) => this.handleTouchEnd(e)}
           onMouseDown={(e) => this.handleClick(e)}
-          onMouseEnter={() => this.updateFocus(this.type)}
+          onMouseEnter={() => p.store.setStat({ focus: this.type })}
           onMouseMove={(e) => this.handleMouseMove(e)}
           onMouseUp={(e) => this.handleDragEnd(e)}
           onMouseLeave={(e) => this.handleDragEnd(e)}
@@ -622,7 +625,6 @@ FractalViewer.propTypes = {
   showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
-  updateFocus: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
