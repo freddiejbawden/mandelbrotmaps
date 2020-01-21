@@ -22,10 +22,6 @@ class App extends Component {
           label: 'Iterations',
           value: props.maxi,
         },
-        zoomLevel: {
-          label: 'Zoom',
-          value: '1x',
-        },
         re: {
           label: 'Re',
           value: -1,
@@ -42,7 +38,6 @@ class App extends Component {
     };
     this.appRef = React.createRef();
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
-    this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
   }
@@ -72,19 +67,6 @@ class App extends Component {
         focus: {
           ...prevState.stats.focus,
           value: focus,
-        },
-      },
-    }));
-  }
-
-  updateZoomLevel(zoom) {
-    this.setState((prevState) => ({
-      ...prevState,
-      stats: {
-        ...prevState.stats,
-        zoomLevel: {
-          ...prevState.stats.zoomLevel,
-          value: `${zoom}x`,
         },
       },
     }));
@@ -134,7 +116,6 @@ class App extends Component {
             position={0}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Julia')}
@@ -146,7 +127,6 @@ class App extends Component {
             position={1}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Mandelbrot')}

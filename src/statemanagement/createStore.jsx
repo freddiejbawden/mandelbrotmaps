@@ -48,6 +48,11 @@ const createStore = (WrappedComponent) => class extends React.Component {
           value: 0,
           unit: 'ms',
         },
+        zoomLevel: {
+          label: 'Zoom Level',
+          value: 1,
+          unit: 'x',
+        },
       },
     }
 

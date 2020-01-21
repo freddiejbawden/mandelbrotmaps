@@ -60,7 +60,6 @@ class FractalViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
-    this.updateZoomLevel = props.updateZoomLevel;
     this.updateCoords = props.updateCoords;
     this.updateFocus = props.updateFocus;
     this.type = props.type;
@@ -547,7 +546,10 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    this.updateZoomLevel(round(this.zoomLevel, 2));
+    const p = this.props;
+    p.store.setStat({
+      zoomLevel: round(this.zoomLevel, 2),
+    });
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
@@ -614,7 +616,6 @@ FractalViewer.propTypes = {
   showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
-  updateZoomLevel: PropTypes.func.isRequired,
   updateCoords: PropTypes.func.isRequired,
   updateFocus: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
