@@ -58,6 +58,16 @@ const createStore = (WrappedComponent) => class extends React.Component {
           value: 200,
           unit: '',
         },
+        re: {
+          label: 'Re',
+          value: -1,
+          unit: '',
+        },
+        im: {
+          label: 'Im',
+          value: 0,
+          unit: '',
+        },
       },
     }
 

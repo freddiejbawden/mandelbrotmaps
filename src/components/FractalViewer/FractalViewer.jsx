@@ -60,7 +60,6 @@ class FractalViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
-    this.updateCoords = props.updateCoords;
     this.updateFocus = props.updateFocus;
     this.type = props.type;
     this.zoomLevel = 1;
@@ -319,13 +318,16 @@ class FractalViewer extends React.Component {
       this.mouseY = e.pageY;
     }
     const coords = this.mouseToWorld();
-    this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
+    const p = this.props;
+    p.store.setStat({
+      re: coords.x.toFixed(5),
+      im: coords.y.toFixed(5),
+    });
     if (this.dragging) {
       if (this.draggingPin) {
         this.juliaPin.move(this.mouseX, this.mouseY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         if (!this.rendering) {
-          const p = this.props;
           p.store.set(
             {
               juliaPoint: [worldJulia.x, worldJulia.y],
@@ -468,7 +470,11 @@ class FractalViewer extends React.Component {
         this.mouseX = pageX;
         this.mouseY = pageY;
         const coords = this.mouseToWorld();
-        this.updateCoords(coords.x.toFixed(5), coords.y.toFixed(5));
+        const p = this.props;
+        p.store.setStat({
+          re: coords.x.toFixed(5),
+          im: coords.y.toFixed(5),
+        });
         requestAnimationFrame(() => this.updateCanvas());
       }
     }
@@ -616,7 +622,6 @@ FractalViewer.propTypes = {
   showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
-  updateCoords: PropTypes.func.isRequired,
   updateFocus: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,

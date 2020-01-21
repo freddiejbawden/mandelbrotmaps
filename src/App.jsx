@@ -22,14 +22,7 @@ class App extends Component {
           label: 'Iterations',
           value: props.maxi,
         },
-        re: {
-          label: 'Re',
-          value: -1,
-        },
-        im: {
-          label: 'Im',
-          value: 0,
-        },
+
         focus: {
           label: 'Focus',
           value: 'mandelbrot',
@@ -38,25 +31,7 @@ class App extends Component {
     };
     this.appRef = React.createRef();
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
-    this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
-  }
-
-  updateCoords(re, im) {
-    this.setState((prevState) => ({
-      ...prevState,
-      stats: {
-        ...prevState.stats,
-        re: {
-          ...prevState.stats.re,
-          value: re,
-        },
-        im: {
-          ...prevState.stats.im,
-          value: im,
-        },
-      },
-    }));
   }
 
   updateFocus(focus) {
@@ -103,7 +78,6 @@ class App extends Component {
             position={0}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Julia')}
             onFocus={() => this.updateFocus('Julia')}
@@ -114,7 +88,6 @@ class App extends Component {
             position={1}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Mandelbrot')}
             onFocus={() => this.updateFocus('Mandelbrot')}
