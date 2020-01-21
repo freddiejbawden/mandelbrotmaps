@@ -21,13 +21,13 @@ class Settings extends Component {
     if (this.iterationUpdateTimer) clearTimeout(this.iterationUpdateTimer);
     const p = this.props;
     this.iterationUpdateTimer = setTimeout(() => {
-      p.store.set('iterations', parseInt(i, 10));
+      p.store.set({ iterations: parseInt(i, 10) });
     }, 300);
   }
 
   updateRenderMethod(val) {
     const p = this.props;
-    p.store.set('renderMode', parseInt(val, 10));
+    p.store.set({ renderMode: parseInt(val, 10) });
     // p.updateRenderMethod(parseInt(val, 10));
   }
 

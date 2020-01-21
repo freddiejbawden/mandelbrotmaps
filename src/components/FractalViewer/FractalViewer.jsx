@@ -64,7 +64,6 @@ class FractalViewer extends React.Component {
     this.updateZoomLevel = props.updateZoomLevel;
     this.updateCoords = props.updateCoords;
     this.updateFocus = props.updateFocus;
-    this.updateJuliaPoint = props.updateJuliaPoint;
     this.type = props.type;
     this.zoomLevel = 1;
     this.juliaShiftX = 0;
@@ -108,10 +107,10 @@ class FractalViewer extends React.Component {
       return true;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {
-      if (nextProps.juliaPoint !== this.renderer.juliaPoint
-        || nextProps.mandelDragging !== this.mandelbrotDragging) {
-        this.renderer.juliaPoint = nextProps.juliaPoint;
-        this.mandelbrotDragging = nextProps.mandelDragging;
+      if (nextProps.store.juliaPoint !== this.renderer.juliaPoint
+        || nextProps.store.mandelDragging !== this.mandelbrotDragging) {
+        this.renderer.juliaPoint = nextProps.store.juliaPoint;
+        this.mandelbrotDragging = nextProps.store.mandelDragging;
         this.drawFractal();
         return false;
       }
@@ -324,8 +323,13 @@ class FractalViewer extends React.Component {
         this.juliaPin.move(this.mouseX, this.mouseY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         if (!this.rendering) {
-          this.updateJuliaPoint([worldJulia.x, worldJulia.y], true);
-          requestAnimationFrame(() => this.updateCanvas());
+          const p = this.props;
+          p.store.set(
+            {
+              juliaPoint: [worldJulia.x, worldJulia.y],
+              mandelDragging: true,
+            },
+          );
         }
       } else {
         this.deltaX += e.movementX;
@@ -346,8 +350,11 @@ class FractalViewer extends React.Component {
         this.deltaY = 0;
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         this.draggingPin = false;
-        this.updateJuliaPoint([worldJulia.x, worldJulia.y], false);
-        requestAnimationFrame(() => this.updateCanvas());
+        const p = this.props;
+        p.store.set({
+          juliaPin: [worldJulia.x, worldJulia.y],
+          mandelDragging: false,
+        });
         return;
       }
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
@@ -441,7 +448,11 @@ class FractalViewer extends React.Component {
       if (this.draggingPin) {
         this.juliaPin.move(pageX, pageY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
-        this.updateJuliaPoint([worldJulia.x, worldJulia.y], true);
+        const p = this.props;
+        p.store.set({
+          juliaPoint: [worldJulia.x, worldJulia.y],
+          mandelDragging: true,
+        });
         requestAnimationFrame(() => this.updateCanvas());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
@@ -600,7 +611,6 @@ FractalViewer.propTypes = {
   updateRenderTime: PropTypes.func.isRequired,
   updateZoomLevel: PropTypes.func.isRequired,
   updateCoords: PropTypes.func.isRequired,
-  updateJuliaPoint: PropTypes.func,
   updateFocus: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   appRef: PropTypes.object.isRequired,
@@ -614,7 +624,6 @@ FractalViewer.propTypes = {
 FractalViewer.defaultProps = {
   showCentreMarker: false,
   juliaPoint: [0, 0],
-  updateJuliaPoint: (() => [0, 0]),
   mandelDragging: false,
 };
 export default withStore(FractalViewer);

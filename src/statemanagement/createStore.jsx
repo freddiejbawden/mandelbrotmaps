@@ -12,9 +12,12 @@ const createStore = (WrappedComponent) => class extends React.Component {
     state = {
       // eslint-disable-next-line react/destructuring-assignment
       get: (key) => this.state[key],
-      set: (key, value) => {
+      set: (updates) => {
         const { state } = this;
-        state[key] = value;
+        Object.keys(updates).forEach((key) => {
+          const value = updates[key];
+          state[key] = value;
+        });
         this.setState(state);
       },
       remove: (key) => {
@@ -24,6 +27,8 @@ const createStore = (WrappedComponent) => class extends React.Component {
       },
       renderMode: RenderMode.JAVASCRIPT,
       iterations: 200,
+      juliaPoint: [0, 0],
+      mandelDragging: false,
     }
 
     render() {
