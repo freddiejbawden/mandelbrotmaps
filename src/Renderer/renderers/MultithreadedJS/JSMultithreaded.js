@@ -37,17 +37,18 @@ class JSMultithreaded {
     dX,
     dY,
     juliaPoint,
+    singleThread,
   ) {
     return new Promise((res) => {
       this.update(pixelSize, width, height, centreCoords, maxIter);
       const newArr = new Uint8ClampedArray(this.height * this.width * 4);
-      const nThreadsFree = navigator.hardwareConcurrency;
+      const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
       this.pixelSplit = this.height / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
-          const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
+          const w = new Worker('../worker/renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }
       }
@@ -93,16 +94,16 @@ class JSMultithreaded {
     });
   }
 
-  async render(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async render(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint, singleThread) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
-      const nThreadsFree = navigator.hardwareConcurrency;
+      const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
       this.pixelSplit = (height * width) / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
-          const w = new Worker('../renderworker.js', { name: 'w', type: 'module' });
+          const w = new Worker('../worker/renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }
       }

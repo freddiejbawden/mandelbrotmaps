@@ -1,6 +1,6 @@
 import JSRenderer from './JavascriptRenderer';
 import WASMRenderer from './WASMRenderer';
-import Rectangle from '../../utils/Rectangle';
+import Rectangle from '../../../utils/Rectangle';
 
 const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200, 1);
 /* eslint no-restricted-globals:0 */
