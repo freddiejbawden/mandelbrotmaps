@@ -1,39 +1,27 @@
 /* eslint-disable import/no-unresolved */
 import idGenerator from '../../../utils/IDGenerator';
 
-class RustMultithreaded {
-  constructor(pixelSize, width, height, centreCoords, maxIter, type) {
-    this.pixelSize = pixelSize;
-    this.width = width;
-    this.height = height;
-    this.centreCoords = centreCoords;
-    this.maxIter = maxIter;
-    this.fractalLimitX = 0;
-    this.fractalLimitY = 0;
-    this.splitHeight = this.height;
+class WebWorkerManager {
+  constructor(type) {
     this.remaining_threads = 0;
     this.workers = [];
-    this.arr = new Uint8ClampedArray(this.height * this.width * 4);
     this.type = type;
   }
 
-  async loadWasm() {
-    try {
-      const { Mandelbrot } = await import('mmap');
-      const { memory } = await import('mmap/mmap_bg');
-      this.mandelbrotWASM = Mandelbrot;
-      this.memory = memory;
-    } catch (err) {
-      // TODO: alert user
-      // eslint-disable-next-line no-console
-      console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
-    }
-  }
-
-  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint, singleThread) {
+  async render(
+    pixelSize,
+    width,
+    height,
+    centreCoords,
+    maxIter,
+    juliaPoint,
+    singleThread,
+    renderer,
+  ) {
     return new Promise((res) => {
       this.arr = new Uint8ClampedArray(height * width * 4);
-      const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
+      const hardwareConcurrency = navigator.hardwareConcurrency || 1;
+      const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
       this.pixelSplit = (height * width) / nThreadsFree;
       this.remaining_threads = nThreadsFree;
       const roundID = idGenerator();
@@ -63,7 +51,7 @@ class RustMultithreaded {
         w.postMessage({
           type: this.type,
           id: roundID,
-          renderer: 'wasm',
+          renderer,
           startPixel: Math.floor(i * this.pixelSplit),
           endPixel: Math.floor((i + 1) * this.pixelSplit),
           arrSize: this.pixelSplit * 4,
@@ -91,6 +79,7 @@ class RustMultithreaded {
     dY,
     juliaPoint,
     singleThread,
+    renderer,
   ) {
     return new Promise((res) => {
       this.width = width;
@@ -133,7 +122,7 @@ class RustMultithreaded {
           type: this.type,
           id: roundID,
           workerID: idGenerator(),
-          renderer: 'wasm',
+          renderer,
           mode: 'partial',
           startRow: Math.floor(i * this.pixelSplit),
           endRow: Math.floor((i + 1) * this.pixelSplit),
@@ -153,4 +142,4 @@ class RustMultithreaded {
     });
   }
 }
-export default RustMultithreaded;
+export default WebWorkerManager;
