@@ -133,7 +133,7 @@ class FractalViewer extends React.Component {
         s.maxIter,
       );
       const p = this.props;
-      if (p.store.renderMode === Mode.WASM || p.store.renderMode === Mode.RUSTMT) {
+      if (p.store.renderMode === Mode.WASM || p.store.renderMode === Mode.WASMMT) {
         requestAnimationFrame(() => this.drawFractal());
       }
     } catch (err) {

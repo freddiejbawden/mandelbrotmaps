@@ -1,6 +1,6 @@
 import Mode from '../utils/RenderMode';
-import JSMultithreaded from './renderers/MultithreadedJS';
-import RustMultithreaded from './renderers/RustMultithreaded';
+import WebWorkerManager from './WebWorkerManager';
+import RendererType from './RendererType';
 
 class Renderer {
   constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
@@ -16,23 +16,9 @@ class Renderer {
     this.fractalLimitX = 0;
     this.fractalLimitY = 0;
     this.timer = undefined;
-    this.type = type;
     this.juliaPoint = juliaPoint;
-    this.wasmMTRenderer = new RustMultithreaded(
-      this.pixelSize,
-      this.width,
-      this.height,
-      this.centreCoords,
-      this.maxIter,
-      this.type,
-    );
-    this.jsMTRender = new JSMultithreaded(
-      this.pixelSize,
-      this.width,
-      this.height,
-      this.centreCoords,
-      this.maxIter,
-      this.type,
+    this.webWorkerManager = new WebWorkerManager(
+      type,
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;
@@ -66,8 +52,7 @@ class Renderer {
   async renderRange(xRect, yRect, dX, dY) {
     if (this.mode === Mode.JAVASCRIPT) {
       const useSingleThread = true;
-      const fractal = await this.jsMTRender.renderRange(
-        this.type,
+      const fractal = await this.webWorkerManager.renderRange(
         this.pixelSize,
         this.width,
         this.height,
@@ -80,6 +65,7 @@ class Renderer {
         dY,
         this.juliaPoint,
         useSingleThread,
+        RendererType.JAVASCRIPT,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -87,7 +73,7 @@ class Renderer {
     if (this.mode === Mode.WASM) {
       const clamped = new Uint8ClampedArray(this.prev_arr);
       const useSingleThread = true;
-      const fractal = await this.wasmMTRenderer.renderRange(
+      const fractal = await this.webWorkerManager.renderRange(
         this.pixelSize,
         this.width,
         this.height,
@@ -100,13 +86,14 @@ class Renderer {
         dY,
         this.juliaPoint,
         useSingleThread,
+        RendererType.WASM,
       );
       this.prev_arr = fractal.arr;
       return fractal;
     }
     if (this.mode === Mode.JAVASCRIPTMT) {
-      const fractal = await this.jsMTRender.renderRange(
-        this.type,
+      const useSingleThread = false;
+      const fractal = await this.webWorkerManager.renderRange(
         this.pixelSize,
         this.width,
         this.height,
@@ -118,13 +105,16 @@ class Renderer {
         dX,
         dY,
         this.juliaPoint,
+        useSingleThread,
+        RendererType.JAVASCRIPT,
       );
       this.prev_arr = fractal.arr;
       return fractal;
     }
-    if (this.mode === Mode.RUSTMT) {
+    if (this.mode === Mode.WASMMT) {
+      const useSingleThread = false;
       const clamped = new Uint8ClampedArray(this.prev_arr);
-      const fractal = await this.wasmMTRenderer.renderRange(
+      const fractal = await this.webWorkerManager.renderRange(
         this.pixelSize,
         this.width,
         this.height,
@@ -136,6 +126,8 @@ class Renderer {
         dX,
         dY,
         this.juliaPoint,
+        useSingleThread,
+        RendererType.WASM,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -154,8 +146,7 @@ class Renderer {
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
         const useSingleThread = true;
-        this.jsMTRender.render(
-          this.type,
+        this.webWorkerManager.render(
           this.pixelSize,
           this.width,
           this.height,
@@ -163,13 +154,14 @@ class Renderer {
           iterations,
           this.juliaPoint,
           useSingleThread,
+          RendererType.JAVASCRIPT,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
         }).catch((e) => reject(e));
       } else if (this.mode === Mode.WASM) {
         const useSingleThread = true;
-        this.wasmMTRenderer.render(
+        this.webWorkerManager.render(
           this.pixelSize,
           this.width,
           this.height,
@@ -177,31 +169,35 @@ class Renderer {
           iterations,
           this.juliaPoint,
           useSingleThread,
+          RendererType.WASM,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
         });
       } else if (this.mode === Mode.JAVASCRIPTMT) {
-        this.jsMTRender.render(
-          this.type,
+        this.webWorkerManager.render(
           this.pixelSize,
           this.width,
           this.height,
           this.centreCoords,
           iterations,
           this.juliaPoint,
+          false,
+          RendererType.JAVASCRIPT,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
         }).catch((e) => reject(e));
-      } else if (this.mode === Mode.RUSTMT) {
-        this.wasmMTRenderer.render(
+      } else if (this.mode === Mode.WASMMT) {
+        this.webWorkerManager.render(
           this.pixelSize,
           this.width,
           this.height,
           this.centreCoords,
           iterations,
           this.juliaPoint,
+          false,
+          RendererType.WASM,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);

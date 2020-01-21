@@ -29,6 +29,9 @@ class Settings extends Component {
 
   updateRenderMethod(val) {
     const p = this.props;
+    p.store.setStat({
+      renderMode: parseInt(val, 10),
+    });
     p.store.set({ renderMode: parseInt(val, 10) });
     // p.updateRenderMethod(parseInt(val, 10));
   }
@@ -69,7 +72,7 @@ class Settings extends Component {
                 <option value={RenderMode.JAVASCRIPT}>Javascript</option>
                 <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
                 <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
-                <option value={RenderMode.RUSTMT}>WASM + Rust (Web Worker)</option>
+                <option value={RenderMode.WASMMT}>WASM + Rust (Web Worker)</option>
               </select>
             </div>
             <div>
