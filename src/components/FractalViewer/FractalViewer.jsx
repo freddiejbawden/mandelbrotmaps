@@ -238,6 +238,8 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
+    let newWidth;
+    let newHeight;
     if (window.screen.orientation) {
       this.orientation = window.screen.orientation.type;
     } else {
@@ -245,13 +247,21 @@ class FractalViewer extends React.Component {
     }
     if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
       this.orientation = 'portrait';
-      this.width = window.innerWidth;
-      this.height = Math.floor(window.innerHeight / 2);
+      newWidth = window.innerWidth;
+      newHeight = Math.floor(window.innerHeight / 2);
     } else {
       this.orientation = 'landscape';
-      this.width = Math.floor(window.innerWidth / 2);
-      this.height = window.innerHeight;
+      newWidth = Math.floor(window.innerWidth / 2);
+      newHeight = window.innerHeight;
     }
+
+    // keep julia pin in correct location
+    this.juliaPin.move(
+      this.juliaPin.x + (newWidth - this.width) / 2,
+      this.juliaPin.y + (newHeight - this.height) / 2,
+    );
+    this.width = newWidth;
+    this.height = newHeight;
     this.renderer.width = this.width;
     this.renderer.height = this.height;
   }
@@ -274,8 +284,6 @@ class FractalViewer extends React.Component {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
       this.updateWidthHeight();
-      this.renderer.width = this.width;
-      this.renderer.height = this.height;
       requestAnimationFrame(() => this.drawFractal());
     }, 100);
   }
