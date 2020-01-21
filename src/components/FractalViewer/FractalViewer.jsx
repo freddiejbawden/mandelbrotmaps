@@ -60,7 +60,6 @@ class FractalViewer extends React.Component {
     this.canvasOffsetX = 0;
     this.canvasOffsetY = 0;
     this.rendering = false;
-    this.updateRenderTime = props.updateRenderTime;
     this.updateZoomLevel = props.updateZoomLevel;
     this.updateCoords = props.updateCoords;
     this.updateFocus = props.updateFocus;
@@ -200,7 +199,10 @@ class FractalViewer extends React.Component {
         this.canvasOffsetY = 0;
         this.canvasZoom = 1;
         this.putImage(fractal.arr, fractal.width, fractal.height);
-        this.updateRenderTime(Date.now() - startTime);
+        const p = this.props;
+        p.store.setStat({
+          renderTime: (Date.now() - startTime),
+        });
       }).catch((err) => {
         // TODO: alert user
         // eslint-disable-next-line
@@ -416,7 +418,10 @@ class FractalViewer extends React.Component {
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;
-      this.updateRenderTime(Date.now() - startTime);
+      const p = this.props;
+      p.store.setStat({
+        renderTime: (Date.now() - startTime),
+      });
     }
   }
 
@@ -609,7 +614,6 @@ FractalViewer.propTypes = {
   showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
-  updateRenderTime: PropTypes.func.isRequired,
   updateZoomLevel: PropTypes.func.isRequired,
   updateCoords: PropTypes.func.isRequired,
   updateFocus: PropTypes.func.isRequired,

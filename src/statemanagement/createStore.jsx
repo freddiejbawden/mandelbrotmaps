@@ -30,11 +30,25 @@ const createStore = (WrappedComponent) => class extends React.Component {
         state[key] = !state[key];
         this.setState(state);
       },
+      setStat: (updates) => {
+        const { state } = this;
+        Object.keys(updates).forEach((key) => {
+          state.stats[key].value = updates[key];
+        });
+        this.setState(state);
+      },
       renderMode: RenderMode.JAVASCRIPT,
       iterations: 200,
       juliaPoint: [0, 0],
       mandelDragging: false,
       showDebugBar: false,
+      stats: {
+        renderTime: {
+          label: 'Render Time',
+          value: 0,
+          unit: 'ms',
+        },
+      },
     }
 
     render() {

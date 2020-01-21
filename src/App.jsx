@@ -18,10 +18,6 @@ class App extends Component {
       showDebugBar: false,
       mandelDragging: false,
       stats: {
-        renderTime: {
-          label: 'Render Time',
-          value: (`${200}ms`),
-        },
         iterations: {
           label: 'Iterations',
           value: props.maxi,
@@ -46,7 +42,6 @@ class App extends Component {
     };
     this.appRef = React.createRef();
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
-    this.updateRenderTime = this.updateRenderTime.bind(this);
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
@@ -64,19 +59,6 @@ class App extends Component {
         im: {
           ...prevState.stats.im,
           value: im,
-        },
-      },
-    }));
-  }
-
-  updateRenderTime(time) {
-    this.setState((prevState) => ({
-      ...prevState,
-      stats: {
-        ...prevState.stats,
-        renderTime: {
-          ...prevState.stats.renderTime,
-          value: `${time}ms`,
         },
       },
     }));
@@ -152,7 +134,6 @@ class App extends Component {
             position={0}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
@@ -165,7 +146,6 @@ class App extends Component {
             position={1}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
-            updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
