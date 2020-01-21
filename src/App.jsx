@@ -7,6 +7,8 @@ import Mode from './utils/RenderMode';
 import DebugBar from './components/DebugBar';
 import FractalType from './utils/FractalType';
 import { withStore } from './statemanagement/createStore';
+import UnsupportedBrowser from './components/UnsupportedBrowser';
+import { checkSupported } from './utils/checkSupported';
 
 class App extends Component {
   constructor(props) {
@@ -21,7 +23,14 @@ class App extends Component {
   render() {
     const s = this.state;
     const p = this.props;
-    // Fall back to JS
+
+    let unsupportedPopUp = '';
+    if (!checkSupported()) {
+      if (!window.localStorage.getItem('understandUnsupported')) {
+        unsupportedPopUp = (<UnsupportedBrowser />);
+      }
+    }
+
     return (
       <div className="App">
         <div className="render-container">
@@ -48,6 +57,7 @@ class App extends Component {
         <DebugBar
           showDebugBar={p.store.showDebugBar}
         />
+        {unsupportedPopUp}
       </div>
     );
   }
