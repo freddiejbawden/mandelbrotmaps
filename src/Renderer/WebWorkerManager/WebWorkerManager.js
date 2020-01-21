@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import idGenerator from '../../../utils/IDGenerator';
+import idGenerator from '../../utils/IDGenerator';
 
 class WebWorkerManager {
   constructor(type) {
@@ -27,7 +27,7 @@ class WebWorkerManager {
       const roundID = idGenerator();
       if (this.workers.length < this.remaining_threads) {
         for (let i = this.workers.length; i < this.remaining_threads; i += 1) {
-          const w = new Worker('../worker/renderworker.js', { name: 'w', type: 'module' });
+          const w = new Worker('./worker/renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }
       }
@@ -91,7 +91,7 @@ class WebWorkerManager {
       const roundID = idGenerator();
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
-          const w = new Worker('../worker/renderworker.js', { name: 'w', type: 'module' });
+          const w = new Worker('./worker/renderworker.js', { name: 'w', type: 'module' });
           this.workers.push(w);
         }
       }

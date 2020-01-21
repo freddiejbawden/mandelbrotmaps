@@ -1,5 +1,5 @@
 import Mode from '../utils/RenderMode';
-import WebWorkerManager from './renderers/WebWorkerManager';
+import WebWorkerManager from './WebWorkerManager';
 import RendererType from './RendererType';
 
 class Renderer {
