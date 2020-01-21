@@ -78,19 +78,6 @@ class App extends Component {
     });
   }
 
-  updateMaxIterations(iter) {
-    this.setState((prevState) => ({
-      ...prevState,
-      stats: {
-        ...prevState.stats,
-        iterations: {
-          ...prevState.stats.iterations,
-          value: `${iter}`,
-        },
-      },
-    }));
-  }
-
   updateCentreMarker() {
     const s = this.state;
     const oldVal = s.showCentreMarker;
@@ -135,7 +122,6 @@ class App extends Component {
         </div>
         <div className="info-panel">
           <Settings
-            updateIter={this.updateMaxIterations}
             selectedRenderMode={s.renderMode}
             maxi={s.maxi}
             updateCentreMarker={this.updateCentreMarker}

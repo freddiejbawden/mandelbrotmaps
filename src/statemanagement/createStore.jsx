@@ -53,6 +53,11 @@ const createStore = (WrappedComponent) => class extends React.Component {
           value: 1,
           unit: 'x',
         },
+        iterations: {
+          label: 'Iterations',
+          value: 200,
+          unit: '',
+        },
       },
     }
 

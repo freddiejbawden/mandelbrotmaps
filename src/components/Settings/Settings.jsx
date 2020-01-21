@@ -21,7 +21,9 @@ class Settings extends Component {
     if (this.iterationUpdateTimer) clearTimeout(this.iterationUpdateTimer);
     const p = this.props;
     this.iterationUpdateTimer = setTimeout(() => {
-      p.store.set({ iterations: parseInt(i, 10) });
+      const iter = parseInt(i, 10);
+      p.store.setStat({ iterations: iter });
+      p.store.set({ iterations: iter });
     }, 300);
   }
 
