@@ -631,12 +631,13 @@ FractalViewer.propTypes = {
   juliaPoint: PropTypes.array,
   mandelDragging: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
-  store: PropTypes.object.isRequired,
+  store: PropTypes.object,
 };
 
 FractalViewer.defaultProps = {
   showCentreMarker: false,
   juliaPoint: [0, 0],
   mandelDragging: false,
+  store: {},
 };
 export default withStore(FractalViewer);

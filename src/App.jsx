@@ -65,7 +65,6 @@ class App extends Component {
           />
         </div>
         <DebugBar
-          stats={s.stats}
           showDebugBar={p.store.showDebugBar}
         />
       </div>
@@ -76,11 +75,12 @@ App.propTypes = {
   renderMode: PropTypes.number,
   maxi: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
-  store: PropTypes.object.isRequired,
+  store: PropTypes.object,
 };
 App.defaultProps = {
   renderMode: Mode.JAVASCRIPT,
   maxi: 200,
+  store: {},
 };
 
 export default withStore(App);

@@ -88,12 +88,13 @@ class Settings extends Component {
 }
 Settings.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  store: PropTypes.object.isRequired,
+  store: PropTypes.object,
   selectedRenderMode: PropTypes.number,
   updateCentreMarker: PropTypes.func.isRequired,
 };
 Settings.defaultProps = {
   selectedRenderMode: 0,
+  store: {},
 };
 
 export default withStore(Settings);
