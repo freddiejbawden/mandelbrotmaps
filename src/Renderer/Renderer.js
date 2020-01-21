@@ -1,6 +1,4 @@
 import Mode from '../utils/RenderMode';
-import JavascriptRenderer from './renderers/JavascriptRenderer';
-import WASMRenderer from './renderers/WASMRenderer';
 import JSMultithreaded from './renderers/MultithreadedJS';
 import RustMultithreaded from './renderers/RustMultithreaded';
 
@@ -20,14 +18,6 @@ class Renderer {
     this.timer = undefined;
     this.type = type;
     this.juliaPoint = juliaPoint;
-    this.wasm_render = new WASMRenderer(
-      this.pixelSize,
-      this.width,
-      this.height,
-      this.centreCoords,
-      this.maxIter,
-      this.type,
-    );
     this.wasmMTRenderer = new RustMultithreaded(
       this.pixelSize,
       this.width,
@@ -75,44 +65,41 @@ class Renderer {
 
   async renderRange(xRect, yRect, dX, dY) {
     if (this.mode === Mode.JAVASCRIPT) {
-      const jsRender = new JavascriptRenderer(
+      const useSingleThread = true;
+      const fractal = await this.jsMTRender.renderRange(
         this.type,
         this.pixelSize,
         this.width,
         this.height,
         this.centreCoords,
         this.maxIter,
-        this.juliaPoint,
-      );
-      const clamped = new Uint8ClampedArray(this.prev_arr);
-      const fractal = await jsRender.renderRange(
+        this.prev_arr,
         xRect,
         yRect,
         dX,
         dY,
-        clamped,
-        0,
-        this.height,
+        this.juliaPoint,
+        useSingleThread,
       );
       this.prev_arr = fractal.arr;
       return fractal;
     }
     if (this.mode === Mode.WASM) {
       const clamped = new Uint8ClampedArray(this.prev_arr);
-      const fractal = await this.wasm_render.renderRange(
+      const useSingleThread = true;
+      const fractal = await this.wasmMTRenderer.renderRange(
+        this.pixelSize,
+        this.width,
+        this.height,
+        this.centreCoords,
+        this.maxIter,
+        clamped,
         xRect,
         yRect,
         dX,
         dY,
-        clamped,
-        0,
-        this.height,
-        this.width,
-        this.height,
-        this.maxIter,
-        this.centreCoords[0],
-        this.centreCoords[1],
         this.juliaPoint,
+        useSingleThread,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -166,7 +153,8 @@ class Renderer {
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
-        const jsRender = new JavascriptRenderer(
+        const useSingleThread = true;
+        this.jsMTRender.render(
           this.type,
           this.pixelSize,
           this.width,
@@ -174,20 +162,23 @@ class Renderer {
           this.centreCoords,
           iterations,
           this.juliaPoint,
-        );
-        const fractal = await jsRender.render();
-        this.prev_arr = fractal.arr;
-        resolve(fractal);
+          useSingleThread,
+        ).then((fractal) => {
+          this.prev_arr = fractal.arr;
+          resolve(fractal);
+        }).catch((e) => reject(e));
       } else if (this.mode === Mode.WASM) {
-        this.wasm_render.render(
+        const useSingleThread = true;
+        this.wasmMTRenderer.render(
           this.pixelSize,
           this.width,
           this.height,
           this.centreCoords,
           iterations,
           this.juliaPoint,
+          useSingleThread,
         ).then((fractal) => {
-          this.prev_arr = fractal.arr.slice(0);
+          this.prev_arr = fractal.arr;
           resolve(fractal);
         });
       } else if (this.mode === Mode.JAVASCRIPTMT) {
