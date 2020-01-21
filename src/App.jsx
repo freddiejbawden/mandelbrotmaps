@@ -16,21 +16,6 @@ class App extends Component {
       renderMode: props.renderMode,
     };
     this.appRef = React.createRef();
-    this.updateCentreMarker = this.updateCentreMarker.bind(this);
-  }
-
-  updateRenderMethod(newRenderMode) {
-    this.setState({
-      renderMode: newRenderMode,
-    });
-  }
-
-  updateCentreMarker() {
-    const s = this.state;
-    const oldVal = s.showCentreMarker;
-    this.setState({
-      showCentreMarker: !oldVal,
-    });
   }
 
   render() {
@@ -44,14 +29,12 @@ class App extends Component {
             id="fractal-viewer"
             type={FractalType.MANDELBROT}
             position={0}
-            showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
           />
           <FractalViewer
             id="fractal-viewer"
             type={FractalType.JULIA}
             position={1}
-            showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
           />
         </div>
@@ -59,8 +42,6 @@ class App extends Component {
           <Settings
             selectedRenderMode={s.renderMode}
             maxi={s.maxi}
-            updateCentreMarker={this.updateCentreMarker}
-            updateRenderMethod={this.updateRenderMethod}
             ref={this.appRef}
           />
         </div>
