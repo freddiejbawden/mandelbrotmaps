@@ -73,12 +73,8 @@ class Settings extends Component {
               </select>
             </div>
             <div>
-              <span>Enable Centre Marker </span>
-              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateCentreMarker()} />
-            </div>
-            <div>
               <span>Enable Debug Bar </span>
-              <input type="checkbox" name="centremarker" value="true" onChange={() => p.store.toggle('showDebugBar')} />
+              <input type="checkbox" name="debugbar" value="true" onChange={() => p.store.toggle('showDebugBar')} />
             </div>
           </div>
         </div>
@@ -90,7 +86,6 @@ Settings.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   store: PropTypes.object,
   selectedRenderMode: PropTypes.number,
-  updateCentreMarker: PropTypes.func.isRequired,
 };
 Settings.defaultProps = {
   selectedRenderMode: 0,

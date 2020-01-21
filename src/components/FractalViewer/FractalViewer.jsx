@@ -48,7 +48,6 @@ class FractalViewer extends React.Component {
     this.mouseY = 0;
     this.dirty = false;
     this.renderID = undefined;
-    this.showCentreMarker = props.showCentreMarker;
     this.updateDimensions = this.updateDimensions.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
@@ -116,9 +115,6 @@ class FractalViewer extends React.Component {
 
   componentDidUpdate() {
     const p = this.props;
-    if (p.showCentreMarker !== this.showCentreMarker) {
-      this.showCentreMarker = p.showCentreMarker;
-    }
     this.renderer.mode = p.store.renderMode;
     requestAnimationFrame(() => this.drawFractal());
   }
@@ -161,11 +157,6 @@ class FractalViewer extends React.Component {
       pageX: x,
       pageY: y,
     };
-  }
-
-  updateCentreMarker() {
-    this.showCentreMarker = !this.showCentreMarker;
-    this.drawFractal();
   }
 
   updateIter(iter) {
@@ -222,10 +213,6 @@ class FractalViewer extends React.Component {
     fractalContext.translate(this.originX, this.originY);
     fractalContext.drawImage(newCanvas, 0, 0);
     fractalContext.setTransform(1, 0, 0, 1, 0, 0);
-    if (this.showCentreMarker) {
-      fractalContext.fillStyle = '#00ff00';
-      fractalContext.fillRect(this.width / 2 - 5, this.height / 2 - 5, 10, 10);
-    }
     if (this.type === FractalType.MANDELBROT) {
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
@@ -622,7 +609,6 @@ class FractalViewer extends React.Component {
   }
 }
 FractalViewer.propTypes = {
-  showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
@@ -635,7 +621,6 @@ FractalViewer.propTypes = {
 };
 
 FractalViewer.defaultProps = {
-  showCentreMarker: false,
   juliaPoint: [0, 0],
   mandelDragging: false,
   store: {},
