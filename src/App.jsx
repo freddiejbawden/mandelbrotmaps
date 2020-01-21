@@ -6,6 +6,7 @@ import Settings from './components/Settings';
 import Mode from './utils/RenderMode';
 import DebugBar from './components/DebugBar';
 import FractalType from './utils/FractalType';
+import { withStore } from './statemanagement/createStore';
 
 class App extends Component {
   constructor(props) {
@@ -49,8 +50,6 @@ class App extends Component {
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
     this.updateFocus = this.updateFocus.bind(this);
-    this.updateDebugBar = this.updateDebugBar.bind(this);
-    this.updateJuliaPoint = this.updateJuliaPoint.bind(this);
   }
 
   updateCoords(re, im) {
@@ -128,10 +127,6 @@ class App extends Component {
     }));
   }
 
-  updateDebugBar() {
-    this.setState((prevState) => ({ showDebugBar: !prevState.showDebugBar }));
-  }
-
   updateCentreMarker() {
     const s = this.state;
     const oldVal = s.showCentreMarker;
@@ -146,6 +141,7 @@ class App extends Component {
 
   render() {
     const s = this.state;
+    const p = this.props;
     // Fall back to JS
     return (
       <div className="App">
@@ -184,13 +180,12 @@ class App extends Component {
             maxi={s.maxi}
             updateCentreMarker={this.updateCentreMarker}
             updateRenderMethod={this.updateRenderMethod}
-            updateDebugBar={this.updateDebugBar}
             ref={this.appRef}
           />
         </div>
         <DebugBar
           stats={s.stats}
-          showDebugBar={s.showDebugBar}
+          showDebugBar={p.store.showDebugBar}
         />
       </div>
     );
@@ -199,10 +194,12 @@ class App extends Component {
 App.propTypes = {
   renderMode: PropTypes.number,
   maxi: PropTypes.number,
+  // eslint-disable-next-line react/forbid-prop-types
+  store: PropTypes.object.isRequired,
 };
 App.defaultProps = {
   renderMode: Mode.JAVASCRIPT,
   maxi: 200,
 };
 
-export default App;
+export default withStore(App);

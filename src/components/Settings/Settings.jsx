@@ -76,7 +76,7 @@ class Settings extends Component {
             </div>
             <div>
               <span>Enable Debug Bar </span>
-              <input type="checkbox" name="centremarker" value="true" onChange={() => p.updateDebugBar()} />
+              <input type="checkbox" name="centremarker" value="true" onChange={() => p.store.toggle('showDebugBar')} />
             </div>
           </div>
         </div>
@@ -89,8 +89,6 @@ Settings.propTypes = {
   store: PropTypes.object.isRequired,
   selectedRenderMode: PropTypes.number,
   updateCentreMarker: PropTypes.func.isRequired,
-  updateDebugBar: PropTypes.func.isRequired,
-
 };
 Settings.defaultProps = {
   selectedRenderMode: 0,

@@ -25,10 +25,16 @@ const createStore = (WrappedComponent) => class extends React.Component {
         delete state[key];
         this.setState(state);
       },
+      toggle: (key) => {
+        const { state } = this;
+        state[key] = !state[key];
+        this.setState(state);
+      },
       renderMode: RenderMode.JAVASCRIPT,
       iterations: 200,
       juliaPoint: [0, 0],
       mandelDragging: false,
+      showDebugBar: false,
     }
 
     render() {
