@@ -184,7 +184,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          level,
+          iterations,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr.slice(0);
@@ -197,7 +197,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          level,
+          iterations,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
@@ -209,7 +209,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          level,
+          iterations,
           this.juliaPoint,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;

@@ -10,7 +10,7 @@ import JuliaPin from '../../JuliaPin';
 import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
-
+import Mode from '../../utils/RenderMode';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -69,15 +69,15 @@ class FractalViewer extends React.Component {
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
     this.previousLength = -1;
-    this.renderMode = props.renderMode;
+    this.renderMode = props.store.renderMode;
     this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
     this.draggingPin = false;
     this.renderer = new Renderer(
       props.type,
-      parseInt(props.renderMode, 10),
+      parseInt(this.renderMode, 10),
       this.width,
       this.height,
-      parseInt(props.maxi, 10),
+      parseInt(props.store.maxIter, 10),
       [-1, 0],
     );
   }
@@ -123,7 +123,7 @@ class FractalViewer extends React.Component {
     if (p.showCentreMarker !== this.showCentreMarker) {
       this.showCentreMarker = p.showCentreMarker;
     }
-    this.renderer.mode = p.renderMode;
+    this.renderer.mode = p.store.renderMode;
     requestAnimationFrame(() => this.drawFractal());
   }
 
@@ -140,7 +140,8 @@ class FractalViewer extends React.Component {
         this.pixelSize,
         s.maxIter,
       );
-      if (s.renderMode === 'wasm') {
+      const p = this.props;
+      if (p.store.renderMode === Mode.WASM || p.store.renderMode === Mode.RUSTMT) {
         requestAnimationFrame(() => this.drawFractal());
       }
     } catch (err) {
@@ -330,6 +331,7 @@ class FractalViewer extends React.Component {
               mandelDragging: true,
             },
           );
+          requestAnimationFrame(() => this.updateCanvas());
         }
       } else {
         this.deltaX += e.movementX;
@@ -355,6 +357,7 @@ class FractalViewer extends React.Component {
           juliaPin: [worldJulia.x, worldJulia.y],
           mandelDragging: false,
         });
+        requestAnimationFrame(() => this.updateCanvas());
         return;
       }
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
@@ -603,8 +606,6 @@ class FractalViewer extends React.Component {
   }
 }
 FractalViewer.propTypes = {
-  renderMode: PropTypes.number.isRequired,
-  maxi: PropTypes.number.isRequired,
   showCentreMarker: PropTypes.bool,
   type: PropTypes.number.isRequired,
   position: PropTypes.number.isRequired,

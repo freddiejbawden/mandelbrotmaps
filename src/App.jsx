@@ -44,9 +44,7 @@ class App extends Component {
       },
     };
     this.appRef = React.createRef();
-    this.updateMaxIterations = this.updateMaxIterations.bind(this);
     this.updateCentreMarker = this.updateCentreMarker.bind(this);
-    this.updateRenderMethod = this.updateRenderMethod.bind(this);
     this.updateRenderTime = this.updateRenderTime.bind(this);
     this.updateZoomLevel = this.updateZoomLevel.bind(this);
     this.updateCoords = this.updateCoords.bind(this);
@@ -149,8 +147,6 @@ class App extends Component {
   render() {
     const s = this.state;
     // Fall back to JS
-    const renderMode = parseInt(s.renderMode || 1, 10);
-    const iterations = parseInt(s.stats.iterations.value || 200, 10);
     return (
       <div className="App">
         <div className="render-container">
@@ -158,15 +154,12 @@ class App extends Component {
             id="fractal-viewer"
             type={FractalType.MANDELBROT}
             position={0}
-            maxi={iterations}
-            renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
             updateZoomLevel={this.updateZoomLevel}
             updateCoords={this.updateCoords}
             updateFocus={this.updateFocus}
-            updateJuliaPoint={this.updateJuliaPoint}
             onMouseOver={() => this.updateFocus('Julia')}
             onFocus={() => this.updateFocus('Julia')}
           />
@@ -174,8 +167,6 @@ class App extends Component {
             id="fractal-viewer"
             type={FractalType.JULIA}
             position={1}
-            maxi={iterations}
-            renderMode={renderMode}
             showCentreMarker={s.showCentreMarker}
             appRef={this.appRef}
             updateRenderTime={this.updateRenderTime}
@@ -184,8 +175,6 @@ class App extends Component {
             updateFocus={this.updateFocus}
             onMouseOver={() => this.updateFocus('Mandelbrot')}
             onFocus={() => this.updateFocus('Mandelbrot')}
-            juliaPoint={s.juliaPoint}
-            mandelDragging={s.mandelDragging}
           />
         </div>
         <div className="info-panel">
