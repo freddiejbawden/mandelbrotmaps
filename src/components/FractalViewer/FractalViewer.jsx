@@ -81,6 +81,24 @@ class FractalViewer extends React.Component {
     this.fractal.current.focus();
     await this.loadWasm();
     const startTime = Date.now();
+
+    // Safari support
+    document.addEventListener('gesturechange', (e) => {
+      const p = this.props;
+      const { store } = p;
+      if (store.stats.focus.value === this.position && !this.rendering) {
+        if (this.previousLength === -1) {
+          this.previousLength = e.scale;
+        }
+        let magnification = Math.abs((e.scale - this.previousLength));
+        if (magnification > 0.02) {
+          magnification = 0.02;
+        }
+        if (e.scale > this.previousLength) this.zoom(-1, magnification);
+        if (e.scale < this.previousLength) this.zoom(1, magnification);
+        this.previousLength = e.scale;
+      }
+    });
     window.addEventListener('resize', this.updateDimensions);
     window.performance.mark('fractal_rendered_start');
     requestAnimationFrame(() => {
@@ -309,7 +327,7 @@ class FractalViewer extends React.Component {
       re: coords.x.toFixed(5),
       im: coords.y.toFixed(5),
     });
-    if (this.dragging) {
+    if (this.dragging && !this.rendering) {
       if (this.draggingPin) {
         this.juliaPin.move(this.mouseX, this.mouseY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
@@ -522,7 +540,6 @@ class FractalViewer extends React.Component {
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
       this.juliaPin.move(this.juliaPin.x + jRX, this.juliaPin.y + jRY);
-      this.dirty = true;
       this.prevStepZoom = 1;
       this.previousLength = -1;
       this.originX = 0;
@@ -534,6 +551,9 @@ class FractalViewer extends React.Component {
   }
 
   zoom(direction, magnificationStep) {
+    if (this.rendering) {
+      return;
+    }
     const magnificationDelta = magnificationStep || 0.02;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;

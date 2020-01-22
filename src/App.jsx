@@ -9,6 +9,7 @@ import FractalType from './utils/FractalType';
 import { withStore } from './statemanagement/createStore';
 import UnsupportedBrowser from './components/UnsupportedBrowser';
 import { checkSupported } from './utils/checkSupported';
+import preventZoom from './utils/preventZoom';
 
 class App extends Component {
   constructor(props) {
@@ -30,7 +31,6 @@ class App extends Component {
         unsupportedPopUp = (<UnsupportedBrowser />);
       }
     }
-
     return (
       <div className="App">
         <div className="render-container">
@@ -74,4 +74,4 @@ App.defaultProps = {
   store: {},
 };
 
-export default withStore(App);
+export default withStore(preventZoom(App));
