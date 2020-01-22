@@ -218,7 +218,6 @@ class FractalViewer extends React.Component {
   }
 
   updateCanvas() {
-    console.log(this.rendering, this.canvasZoom);
     const fractalContext = this.fractal.current.getContext('2d');
     fractalContext.fillStyle = '#000000';
 
@@ -546,7 +545,6 @@ class FractalViewer extends React.Component {
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
       this.juliaPin.move(this.juliaPin.x + jRX, this.juliaPin.y + jRY);
-      console.log('here');
       await this.drawFractal();
       this.prevStepZoom = 1;
       this.previousLength = -1;
@@ -628,7 +626,7 @@ class FractalViewer extends React.Component {
           onMouseLeave={(e) => this.handleDragEnd(e)}
           onWheel={(e) => this.handleScroll(e)}
           className="fractal"
-          id="fractal"
+          id={`fractal-${this.type}`}
           ref={this.fractal}
         />
       </div>
