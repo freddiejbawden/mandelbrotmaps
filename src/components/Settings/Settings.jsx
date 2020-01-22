@@ -64,20 +64,27 @@ class Settings extends Component {
             <strong>Settings</strong>
             <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={this.updateIterations} timeout={1000} />
             <div>
-              <div>Render Method</div>
-              <select
-                defaultValue={p.selectedRenderMode}
-                onChange={(event) => this.updateRenderMethod(event.target.value)}
-              >
-                <option value={RenderMode.JAVASCRIPT}>Javascript</option>
-                <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
-                <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
-                <option value={RenderMode.WASMMT}>WASM + Rust (Web Worker)</option>
-              </select>
+              <label htmlFor="renderMethod">
+Render Method
+                <select
+                  id="renderMethod"
+                  defaultValue={p.selectedRenderMode}
+                  onChange={(event) => this.updateRenderMethod(event.target.value)}
+                >
+                  <option value={RenderMode.JAVASCRIPT}>Javascript</option>
+                  <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
+                  <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
+                  <option value={RenderMode.WASMMT}>WASM + Rust (Web Worker)</option>
+                </select>
+              </label>
+
+
             </div>
             <div>
-              <span>Enable Debug Bar </span>
-              <input type="checkbox" name="debugbar" value="true" onChange={() => p.store.toggle('showDebugBar')} />
+              <label htmlFor="debugbartoggle">
+Enable Debug Bar
+                <input id="debugbartoggle" type="checkbox" name="debugbar" value="true" onChange={() => p.store.toggle('showDebugBar')} />
+              </label>
             </div>
           </div>
         </div>
