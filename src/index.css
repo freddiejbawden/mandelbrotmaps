@@ -12,6 +12,7 @@ body {
   width: 100%;
   overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
+  touch-action: none;
 }
 
 html {
