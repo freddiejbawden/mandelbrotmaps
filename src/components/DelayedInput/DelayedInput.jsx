@@ -26,13 +26,13 @@ export default class DelayedInput extends Component {
         <label htmlFor={p.label}>
           {p.label}
           {' '}
-          <input
-            id={p.label}
-            type={p.type}
-            defaultValue={p.defaultValue}
-            onChange={(event) => this.timerCallback(event.target.value)}
-          />
         </label>
+        <input
+          id={p.label}
+          type={p.type}
+          defaultValue={p.defaultValue}
+          onChange={(event) => this.timerCallback(event.target.value)}
+        />
       </div>
     );
   }

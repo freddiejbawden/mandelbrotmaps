@@ -1,27 +1,43 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './Settings.css';
-import DelayedInput from '../DelayedInput';
+import {
+  Modal, Grid, Button,
+} from 'semantic-ui-react';
+
 import RenderMode from '../../Renderer/RenderMode';
-import Cog from './cog.svg';
 import { withStore } from '../../statemanagement/createStore';
+import OptionCheck from './OptionCheck/OptionCheck';
+import OptionSpinner from './OptionSpinner/OptionSpinner';
+import OptionText from './OptionText/OptionText';
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.iterationUpdateTimer = undefined;
     this.iterations = 200;
-    this.state = {
-      collapsed: true,
-    };
     this.updateIterations = this.updateIterations.bind(this);
+    this.state = {
+      modalOpen: false,
+    };
   }
+
+  handleOpen = () => this.setState({
+    modalOpen: true,
+  })
+
+  handleClose = () => this.setState({ modalOpen: false })
 
   updateIterations(i) {
     if (this.iterationUpdateTimer) clearTimeout(this.iterationUpdateTimer);
     const p = this.props;
     this.iterationUpdateTimer = setTimeout(() => {
-      const iter = parseInt(i, 10);
+      let iter;
+      if (!i) {
+        iter = 200;
+      } else {
+        iter = parseInt(i, 10);
+      }
       p.store.setStat({ iterations: iter });
       p.store.set({
         customIterations: iter,
@@ -35,86 +51,63 @@ class Settings extends Component {
       renderMode: parseInt(val, 10),
     });
     p.store.set({ renderMode: parseInt(val, 10) });
-    // p.updateRenderMethod(parseInt(val, 10));
   }
 
-  toggle() {
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    const s = this.state;
-    this.setState({
-      collapsed: !s.collapsed,
-    }, () => {
-    });
+  toggleIterations() {
+    const p = this.props;
+    const st = p.store;
+    st.toggle('overrideIterations');
   }
 
   render() {
     const p = this.props;
-    const s = this.state;
     const st = p.store;
-    const contentsClasses = (s.collapsed) ? 'settings-collapsed settings-boxes' : 'settings-boxes';
-    const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
-    const blockerClass = (s.collapsed) ? 'blocker-collapse' : 'blocker';
-    const blocker = (window.innerWidth < 300) ? (<div className={blockerClass} />) : '';
-    let iterationsInput;
-    if (st.overrideIterations) {
-      iterationsInput = (<DelayedInput label="Iteration Count" type="number" defaultValue={st.customIterations} callback={this.updateIterations} timeout={1000} />);
-    }
-
+    const renderOptions = [
+      { key: 2, value: RenderMode.JAVASCRIPT, text: 'Javascript' },
+      { key: 3, value: RenderMode.WASM, text: 'Web Assembly' },
+      { key: 4, value: RenderMode.JAVASCRIPTMT, text: 'Javascript (Multi Threaded)' },
+      { key: 5, value: RenderMode.WASMMT, text: 'Web Assembly (Multi Threaded)' },
+    ];
+    const s = this.state;
     return (
-      <div className="settings-container">
-        {blocker}
-        <div aria-label="Toggle Menu" tabIndex={0} role="button" onKeyDown={() => this.toggle()} onClick={() => this.toggle()} className={arrowClasses}>
-          <img src={Cog} alt="Settings Cog" />
-        </div>
-        <div className={contentsClasses}>
-          <div className="options-container ">
-            <strong>Settings</strong>
-            <br />
-
-
-            <label htmlFor="iterationToggle">
-              {' '}
-
-Override Iterations
-              <input id="iterationToggle" type="checkbox" name="iterationToggle" value="false" onChange={() => p.store.toggle('overrideIterations')} />
-            </label>
-            {iterationsInput}
-            <div>
-              <label htmlFor="renderMethod">
-Render Method
-                <select
-                  id="renderMethod"
-                  defaultValue={p.selectedRenderMode}
-                  onChange={(event) => this.updateRenderMethod(event.target.value)}
-                >
-                  <option value={RenderMode.JAVASCRIPT}>Javascript</option>
-                  <option value={RenderMode.WASM}>WASM + Rust (Single Thread)</option>
-                  <option value={RenderMode.JAVASCRIPTMT}>Javascript (Web Worker)</option>
-                  <option value={RenderMode.WASMMT}>WASM + Rust (Web Worker)</option>
-                </select>
-              </label>
-
-
-            </div>
-            <div>
-              <label htmlFor="debugbartoggle">
-Enable Debug Bar
-                <input id="debugbartoggle" type="checkbox" name="debugbar" value="true" onChange={() => p.store.toggle('showDebugBar')} />
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Modal
+        closeIcon
+        trigger={(
+          <Button
+            size="large"
+            onClick={this.handleOpen}
+            circular
+            icon="settings"
+          />
+        )}
+        className="options-container"
+        open={s.modalOpen}
+        onClose={this.handleClose}
+      >
+        <Modal.Header>Settings</Modal.Header>
+        <Modal.Content>
+          <Grid columns="equal" verticalAlign="middle">
+            <OptionCheck defaultChecked={st.overrideIterations} focus callback={() => this.toggleIterations()} name="Override Iteration Count" description="Override the automatic setting of iterations" />
+            <OptionText placeholder={st.customIterations} focus={st.overrideIterations} callback={(iter) => this.updateIterations(iter)} disabled={!st.overrideIterations} name="Iteration Count" description="Set the number of iterations to a fixed value" />
+            <OptionSpinner value={st.renderMode} callback={(data) => this.updateRenderMethod(data)} name="Render Mode" description="Method used to render the fractals" options={renderOptions} />
+            <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
+            <Grid.Row>
+              <Grid.Column textAlign="center">
+                <Button onClick={this.handleClose} size="large" primary>Save and Close</Button>
+                <Button onClick={this.handleClose} size="large" basic color="black">Close</Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Modal.Content>
+      </Modal>
     );
   }
 }
 Settings.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   store: PropTypes.object,
-  selectedRenderMode: PropTypes.number,
 };
 Settings.defaultProps = {
-  selectedRenderMode: 0,
   store: {},
 };
 

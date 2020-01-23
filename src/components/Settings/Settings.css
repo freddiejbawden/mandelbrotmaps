@@ -1,71 +1,8 @@
 .options-container {
-  width: 200px;
-  background-color: azure;
-
-  padding: 10px;
-  line-height: 1.5rem;
-}
-.options-container > div {
-  margin-bottom: 10px;
-}
-.settings-container {
-  margin: 10px;
-  z-index: 0;
-  display: flex;
-}
-.settings-collapsed {
-  opacity: 0;
-  transform: translateX(-20px);
-  height: 0;
-  margin: 0;
-}
-
-.settings-boxes {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 10;
-  transition: all 200ms;
-  margin-left: 10px;
-  min-height: 10px;
-}
-
-.settings-container > div  {
-  margin-bottom: 10px;
-}
-.settings-container > div > div {
-  margin-bottom: 10px;
-}
-@keyframes spin {
-  from {transform:rotate(0deg);}
-  to {transform:rotate(720deg);}
-}
-
-.settings-min-max {
-  width: 30px; 
-  height: 30px; 
-  background-color: lightgray;
-  border-radius: 30px;
-  padding: 5px;
-  transform: rotate(0deg);
-  transition-duration: 300ms;
-}
-
-.settings-min-max:hover {
-  background-color: lightgrey;
-}
-
-.settings-min-max-collapse {
-  background-color: grey;
-  transform: rotate(180deg);
-}
-
-@media screen and (orientation:landscape) and (max-height: 600px) {
-  .settings-boxes{
-    flex-direction: row;
-  }
-  .settings-boxes > * {
-    margin-left: 20px;
-  }
+  background-color: #ffffff;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  border-radius: 5px;
+  border: 1px solid lightgray;
+  font-family: 'Roboto';
+  padding: 1em;
 }
