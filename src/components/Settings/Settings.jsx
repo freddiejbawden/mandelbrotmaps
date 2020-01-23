@@ -24,16 +24,7 @@ class Settings extends Component {
       const iter = parseInt(i, 10);
       p.store.setStat({ iterations: iter });
       p.store.set({
-        iterationLimits: {
-          mandelbrot: {
-            ...p.store.iterationLimits.mandelbrot,
-            high: iter,
-          },
-          julia: {
-            ...p.store.iterationLimits.julia,
-            high: iter,
-          },
-        },
+        customIterations: iter,
       });
     }, 300);
   }
@@ -59,10 +50,15 @@ class Settings extends Component {
   render() {
     const p = this.props;
     const s = this.state;
+    const st = p.store;
     const contentsClasses = (s.collapsed) ? 'settings-collapsed settings-boxes' : 'settings-boxes';
     const arrowClasses = (s.collapsed) ? 'settings-min-max settings-min-max-collapse' : 'settings-min-max';
     const blockerClass = (s.collapsed) ? 'blocker-collapse' : 'blocker';
     const blocker = (window.innerWidth < 300) ? (<div className={blockerClass} />) : '';
+    let iterationsInput;
+    if (st.overrideIterations) {
+      iterationsInput = (<DelayedInput label="Iteration Count" type="number" defaultValue={st.customIterations} callback={this.updateIterations} timeout={1000} />);
+    }
 
     return (
       <div className="settings-container">
@@ -73,7 +69,16 @@ class Settings extends Component {
         <div className={contentsClasses}>
           <div className="options-container ">
             <strong>Settings</strong>
-            <DelayedInput label="Iteration Count" type="number" defaultValue={200} callback={this.updateIterations} timeout={1000} />
+            <br />
+
+
+            <label htmlFor="iterationToggle">
+              {' '}
+
+Override Iterations
+              <input id="iterationToggle" type="checkbox" name="iterationToggle" value="false" onChange={() => p.store.toggle('overrideIterations')} />
+            </label>
+            {iterationsInput}
             <div>
               <label htmlFor="renderMethod">
 Render Method

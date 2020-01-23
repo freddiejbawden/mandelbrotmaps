@@ -74,7 +74,8 @@ class FractalViewer extends React.Component {
       parseInt(props.store.maxIter, 10),
       [-1, 0],
     );
-    this.previousIterations = props.store.iterationLimits;
+    this.previousIterations = props.store.customIterations;
+    this.previousOverride = props.store.overrideIterations;
   }
 
   async componentDidMount() {
@@ -114,8 +115,14 @@ class FractalViewer extends React.Component {
       this.renderMode = nextProps.store.renderMode;
       return true;
     }
-    if (this.previousIterations !== nextProps.store.iterationLimits) {
-      this.customIterations = nextProps.store.customIterations;
+    if (
+      this.previousIterations !== nextProps.store.customIterations
+      && nextProps.store.overrideIterations) {
+      this.previousIterations = nextProps.store.customIterations;
+      return true;
+    }
+    if (this.previousOverride !== nextProps.store.overrideIterations) {
+      this.previousOverride = nextProps.store.overrideIterations;
       return true;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {

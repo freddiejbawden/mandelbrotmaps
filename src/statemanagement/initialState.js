@@ -3,7 +3,7 @@ import Mode from '../Renderer/RenderMode';
 const initialState = {
   renderMode: Mode.JAVASCRIPT,
   overrideIterations: false,
-  customIterations: undefined,
+  customIterations: 200,
   juliaPoint: [0, 0],
   mandelDragging: false,
   showDebugBar: false,
