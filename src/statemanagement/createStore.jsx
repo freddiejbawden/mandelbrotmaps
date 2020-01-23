@@ -2,7 +2,7 @@
 /* eslint-disable max-classes-per-file */
 
 import React from 'react';
-import RenderMode from '../utils/RenderMode';
+import initialState from './initialState';
 
 const StoreContext = React.createContext();
 // Adapted From https://itnext.io/manage-react-state-without-redux-a1d03403d360
@@ -37,48 +37,7 @@ const createStore = (WrappedComponent) => class extends React.Component {
         });
         this.setState(state);
       },
-      renderMode: RenderMode.JAVASCRIPT,
-      iterations: 200,
-      juliaPoint: [0, 0],
-      mandelDragging: false,
-      showDebugBar: false,
-      stats: {
-        renderTime: {
-          label: 'Render Time',
-          value: 0,
-          unit: 'ms',
-        },
-        renderMode: {
-          label: 'Render Mode',
-          value: 0,
-          unit: '',
-        },
-        zoomLevel: {
-          label: 'Zoom Level',
-          value: 1,
-          unit: 'x',
-        },
-        iterations: {
-          label: 'Iterations',
-          value: 200,
-          unit: '',
-        },
-        re: {
-          label: 'Re',
-          value: -1,
-          unit: '',
-        },
-        im: {
-          label: 'Im',
-          value: 0,
-          unit: '',
-        },
-        focus: {
-          label: 'Focus',
-          value: 'Mandelbrot',
-          unit: '',
-        },
-      },
+      ...initialState,
     }
 
     render() {

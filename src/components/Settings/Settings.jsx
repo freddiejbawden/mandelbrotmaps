@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './Settings.css';
 import DelayedInput from '../DelayedInput';
-import RenderMode from '../../utils/RenderMode';
+import RenderMode from '../../Renderer/RenderMode';
 import Cog from './cog.svg';
 import { withStore } from '../../statemanagement/createStore';
 
@@ -23,7 +23,18 @@ class Settings extends Component {
     this.iterationUpdateTimer = setTimeout(() => {
       const iter = parseInt(i, 10);
       p.store.setStat({ iterations: iter });
-      p.store.set({ iterations: iter });
+      p.store.set({
+        iterationLimits: {
+          mandelbrot: {
+            ...p.store.iterationLimits.mandelbrot,
+            high: iter,
+          },
+          julia: {
+            ...p.store.iterationLimits.julia,
+            high: iter,
+          },
+        },
+      });
     }, 300);
   }
 
