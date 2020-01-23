@@ -1,4 +1,4 @@
-import Mode from '../utils/RenderMode';
+import Mode from './RenderMode';
 import WebWorkerManager from './WebWorkerManager';
 import RendererType from './RendererType';
 
@@ -136,12 +136,7 @@ class Renderer {
   }
 
   render(level) {
-    let iterations;
-    if (level) {
-      iterations = level;
-    } else {
-      iterations = this.maxIter;
-    }
+    this.maxIter = level;
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
       if (this.mode === Mode.JAVASCRIPT) {
@@ -151,7 +146,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          iterations,
+          this.maxIter,
           this.juliaPoint,
           useSingleThread,
           RendererType.JAVASCRIPT,
@@ -166,7 +161,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          iterations,
+          this.maxIter,
           this.juliaPoint,
           useSingleThread,
           RendererType.WASM,
@@ -180,7 +175,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          iterations,
+          this.maxIter,
           this.juliaPoint,
           false,
           RendererType.JAVASCRIPT,
@@ -194,7 +189,7 @@ class Renderer {
           this.width,
           this.height,
           this.centreCoords,
-          iterations,
+          this.maxIter,
           this.juliaPoint,
           false,
           RendererType.WASM,

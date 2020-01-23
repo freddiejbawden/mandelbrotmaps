@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './FractalViewer.css';
 import Renderer from '../../Renderer';
-import RenderQuality from '../../Renderer/RenderQuality';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
 import round from '../../utils/Round';
@@ -10,7 +9,7 @@ import JuliaPin from '../../JuliaPin';
 import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
-import Mode from '../../utils/RenderMode';
+import Mode from '../../Renderer/RenderMode';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -75,6 +74,8 @@ class FractalViewer extends React.Component {
       parseInt(props.store.maxIter, 10),
       [-1, 0],
     );
+    this.previousIterations = props.store.customIterations;
+    this.previousOverride = props.store.overrideIterations;
   }
 
   async componentDidMount() {
@@ -114,9 +115,14 @@ class FractalViewer extends React.Component {
       this.renderMode = nextProps.store.renderMode;
       return true;
     }
-    if (this.renderer.maxIter !== nextProps.store.iterations) {
-      this.renderer.maxIter = nextProps.store.iterations;
-      // this.drawFractal(RenderQuality.CUSTOM);
+    if (
+      this.previousIterations !== nextProps.store.customIterations
+      && nextProps.store.overrideIterations) {
+      this.previousIterations = nextProps.store.customIterations;
+      return true;
+    }
+    if (this.previousOverride !== nextProps.store.overrideIterations) {
+      this.previousOverride = nextProps.store.overrideIterations;
       return true;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {
@@ -177,6 +183,12 @@ class FractalViewer extends React.Component {
     };
   }
 
+  checkFocus() {
+    const p = this.props;
+    const s = p.store;
+    return (this.position === s.stats.focus.value);
+  }
+
   updateIter(iter) {
     let i;
     if (!iter) {
@@ -194,18 +206,38 @@ class FractalViewer extends React.Component {
   }
 
   drawFractal() {
+    const iterationCalc = (zoom) => {
+      const newIter = 54 * Math.exp(Math.abs(0.5 * Math.log(zoom)));
+      const p = this.props;
+      const s = p.store;
+      s.setStat({
+        iterations: newIter,
+      });
+      return Math.floor(newIter);
+    };
     this.updateWidthHeight();
     this.rendering = true;
     const startTime = Date.now();
     if (!this.dragging || !this.dirty) {
-      const level = (this.mandelbrotDragging) ? RenderQuality.LOW : null;
-      this.renderer.render(level).then((fractal) => {
+      let iterationCount;
+      const p = this.props;
+      const s = p.store;
+      const iters = iterationCalc(this.zoomLevel);
+      if (s.overrideIterations && !this.mandelbrotDragging) {
+        iterationCount = s.customIterations;
+      } else if (this.type === FractalType.MANDELBROT) {
+        iterationCount = iters;
+      } else if (this.mandelbrotDragging) {
+        iterationCount = Math.min(100, iters / 2);
+      } else {
+        iterationCount = iters;
+      }
+      this.renderer.render(iterationCount).then((fractal) => {
         this.rendering = false;
         this.canvasOffsetX = 0;
         this.canvasOffsetY = 0;
         this.canvasZoom = 1;
         this.putImage(fractal.arr, fractal.width, fractal.height);
-        const p = this.props;
         p.store.setStat({
           renderTime: (Date.now() - startTime),
         });

@@ -3,7 +3,7 @@ import './App.css';
 import PropTypes from 'prop-types';
 import FractalViewer from './components/FractalViewer';
 import Settings from './components/Settings';
-import Mode from './utils/RenderMode';
+import Mode from './Renderer/RenderMode';
 import DebugBar from './components/DebugBar';
 import FractalType from './utils/FractalType';
 import { withStore } from './statemanagement/createStore';
