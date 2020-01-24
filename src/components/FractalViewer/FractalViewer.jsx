@@ -377,7 +377,7 @@ class FractalViewer extends React.Component {
       } else {
         this.deltaX += e.movementX;
         this.deltaY += e.movementY;
-        requestAnimationFrame(() => this.safeUpdate());
+        this.safeUpdate();
       }
     }
   }
