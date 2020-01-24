@@ -519,7 +519,8 @@ class FractalViewer extends React.Component {
           re: coords.x.toFixed(5),
           im: coords.y.toFixed(5),
         });
-        requestAnimationFrame(() => this.safeUpdate());
+        // do not request animation frame as we must finish this before the drag ends
+        this.safeUpdate();
       }
     }
   }
@@ -598,6 +599,10 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
+    if (this.zoomLevel < 0.5) {
+      this.zoomLevel = 0.5;
+      return;
+    }
     const p = this.props;
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
