@@ -327,8 +327,11 @@ class FractalViewer extends React.Component {
   }
 
   handleClick() {
-    if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
-      this.draggingPin = true;
+    if (this.type !== FractalType.JULIA) {
+      // Make sure the Julia Pin can only be picked up by another fractal
+      if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
+        this.draggingPin = true;
+      }
     }
     this.dragging = true;
   }
@@ -519,7 +522,8 @@ class FractalViewer extends React.Component {
           re: coords.x.toFixed(5),
           im: coords.y.toFixed(5),
         });
-        requestAnimationFrame(() => this.safeUpdate());
+        // do not request animation frame as we must finish this before the drag ends
+        this.safeUpdate();
       }
     }
   }
@@ -598,6 +602,10 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
+    if (this.zoomLevel < 0.5) {
+      this.zoomLevel = 0.5;
+      return;
+    }
     const p = this.props;
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
