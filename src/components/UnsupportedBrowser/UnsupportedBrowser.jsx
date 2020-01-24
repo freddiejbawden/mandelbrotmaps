@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
-
+import { Modal, Button, Checkbox } from 'semantic-ui-react';
 import { getSupportText } from '../../utils/checkSupported';
 import './UnsupportedBrowser.css';
 
 export default function UnsupportedBrowser() {
   const [visible, setVisible] = useState(true);
-  const visibility = (visible) ? 'unsupported-browser-container' : 'unsupported-browser-container-hidden';
   const checkBoxRef = React.createRef();
 
   const updateVisibility = () => {
-    if (checkBoxRef.current.checked) {
-      window.localStorage.setItem('understandUnsupported', true);
+    const remind = checkBoxRef.current.state.checked;
+    if (remind) {
+      window.localStorage.setItem('understandUnsupported', remind);
     }
     setVisible(false);
   };
 
   return (
-    <div className={visibility}>
-      <div className="blocker" />
+    <Modal
+      open={visible}
+      size="small"
+    >
       <div className="unsupported-browser-message-container">
         <h1>Warning!</h1>
         <p>{getSupportText()}</p>
@@ -34,12 +36,10 @@ For the full experience try
           <a href="https://www.microsoft.com/en-us/edge">Edge</a>
 
         </p>
-        <div onKeyDown={() => updateVisibility()} tabIndex={0} role="button" className="continue-button" onClick={() => updateVisibility()}> I understand </div>
-        <p className="dont-remind">
-          {'Don\'t remind me again'}
-          <input ref={checkBoxRef} type="checkbox" id="dont-remind" />
-        </p>
+        <Button primary className="continue-button" onClick={() => updateVisibility()}> I understand </Button>
+        <br />
+        <Checkbox label={{ children: 'Don\'t remind me again' }} ref={checkBoxRef} id="dont-remind" />
       </div>
-    </div>
+    </Modal>
   );
 }
