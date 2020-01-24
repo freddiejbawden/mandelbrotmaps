@@ -327,8 +327,11 @@ class FractalViewer extends React.Component {
   }
 
   handleClick() {
-    if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
-      this.draggingPin = true;
+    if (this.type !== FractalType.JULIA) {
+      // Make sure the Julia Pin can only be picked up by another fractal
+      if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
+        this.draggingPin = true;
+      }
     }
     this.dragging = true;
   }
