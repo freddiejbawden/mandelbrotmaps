@@ -111,6 +111,10 @@ class FractalViewer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    if (nextProps.store.centreJulia) {
+      if (this.type === FractalType.MANDELBROT) this.centreJulia();
+      return false;
+    }
     if (this.renderMode !== nextProps.store.renderMode) {
       this.renderMode = nextProps.store.renderMode;
       return true;
@@ -166,6 +170,20 @@ class FractalViewer extends React.Component {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
   };
+
+  centreJulia() {
+    const p = this.props;
+    const st = p.store;
+    const newX = this.width / 2;
+    const newY = this.height / 2;
+    const newPos = this.coordsToWorld(newX, newY);
+    this.juliaPin.move(newX, newY);
+    st.set({
+      centreJulia: false,
+      juliaPoint: [newPos.x, newPos.y],
+    });
+    requestAnimationFrame(() => this.updateCanvas());
+  }
 
   addTouch({ identifier, pageX, pageY }) {
     let x;
@@ -591,11 +609,12 @@ class FractalViewer extends React.Component {
     }
   }
 
+
   zoom(direction, magnificationStep) {
     if (this.rendering) {
       return;
     }
-    const magnificationDelta = (magnificationStep < 0.1) ? magnificationStep : 0.1;
+    const magnificationDelta = (magnificationStep < 0.05) ? magnificationStep : 0.1;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
@@ -648,7 +667,6 @@ class FractalViewer extends React.Component {
   }
 
   handleScroll(e) {
-    console.log(e.deltaX, e.deltaY);
     this.zoom(e.deltaY, Math.abs(e.deltaY) / 100);
   }
 
