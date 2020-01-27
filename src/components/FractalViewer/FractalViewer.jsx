@@ -111,6 +111,10 @@ class FractalViewer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    if (nextProps.store.resetFractal) {
+      this.reset();
+      return false;
+    }
     if (nextProps.store.centreJulia) {
       if (this.type === FractalType.MANDELBROT) this.centreJulia();
       return false;
@@ -199,6 +203,28 @@ class FractalViewer extends React.Component {
       pageX: x,
       pageY: y,
     };
+  }
+
+  reset() {
+    this.zoomLevel = 1;
+    const p = this.props;
+    p.store.setStat({
+      zoomLevel: round(this.zoomLevel, 2),
+    });
+    if (p.store.get('dualUpdateFlag')) {
+      p.store.set({
+        resetFractal: false,
+        dualUpdateFlag: false,
+      });
+    } else {
+      p.store.set({
+        dualUpdateFlag: true,
+      });
+    }
+    this.renderer.pixelSize = 0.004;
+    this.renderer.centreCoords = [0, 0];
+    this.centreJulia();
+    requestAnimationFrame(() => this.drawFractal());
   }
 
   checkFocus() {
