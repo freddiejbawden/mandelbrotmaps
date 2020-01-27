@@ -595,7 +595,7 @@ class FractalViewer extends React.Component {
     if (this.rendering) {
       return;
     }
-    const magnificationDelta = magnificationStep || 0.02;
+    const magnificationDelta = (magnificationStep < 0.1) ? magnificationStep : 0.1;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
@@ -648,7 +648,8 @@ class FractalViewer extends React.Component {
   }
 
   handleScroll(e) {
-    this.zoom(e.deltaY);
+    console.log(e.deltaX, e.deltaY);
+    this.zoom(e.deltaY, Math.abs(e.deltaY) / 100);
   }
 
   render() {
