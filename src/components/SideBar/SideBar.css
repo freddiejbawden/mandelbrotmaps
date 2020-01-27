@@ -1,0 +1,11 @@
+.side-bar-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1em;
+  display: flex;
+  flex-direction: column;
+}
+.side-bar-container div {
+  margin-bottom: 10px;
+}

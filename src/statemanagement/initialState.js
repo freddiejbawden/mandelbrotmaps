@@ -5,6 +5,7 @@ const initialState = {
   overrideIterations: false,
   customIterations: 200,
   juliaPoint: [0, 0],
+  centreJulia: false,
   mandelDragging: false,
   showDebugBar: false,
   stats: {
