@@ -14,6 +14,14 @@ class SideBar extends Component {
     });
   }
 
+  resetZoom() {
+    const p = this.props;
+    const st = p.store;
+    st.set({
+      resetFractal: true,
+    });
+  }
+
   render() {
     return (
       <div className="side-bar-container">
@@ -29,7 +37,15 @@ class SideBar extends Component {
             icon="crosshairs"
           />
         </div>
-
+        <div>
+          <Button
+            onClick={() => this.resetZoom()}
+            className="side-button"
+            size="large"
+            circular
+            icon="undo"
+          />
+        </div>
       </div>
     );
   }

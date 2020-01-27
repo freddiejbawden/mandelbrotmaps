@@ -8,6 +8,7 @@ const initialState = {
   centreJulia: false,
   mandelDragging: false,
   showDebugBar: false,
+  resetFractal: false,
   stats: {
     renderTime: {
       label: 'Render Time',
