@@ -9,6 +9,7 @@ const initialState = {
   mandelDragging: false,
   showDebugBar: false,
   resetFractal: false,
+  dualUpdateFlag: false,
   stats: {
     renderTime: {
       label: 'Render Time',
