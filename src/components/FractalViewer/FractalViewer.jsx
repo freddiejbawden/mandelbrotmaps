@@ -251,7 +251,7 @@ class FractalViewer extends React.Component {
 
   drawFractal() {
     const iterationCalc = (zoom) => {
-      const newIter = 54 * Math.exp(Math.abs(0.5 * Math.log(zoom)));
+      const newIter = 54 * Math.exp(Math.abs(0.5 * Math.log10(zoom)));
       const p = this.props;
       const s = p.store;
       s.setStat({
