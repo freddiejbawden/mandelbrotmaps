@@ -17,13 +17,14 @@ class WebWorkerManager {
     juliaPoint,
     singleThread,
     renderer,
+    showRenderTrace,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
       this.arr = new Uint8ClampedArray(height * width * 4);
       const hardwareConcurrency = navigator.hardwareConcurrency || 1;
       const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 10;
+      const nChunks = (singleThread) ? 1 : 250;
       this.pixelSplit = (height * width) / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
@@ -33,8 +34,10 @@ class WebWorkerManager {
           this.workers.push(w);
         }
       }
-      const renderChunk = (w, startPixel, endPixel) => {
+      const renderChunk = (w, startPixel, endPixel, wid) => {
         w.postMessage({
+          showRenderTrace,
+          wid,
           type: this.type,
           id: roundID,
           renderer,
@@ -50,9 +53,9 @@ class WebWorkerManager {
         });
         this.nextChunk += 1;
       };
-
       for (let i = 0; i < nThreadsFree; i += 1) {
         const w = this.workers[i];
+        const id = i;
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
             this.arr.set(e.data.arr, e.data.offset);
@@ -70,6 +73,7 @@ class WebWorkerManager {
                 w,
                 Math.floor((this.nextChunk) * this.pixelSplit),
                 Math.floor((this.nextChunk + 1) * this.pixelSplit),
+                id,
               );
             }
           }
@@ -78,6 +82,7 @@ class WebWorkerManager {
           w,
           Math.floor((this.nextChunk) * this.pixelSplit),
           Math.floor((this.nextChunk + 1) * this.pixelSplit),
+          i,
         );
       }
     });
@@ -97,6 +102,7 @@ class WebWorkerManager {
     juliaPoint,
     singleThread,
     renderer,
+    showRenderTrace,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
@@ -104,7 +110,7 @@ class WebWorkerManager {
       this.height = height;
       const newArr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
-      const nChunks = 4;
+      const nChunks = (singleThread) ? 1 : 250;
       this.pixelSplit = height / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
@@ -114,8 +120,9 @@ class WebWorkerManager {
           this.workers.push(w);
         }
       }
-      const renderChunk = (w, startRow, endRow) => {
+      const renderChunk = (w, startRow, endRow, wid) => {
         w.postMessage({
+          wid,
           type: this.type,
           id: roundID,
           workerID: idGenerator(),
@@ -134,11 +141,13 @@ class WebWorkerManager {
           dX,
           dY,
           juliaPoint,
+          showRenderTrace,
         });
         this.nextChunk += 1;
       };
 
       for (let i = 0; i < nThreadsFree; i += 1) {
+        const id = i;
         const w = this.workers[i];
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
@@ -163,6 +172,7 @@ class WebWorkerManager {
                 w,
                 Math.floor(this.nextChunk * this.pixelSplit),
                 Math.floor((this.nextChunk + 1) * this.pixelSplit),
+                id,
               );
             }
           }
@@ -171,6 +181,7 @@ class WebWorkerManager {
           w,
           Math.floor(this.nextChunk * this.pixelSplit),
           Math.floor((this.nextChunk + 1) * this.pixelSplit),
+          id,
         );
       }
     });

@@ -81,7 +81,6 @@ class FractalViewer extends React.Component {
   async componentDidMount() {
     this.fractal.current.focus();
     await this.loadWasm();
-    const startTime = Date.now();
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
@@ -101,18 +100,23 @@ class FractalViewer extends React.Component {
       }
     });
     window.addEventListener('resize', this.updateDimensions);
-    window.performance.mark('fractal_rendered_start');
     requestAnimationFrame(() => {
       this.drawFractal();
-      window.performance.mark('fractal_rendered_end');
-      this.endTime = Date.now() - startTime;
-      window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
     });
   }
 
   shouldComponentUpdate(nextProps) {
+    if (nextProps.store.forceUpdate === this.type) {
+      this.forceUpdate();
+      return false;
+    }
     if (nextProps.store.resetFractal) {
       this.reset();
+      return false;
+    }
+    if (nextProps.store.showRenderTrace !== this.renderer.showRenderTrace) {
+      this.renderer.showRenderTrace = nextProps.store.showRenderTrace;
+      this.drawFractal();
       return false;
     }
     if (nextProps.store.centreJulia) {
@@ -233,6 +237,14 @@ class FractalViewer extends React.Component {
     return (this.position === s.stats.focus.value);
   }
 
+  forceUpdate() {
+    const p = this.props;
+    p.store.set({
+      forceUpdate: -1,
+    });
+    requestAnimationFrame(() => this.drawFractal());
+  }
+
   updateIter(iter) {
     let i;
     if (!iter) {
@@ -262,6 +274,7 @@ class FractalViewer extends React.Component {
     this.updateWidthHeight();
     this.rendering = true;
     const startTime = Date.now();
+    window.performance.mark('fractal_rendered_start');
     if (!this.dragging || !this.dirty) {
       let iterationCount;
       const p = this.props;
@@ -282,6 +295,9 @@ class FractalViewer extends React.Component {
         this.canvasOffsetY = 0;
         this.canvasZoom = 1;
         this.putImage(fractal.arr, fractal.width, fractal.height);
+        window.performance.mark('fractal_rendered_end');
+        window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
+        // ${window.performance.getEntriesByName('fractal_render_time').pop().duration}`
         p.store.setStat({
           renderTime: (Date.now() - startTime),
         });
