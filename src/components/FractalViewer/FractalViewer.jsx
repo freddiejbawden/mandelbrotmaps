@@ -45,6 +45,12 @@ class FractalViewer extends React.Component {
     this.deltaY = 0;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.keysDown = {
+      37: false,
+      38: false,
+      39: false,
+      40: false,
+    };
     this.dirty = false;
     this.renderID = undefined;
     this.updateDimensions = this.updateDimensions.bind(this);
@@ -102,6 +108,38 @@ class FractalViewer extends React.Component {
     window.addEventListener('resize', this.updateDimensions);
     requestAnimationFrame(() => {
       this.drawFractal();
+    });
+
+    // accessibility fallback for keyboard
+    document.addEventListener('keydown', async (e) => {
+      const p = this.props;
+      const st = p.store;
+      // TODO: change focus to be both regular and stat
+      if (st.stats.focus.value === this.type) {
+        // + key
+        if (e.keyCode === 61) {
+          this.zoom(-1, 0.05);
+        }
+        // - key
+        if (e.keyCode === 173) {
+          this.zoom(1, 0.05);
+        }
+        // Arrow keys have keycodes 37 -> 40
+        if (e.keyCode >= 37 && e.keyCode <= 40 && !this.dirty) {
+          const movement = 5;
+          this.dragging = true;
+          this.keysDown[e.keyCode] = true;
+          this.deltaX += this.keysDown[37] * movement + this.keysDown[39] * -1 * movement;
+          this.deltaY += this.keysDown[38] * movement + this.keysDown[40] * -1 * movement;
+          this.safeUpdate();
+        }
+      }
+    });
+    document.addEventListener('keyup', async (e) => {
+      if (e.keyCode >= 37 && e.keyCode <= 40) {
+        this.keysDown[e.keyCode] = false;
+        await this.handleDragEnd();
+      }
     });
   }
 
@@ -408,6 +446,10 @@ class FractalViewer extends React.Component {
   }
 
   handleMouseMove(e) {
+    // check if a key is pressed
+    if (Object.values(this.keysDown).some((el) => el)) {
+      return;
+    }
     if (this.orientation === 'portrait') {
       this.mouseX = e.pageX;
       this.mouseY = e.pageY - this.height * this.position;
@@ -652,7 +694,7 @@ class FractalViewer extends React.Component {
   }
 
 
-  zoom(direction, magnificationStep) {
+  zoom(direction, magnificationStep, immediate) {
     if (this.rendering) {
       return;
     }
@@ -696,15 +738,20 @@ class FractalViewer extends React.Component {
     this.callBackMouse = [this.mouseX, this.mouseY];
 
     clearTimeout(this.zoomTimeout);
-    this.zoomTimeout = setTimeout(() => {
-      this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
-      this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
-      this.resetZoomAndRender();
-    }, 300);
+    if (!immediate) {
+      this.zoomTimeout = setTimeout(() => {
+        this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
+        this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
+        this.resetZoomAndRender();
+      }, 300);
+    }
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
     this.dirty = true;
+    if (immediate) {
+      this.resetZoomAndRender();
+    }
     requestAnimationFrame(() => this.safeUpdate());
   }
 
