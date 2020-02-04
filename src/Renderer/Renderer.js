@@ -5,7 +5,7 @@ import RendererType from './RendererType';
 class Renderer {
   constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
     this.mode = renderMethod;
-    this.pixelSize = 0.004;
+    this.pixelSize = 0.008;
     this.maximumPixelSize = this.pixelSize * 2;
     this.basePixelSize = this.pixelSize;
     this.zoomLevel = 0;
