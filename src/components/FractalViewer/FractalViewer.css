@@ -3,4 +3,11 @@
   height: 100%;
   border-right: grey solid 1px;
   border-bottom: grey solid 1px;
+  position: relative;
+}
+
+.focusIcon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }

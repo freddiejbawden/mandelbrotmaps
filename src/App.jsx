@@ -9,11 +9,17 @@ import UnsupportedBrowser from './components/UnsupportedBrowser';
 import { checkSupported } from './utils/checkSupported';
 import preventZoom from './utils/preventZoom';
 import SideBar from './components/SideBar';
+import setUpFocusHandler from './focusHandler/focusHandler';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.appRef = React.createRef();
+  }
+
+  componentDidMount() {
+    const p = this.props;
+    setUpFocusHandler(p.store);
   }
 
   render() {

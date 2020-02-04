@@ -107,6 +107,11 @@ class SideBar extends Component {
 }
 SideBar.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  store: PropTypes.object.isRequired,
+  store: PropTypes.object,
 };
+
+SideBar.defaultProps = {
+  store: {},
+};
+
 export default withStore(SideBar);
