@@ -42,7 +42,13 @@ class FractalViewer extends React.Component {
       this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
     }
-    this.focus = props.store.stats.focus.value;
+
+    // does not exist under test
+    if (props.store) {
+      if (props.store.stats) {
+        this.focus = props.store.stats.focus.value;
+      }
+    }
     this.dragging = false;
     this.deltaX = 0;
     this.deltaY = 0;
