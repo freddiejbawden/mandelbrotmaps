@@ -22,6 +22,7 @@ class Renderer {
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;
+    this.showRenderTrace = false;
   }
 
   calculateFractalLimit() {
@@ -66,6 +67,7 @@ class Renderer {
         this.juliaPoint,
         useSingleThread,
         RendererType.JAVASCRIPT,
+        this.showRenderTrace,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -107,6 +109,7 @@ class Renderer {
         this.juliaPoint,
         useSingleThread,
         RendererType.JAVASCRIPT,
+        this.showRenderTrace,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -128,6 +131,7 @@ class Renderer {
         this.juliaPoint,
         useSingleThread,
         RendererType.WASM,
+        this.showRenderTrace,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -150,6 +154,7 @@ class Renderer {
           this.juliaPoint,
           useSingleThread,
           RendererType.JAVASCRIPT,
+          this.showRenderTrace,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -179,6 +184,7 @@ class Renderer {
           this.juliaPoint,
           false,
           RendererType.JAVASCRIPT,
+          this.showRenderTrace,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);

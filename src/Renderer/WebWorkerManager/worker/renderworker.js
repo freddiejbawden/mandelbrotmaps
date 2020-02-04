@@ -3,10 +3,10 @@ import WASMRenderer from './WASMRenderer';
 import Rectangle from '../../../utils/Rectangle';
 
 const wasmRenderer = new WASMRenderer(0.003, 300, 300, [0, 0], 200, 1);
+
 /* eslint no-restricted-globals:0 */
 const renderJS = (data) => {
   try {
-    const arr = new Uint8ClampedArray(data.arrSize);
     const mr = new JSRenderer(
       data.type,
       data.pixelSize,
@@ -16,15 +16,13 @@ const renderJS = (data) => {
       data.maxIter,
       data.juliaPoint,
     );
-    const colorScale = 255.0 / data.maxIter;
-    mr.calculateFractalLimit();
-    for (let i = 0; i <= data.endPixel * 4 - data.startPixel * 4; i += 4) {
-      const iter = mr.escapeAlgorithm((i / 4) + data.startPixel) * colorScale;
-      arr[i] = iter;
-      arr[i + 1] = iter;
-      arr[i + 2] = iter;
-      arr[i + 3] = 255;
-    }
+    const arr = mr.render(
+      data.wid,
+      data.startPixel,
+      data.endPixel,
+      data.arrSize,
+      data.showRenderTrace,
+    );
     postMessage({
       arr,
       workerID: data.workerID,
@@ -130,6 +128,8 @@ const renderJSRange = async (data) => {
       data.oldArr,
       data.startRow,
       data.endRow,
+      data.showRenderTrace,
+      data.wid,
     );
     postMessage({
       success: true,

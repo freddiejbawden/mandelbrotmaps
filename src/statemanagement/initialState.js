@@ -10,6 +10,7 @@ const initialState = {
   showDebugBar: false,
   resetFractal: false,
   dualUpdateFlag: false,
+  forceUpdate: 100,
   stats: {
     renderTime: {
       label: 'Render Time',

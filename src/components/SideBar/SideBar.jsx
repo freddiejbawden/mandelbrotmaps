@@ -4,8 +4,26 @@ import PropTypes from 'prop-types';
 import Settings from '../Settings/Settings';
 import './SideBar.css';
 import { withStore } from '../../statemanagement/createStore';
+import FractalType from '../../utils/FractalType';
 
 class SideBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      devMode: false,
+    };
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 112) {
+        this.setState((ps) => ({
+          devMode: !ps.devMode,
+        }));
+      }
+    });
+  }
+
   centreJulia() {
     const p = this.props;
     const st = p.store;
@@ -22,7 +40,37 @@ class SideBar extends Component {
     });
   }
 
+  forceUpdate(v) {
+    const p = this.props;
+    const st = p.store;
+    st.set({
+      forceUpdate: v,
+    });
+  }
+
   render() {
+    let devTools = '';
+    const s = this.state;
+    if (s.devMode) {
+      devTools = (
+        <div>
+          <Button
+            onClick={() => this.forceUpdate(FractalType.MANDELBROT)}
+            className="side-button"
+            size="large"
+          >
+            Render Mandelbrot
+          </Button>
+          <Button
+            onClick={() => this.forceUpdate(FractalType.JULIA)}
+            className="side-button"
+            size="large"
+          >
+            Render J
+          </Button>
+        </div>
+      );
+    }
     return (
       <div className="side-bar-container">
         <div>
@@ -46,6 +94,7 @@ class SideBar extends Component {
             icon="undo"
           />
         </div>
+        {devTools}
       </div>
     );
   }

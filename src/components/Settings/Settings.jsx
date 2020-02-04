@@ -91,6 +91,10 @@ class Settings extends Component {
             <OptionText placeholder={st.customIterations} focus={st.overrideIterations} callback={(iter) => this.updateIterations(iter)} disabled={!st.overrideIterations} name="Iteration Count" description="Set the number of iterations to a fixed value" />
             <OptionSpinner value={st.renderMode} callback={(data) => this.updateRenderMethod(data)} name="Render Mode" description="Method used to render the fractals" options={renderOptions} />
             <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
+            <OptionCheck defaultChecked={st.showRenderTrace} callback={() => st.toggle('showRenderTrace')} name="Show Renderer Trace" description="Tint pixel depending on which renderer it came from (JS Only)" />
+            {
+              // Save button
+            }
             <Grid.Row>
               <Grid.Column textAlign="center">
                 <Button onClick={this.handleClose} size="large" primary>Save and Close</Button>
