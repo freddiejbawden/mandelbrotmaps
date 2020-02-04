@@ -445,6 +445,22 @@ class FractalViewer extends React.Component {
     return this.coordsToWorld(this.mouseX, this.mouseY);
   }
 
+  moveJulia(newX, newY) {
+    const p = this.props;
+    this.juliaPin.move(newX, newY);
+    const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
+    if (!this.rendering) {
+      p.store.set(
+        {
+          juliaPoint: [worldJulia.x, worldJulia.y],
+          mandelDragging: true,
+        },
+      );
+      requestAnimationFrame(() => this.safeUpdate());
+    }
+  }
+
+
   handleMouseMove(e) {
     // check if a key is pressed
     if (Object.values(this.keysDown).some((el) => el)) {
@@ -465,17 +481,7 @@ class FractalViewer extends React.Component {
     });
     if (this.dragging && !this.rendering) {
       if (this.draggingPin) {
-        this.juliaPin.move(this.mouseX, this.mouseY);
-        const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
-        if (!this.rendering) {
-          p.store.set(
-            {
-              juliaPoint: [worldJulia.x, worldJulia.y],
-              mandelDragging: true,
-            },
-          );
-          requestAnimationFrame(() => this.safeUpdate());
-        }
+        this.moveJulia(this.mouseX, this.mouseY);
       } else {
         this.deltaX += e.movementX;
         this.deltaY += e.movementY;

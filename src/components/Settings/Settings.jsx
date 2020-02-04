@@ -22,6 +22,16 @@ class Settings extends Component {
     };
   }
 
+  componentDidMount() {
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 83) {
+        this.setState((prevState) => ({
+          modalOpen: !prevState.modalOpen,
+        }));
+      }
+    });
+  }
+
   handleOpen = () => this.setState({
     modalOpen: true,
   })
