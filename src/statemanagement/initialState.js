@@ -11,7 +11,7 @@ const initialState = {
   resetFractal: false,
   dualUpdateFlag: false,
   forceUpdate: 100,
-  focusHighlight: true,
+  focusHighlight: false,
   stats: {
     renderTime: {
       label: 'Render Time',
