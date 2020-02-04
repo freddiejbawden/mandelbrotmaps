@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './FractalViewer.css';
+import { Icon } from 'semantic-ui-react';
 import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
@@ -26,6 +27,8 @@ class FractalViewer extends React.Component {
     } else {
       this.orientation = 'landscape-primary';
     }
+    this.showFocus = props.store.focusHighlight;
+    this.shiftPressed = false;
     this.position = props.position;
     this.appRef = props.appRef;
     this.fractal = React.createRef();
@@ -39,7 +42,7 @@ class FractalViewer extends React.Component {
       this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
     }
-    this.state = {};
+    this.focus = props.store.stats.focus.value;
     this.dragging = false;
     this.deltaX = 0;
     this.deltaY = 0;
@@ -112,26 +115,36 @@ class FractalViewer extends React.Component {
 
     // accessibility fallback for keyboard
     document.addEventListener('keydown', async (e) => {
-      const p = this.props;
-      const st = p.store;
       // TODO: change focus to be both regular and stat
-      if (st.stats.focus.value === this.type) {
+      if (this.focus === this.type) {
         // + key
         if (e.keyCode === 61) {
-          this.zoom(-1, 0.05);
+          await this.zoom(-1, 0.05, true);
         }
         // - key
         if (e.keyCode === 173) {
-          this.zoom(1, 0.05);
+          await this.zoom(1, 0.05, true);
         }
         // Arrow keys have keycodes 37 -> 40
+        if (e.keyCode === 16) {
+          this.shiftPressed = true;
+        }
         if (e.keyCode >= 37 && e.keyCode <= 40 && !this.dirty) {
           const movement = 5;
           this.dragging = true;
           this.keysDown[e.keyCode] = true;
-          this.deltaX += this.keysDown[37] * movement + this.keysDown[39] * -1 * movement;
-          this.deltaY += this.keysDown[38] * movement + this.keysDown[40] * -1 * movement;
-          this.safeUpdate();
+          if (this.shiftPressed) {
+            this.draggingPin = true;
+            const newX = this.juliaPin.x + this.keysDown[37] * -1 * movement
+              + this.keysDown[39] * movement;
+            const newY = this.juliaPin.y + this.keysDown[38] * -1 * movement
+              + this.keysDown[40] * movement;
+            this.moveJulia(newX, newY);
+          } else {
+            this.deltaX += this.keysDown[37] * movement + this.keysDown[39] * -1 * movement;
+            this.deltaY += this.keysDown[38] * movement + this.keysDown[40] * -1 * movement;
+            await this.safeUpdate();
+          }
         }
       }
     });
@@ -140,17 +153,28 @@ class FractalViewer extends React.Component {
         this.keysDown[e.keyCode] = false;
         await this.handleDragEnd();
       }
+      if (e.keyCode === 16) {
+        this.shiftPressed = false;
+      }
     });
   }
 
   shouldComponentUpdate(nextProps) {
     if (nextProps.store.forceUpdate === this.type) {
-      this.forceUpdate();
+      this.drawFractal();
       return false;
+    }
+    if (nextProps.store.focusHighlight !== this.focusHighlight) {
+      this.focusHighlight = nextProps.store.focusHighlight;
+      return true;
     }
     if (nextProps.store.resetFractal) {
       this.reset();
       return false;
+    }
+    if (nextProps.store.stats.focus.value !== this.focus) {
+      this.focus = nextProps.store.stats.focus.value;
+      return true;
     }
     if (nextProps.store.showRenderTrace !== this.renderer.showRenderTrace) {
       this.renderer.showRenderTrace = nextProps.store.showRenderTrace;
@@ -185,12 +209,6 @@ class FractalViewer extends React.Component {
       }
     }
     return false;
-  }
-
-  componentDidUpdate() {
-    const p = this.props;
-    this.renderer.mode = p.store.renderMode;
-    requestAnimationFrame(() => this.drawFractal());
   }
 
   loadWasm = async () => {
@@ -267,12 +285,6 @@ class FractalViewer extends React.Component {
     this.renderer.centreCoords = [0, 0];
     this.centreJulia();
     requestAnimationFrame(() => this.drawFractal());
-  }
-
-  checkFocus() {
-    const p = this.props;
-    const s = p.store;
-    return (this.position === s.stats.focus.value);
   }
 
   forceUpdate() {
@@ -700,7 +712,7 @@ class FractalViewer extends React.Component {
   }
 
 
-  zoom(direction, magnificationStep, immediate) {
+  zoom(direction, magnificationStep, centred) {
     if (this.rendering) {
       return;
     }
@@ -722,8 +734,8 @@ class FractalViewer extends React.Component {
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
-    this.mouseX = (this.mouseX) ? this.mouseX : this.width / 2;
-    this.mouseY = (this.mouseY) ? this.mouseY : this.height / 2;
+    this.mouseX = (this.mouseX && !centred) ? this.mouseX : this.width / 2;
+    this.mouseY = (this.mouseY && !centred) ? this.mouseY : this.height / 2;
 
     const centreX = this.mouseX;
     const centreY = this.mouseY;
@@ -744,20 +756,15 @@ class FractalViewer extends React.Component {
     this.callBackMouse = [this.mouseX, this.mouseY];
 
     clearTimeout(this.zoomTimeout);
-    if (!immediate) {
-      this.zoomTimeout = setTimeout(() => {
-        this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
-        this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
-        this.resetZoomAndRender();
-      }, 300);
-    }
+    this.zoomTimeout = setTimeout(() => {
+      this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
+      this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
+      this.resetZoomAndRender();
+    }, 300);
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
     this.dirty = true;
-    if (immediate) {
-      this.resetZoomAndRender();
-    }
     requestAnimationFrame(() => this.safeUpdate());
   }
 
@@ -767,6 +774,19 @@ class FractalViewer extends React.Component {
 
   render() {
     const p = this.props;
+    let focus = '';
+    if (this.focus === this.type && this.focusHighlight) {
+      focus = (
+        <Icon
+          circular
+          inverted
+          name="eye"
+          size="large"
+          className="focusIcon"
+          color="grey"
+        />
+      );
+    }
     return (
       <div className="mandelbrot-viewer-container">
         <canvas
@@ -779,10 +799,10 @@ class FractalViewer extends React.Component {
           onMouseUp={(e) => this.handleDragEnd(e)}
           onMouseLeave={(e) => this.handleDragEnd(e)}
           onWheel={(e) => this.handleScroll(e)}
-          className="fractal"
           id={`fractal-${this.type}`}
           ref={this.fractal}
         />
+        {focus}
       </div>
     );
   }

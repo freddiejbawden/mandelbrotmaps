@@ -102,6 +102,8 @@ class Settings extends Component {
             <OptionSpinner value={st.renderMode} callback={(data) => this.updateRenderMethod(data)} name="Render Mode" description="Method used to render the fractals" options={renderOptions} />
             <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
             <OptionCheck defaultChecked={st.showRenderTrace} callback={() => st.toggle('showRenderTrace')} name="Show Renderer Trace" description="Tint pixel depending on which renderer it came from (JS Only)" />
+            <OptionCheck defaultChecked={st.focusHighlight} callback={() => st.toggle('focusHighlight')} name="Show Focus Indicator" description="Display an icon to show which fractal is being interacted with" />
+
             {
               // Save button
             }
