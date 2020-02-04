@@ -21,6 +21,12 @@ class SideBar extends Component {
           devMode: !ps.devMode,
         }));
       }
+      if (e.keyCode === 67) {
+        this.centreJulia();
+      }
+      if (e.keyCode === 82) {
+        this.resetZoom();
+      }
     });
   }
 
