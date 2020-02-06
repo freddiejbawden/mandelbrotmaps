@@ -1,6 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import FractalType from '../../../utils/FractalType';
 import RendererColors from './RendererColors';
+import interpolate from './interpolate';
 
 class JSRenderer {
   constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
@@ -13,6 +14,8 @@ class JSRenderer {
     this.fractalLimitY = 0;
     this.maxIter = (maxIter) || 200;
     this.juliaPoint = juliaPoint || [0, 0];
+    this.startColor = [34, 193, 195];
+    this.endColor = [49, 45, 253];
   }
 
   update(pixelSize, width, height, centreCoords, maxIter) {
@@ -53,13 +56,19 @@ class JSRenderer {
       y = startingPos[1];
       fractalPos = this.juliaPoint;
     }
-    while (x * x + y * y < 4 && i < this.maxIter) {
+    this.maxIter = Math.ceil(this.maxIter);
+    while (x * x + y * y < 1000 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
       x = xtemp;
       i += 1;
     }
-    return i;
+    if (i === this.maxIter) {
+      return -1;
+    }
+
+    const q = i - 1 - Math.log2(Math.log2(x * x + y * y)) + 4;
+    return q;
   }
 
   calculateFractalLimit() {
@@ -67,11 +76,14 @@ class JSRenderer {
     this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }
 
-  renderRow(y, xStart, xEnd, showRenderTrace, wid) {
+  renderRow(y, xStart, xEnd, showRenderTrace, wid, lowRes) {
     const row = [];
     const c = RendererColors[wid % RendererColors.length];
     const colormap = c.map((x) => Math.abs((x / 4) * 3));
-    let setColor = (i, iter) => iter;
+    let setColor = (i, val) => {
+      const factor = (lowRes) ? this.maxIter * 2 : this.maxIter;
+      return Math.ceil(interpolate(this.startColor[i], this.endColor[i], val / factor));
+    };
     if (showRenderTrace) {
       setColor = (i, iter) => colormap[i] + iter / 4;
     }
@@ -129,13 +141,17 @@ class JSRenderer {
     }
   }
 
-  render(wid, startPixel, endPixel, arrSize, showRenderTrace) {
+  render(wid, startPixel, endPixel, arrSize, showRenderTrace, lowRes) {
     this.calculateFractalLimit();
     const arr = new Uint8ClampedArray(arrSize);
     // Iterate through every pixel
     const c = RendererColors[wid % RendererColors.length];
     const colormap = c.map((x) => (x / 4) * 3);
-    let setColor = (i, iter) => iter;
+    console.log(lowRes);
+    let setColor = (i, val) => {
+      const factor = (lowRes) ? this.maxIter * 2 : this.maxIter;
+      return Math.ceil(interpolate(this.startColor[i], this.endColor[i], val / factor));
+    };
     if (showRenderTrace) {
       setColor = (i, iter) => colormap[i] + iter / 4;
     }

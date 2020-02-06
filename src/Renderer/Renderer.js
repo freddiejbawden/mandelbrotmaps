@@ -139,7 +139,7 @@ class Renderer {
     return [];
   }
 
-  render(level) {
+  render(level, lowRes) {
     this.maxIter = level;
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {
@@ -155,6 +155,7 @@ class Renderer {
           useSingleThread,
           RendererType.JAVASCRIPT,
           this.showRenderTrace,
+          lowRes,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -170,6 +171,8 @@ class Renderer {
           this.juliaPoint,
           useSingleThread,
           RendererType.WASM,
+          false,
+          lowRes,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -185,6 +188,7 @@ class Renderer {
           false,
           RendererType.JAVASCRIPT,
           this.showRenderTrace,
+          lowRes,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -199,6 +203,8 @@ class Renderer {
           this.juliaPoint,
           false,
           RendererType.WASM,
+          this.showRenderTrace,
+          lowRes,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);

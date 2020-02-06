@@ -95,7 +95,7 @@ class FractalViewer extends React.Component {
 
   async componentDidMount() {
     this.fractal.current.focus();
-    await this.loadWasm();
+    // await this.loadWasm();
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
@@ -193,17 +193,21 @@ class FractalViewer extends React.Component {
     }
     if (this.renderMode !== nextProps.store.renderMode) {
       this.renderMode = nextProps.store.renderMode;
-      return true;
+      this.renderer.mode = nextProps.store.renderMode;
+      this.drawFractal();
+      return false;
     }
     if (
       this.previousIterations !== nextProps.store.customIterations
       && nextProps.store.overrideIterations) {
       this.previousIterations = nextProps.store.customIterations;
-      return true;
+      this.drawFractal();
+      return false;
     }
     if (this.previousOverride !== nextProps.store.overrideIterations) {
       this.previousOverride = nextProps.store.overrideIterations;
-      return true;
+      this.drawFractal();
+      return false;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {
       if (nextProps.store.juliaPoint !== this.renderer.juliaPoint
@@ -345,7 +349,7 @@ class FractalViewer extends React.Component {
       } else {
         iterationCount = iters;
       }
-      this.renderer.render(iterationCount).then((fractal) => {
+      this.renderer.render(iterationCount, this.mandelbrotDragging).then((fractal) => {
         this.rendering = false;
         this.canvasOffsetX = 0;
         this.canvasOffsetY = 0;

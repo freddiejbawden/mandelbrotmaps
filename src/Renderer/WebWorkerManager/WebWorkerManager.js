@@ -18,6 +18,7 @@ class WebWorkerManager {
     singleThread,
     renderer,
     showRenderTrace,
+    lowRes,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
@@ -36,6 +37,7 @@ class WebWorkerManager {
       }
       const renderChunk = (w, startPixel, endPixel, wid) => {
         w.postMessage({
+          lowRes,
           showRenderTrace,
           wid,
           type: this.type,

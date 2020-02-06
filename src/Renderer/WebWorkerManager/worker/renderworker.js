@@ -22,6 +22,7 @@ const renderJS = (data) => {
       data.endPixel,
       data.arrSize,
       data.showRenderTrace,
+      data.lowRes,
     );
     postMessage({
       arr,
