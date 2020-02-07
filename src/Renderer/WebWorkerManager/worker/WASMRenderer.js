@@ -56,7 +56,6 @@ class WASMRenderer {
           await this.loadWasm();
         }
         this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
-
         await this.wasm_renderer.set_max_i(maxIter);
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
@@ -93,6 +92,7 @@ class WASMRenderer {
       if (!this.wasm_renderer) {
         await this.loadWasm();
       }
+      console.log(s,e);
       this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
       const arrPointer = this.wasm_renderer.render_from_to(
         s,

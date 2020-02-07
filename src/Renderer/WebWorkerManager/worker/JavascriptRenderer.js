@@ -14,8 +14,8 @@ class JSRenderer {
     this.fractalLimitY = 0;
     this.maxIter = (maxIter) || 200;
     this.juliaPoint = juliaPoint || [0, 0];
-    this.startColor = [34, 193, 195];
-    this.endColor = [49, 45, 253];
+    this.startColor = [0, 0, 0];
+    this.endColor = [255, 255, 255];
   }
 
   update(pixelSize, width, height, centreCoords, maxIter) {
@@ -67,7 +67,9 @@ class JSRenderer {
       return -1;
     }
 
-    const q = i - 1 - Math.log2(Math.log2(x * x + y * y)) + 4;
+    const q = (i - 1) - Math.log2(Math.log2(x * x + y * y)) + 4;
+    if (pixelNum === 0) {
+    }
     return q;
   }
 
@@ -87,10 +89,9 @@ class JSRenderer {
     if (showRenderTrace) {
       setColor = (i, iter) => colormap[i] + iter / 4;
     }
-    const colorScale = 255 / this.maxIter;
     for (let x = xStart; x < xEnd; x += 1) {
       const i = this.calculatePixelNum(x, y);
-      const iter = this.escapeAlgorithm(i) * colorScale;
+      const iter = this.escapeAlgorithm(i);
       for (let j = 0; j < 3; j += 1) {
         row.push(setColor(j, iter)); // R value
       }
@@ -147,7 +148,6 @@ class JSRenderer {
     // Iterate through every pixel
     const c = RendererColors[wid % RendererColors.length];
     const colormap = c.map((x) => (x / 4) * 3);
-    console.log(lowRes);
     let setColor = (i, val) => {
       const factor = (lowRes) ? this.maxIter * 2 : this.maxIter;
       return Math.ceil(interpolate(this.startColor[i], this.endColor[i], val / factor));
@@ -155,10 +155,9 @@ class JSRenderer {
     if (showRenderTrace) {
       setColor = (i, iter) => colormap[i] + iter / 4;
     }
-    const colorScale = 255.0 / this.maxIter;
     this.calculateFractalLimit();
     for (let i = 0; i <= endPixel * 4 - startPixel * 4; i += 4) {
-      const iter = this.escapeAlgorithm((i / 4) + startPixel) * colorScale;
+      const iter = this.escapeAlgorithm((i / 4) + startPixel);
       for (let j = 0; j < 3; j += 1) {
         arr[i + j] = setColor(j, iter);
       }

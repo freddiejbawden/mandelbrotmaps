@@ -25,7 +25,7 @@ class WebWorkerManager {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const hardwareConcurrency = navigator.hardwareConcurrency || 1;
       const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 250;
+      const nChunks = (singleThread) ? 1 : 4;
       this.pixelSplit = (height * width) / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
@@ -112,7 +112,7 @@ class WebWorkerManager {
       this.height = height;
       const newArr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 40;
+      const nChunks = (singleThread) ? 1 : 4;
       this.pixelSplit = height / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();

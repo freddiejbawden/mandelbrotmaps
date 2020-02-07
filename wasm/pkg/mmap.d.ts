@@ -83,16 +83,6 @@ export class Mandelbrot {
 */
   update(pixel_size: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number, max_i: number): void;
 /**
-* @param {number} pixel_size 
-* @param {number} width 
-* @param {number} height 
-* @param {number} centre_coords_x 
-* @param {number} centre_coords_y 
-* @param {number} max_i 
-* @returns {number} 
-*/
-  render(pixel_size: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number, max_i: number): number;
-/**
 * @param {number} start 
 * @param {number} end 
 * @param {number} pixel_size 
