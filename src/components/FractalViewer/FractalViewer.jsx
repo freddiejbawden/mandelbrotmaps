@@ -357,7 +357,7 @@ class FractalViewer extends React.Component {
         this.putImage(fractal.arr, fractal.width, fractal.height);
         window.performance.mark('fractal_rendered_end');
         window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
-        console.log(`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
+        // (`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
         p.store.setStat({
           renderTime: (Date.now() - startTime),
         });
