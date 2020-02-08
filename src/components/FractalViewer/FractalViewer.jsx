@@ -167,7 +167,7 @@ class FractalViewer extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     if (nextProps.store.forceUpdate === this.type) {
-      this.drawFractal();
+      this.forceUpdate();
       return false;
     }
     if (nextProps.store.focusHighlight !== this.focusHighlight) {
@@ -357,7 +357,7 @@ class FractalViewer extends React.Component {
         this.putImage(fractal.arr, fractal.width, fractal.height);
         window.performance.mark('fractal_rendered_end');
         window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
-        // ${window.performance.getEntriesByName('fractal_render_time').pop().duration}`
+        console.log(`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
         p.store.setStat({
           renderTime: (Date.now() - startTime),
         });

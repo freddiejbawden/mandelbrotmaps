@@ -262,7 +262,6 @@ impl Mandelbrot {
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
     self.fractal_limit_y = self.centre_coords.1 - (h/2.0)*self.pixel_size;
     let _color_scale = 255.0/(self.max_i as f64);
-    log_i32(20);
     for i in start..end {
       let iter = self.escape_algorithm(i);
       self.arr.push(interpolate(self.start_color.getR(), self.end_color.getR(), iter / (*&self.max_i as f64)));
