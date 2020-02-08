@@ -16,6 +16,11 @@ class Color {
   getB() {
     return this.b;
   }
+
+  getArr() {
+    return [this.r, this.g, this.b];
+  }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export { Color };

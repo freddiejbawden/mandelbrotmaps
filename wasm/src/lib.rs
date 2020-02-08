@@ -3,7 +3,7 @@ mod fractal_type;
 use fractal_type::FractalType;
 
 use wasm_bindgen::prelude::*;
-
+use utils::interpolate;
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -113,10 +113,9 @@ impl Mandelbrot {
     for x in x_start..x_end {
       let pixel_num = self.calculate_pixel_num(x,y);
       let iter = self.escape_algorithm(pixel_num);
-      let color = ((iter / (*&self.max_i as f64))*255.0) as u8;    
-      row.push(color);
-      row.push(color);
-      row.push(color);
+      row.push(interpolate(self.start_color.getR(), self.end_color.getR(), iter / (*&self.max_i as f64)));
+      row.push(interpolate(self.start_color.getG(), self.end_color.getG(), iter / (*&self.max_i as f64)));
+      row.push(interpolate(self.start_color.getB(), self.end_color.getB(), iter / (*&self.max_i as f64)));
       row.push(255);
     }
     return row;
@@ -149,15 +148,13 @@ impl Mandelbrot {
     self.fractal_type = new_type;
   }
 
-  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType) -> Mandelbrot {
+  pub fn new(width: i32, height: i32,pixel_size: f64, max_i: i32, centre_coords_x: f64, centre_coords_y: f64, julia_point_x: f64, julia_point_y: f64, fractal_type: FractalType, start_color: Color, end_color: Color) -> Mandelbrot {
     utils::set_panic_hook();
     let centre_coords = (centre_coords_x, centre_coords_y);
     let julia_point = (julia_point_x, julia_point_y);
     let fractal_limit_x = 0.0;
     let fractal_limit_y = 0.0;
     let arr = Vec::new();
-    let start_color = Color::new(0,0,0);
-    let end_color = Color::new(255,255,255);
 
     return Mandelbrot {
       width,
@@ -240,14 +237,14 @@ impl Mandelbrot {
       x = xtemp;
       i+=1;
     }
-    if ( i == *&self.max_i) {
-      return 0.0
+    if i == *&self.max_i {
+      return -1.0;
     }
     let fi = (i -1) as f64;
     let mut mag = x*x + y*y;
     mag = mag.log2();
     mag = mag.log2();
-    return (fi - mag + 4.0);
+    return fi - mag + 4.0;
   }
   pub fn update(&mut self, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32)  {
     self.pixel_size = pixel_size;
@@ -265,12 +262,12 @@ impl Mandelbrot {
     self.fractal_limit_x = self.centre_coords.0 - (w/2.0)*self.pixel_size;
     self.fractal_limit_y = self.centre_coords.1 - (h/2.0)*self.pixel_size;
     let _color_scale = 255.0/(self.max_i as f64);
-    for i in 0..(end-start) {
+    log_i32(20);
+    for i in start..end {
       let iter = self.escape_algorithm(i);
-      let color = ((iter / (*&self.max_i as f64))*255.0) as u8;      
-      self.arr.push(color);
-      self.arr.push(color);
-      self.arr.push(color);
+      self.arr.push(interpolate(self.start_color.getR(), self.end_color.getR(), iter / (*&self.max_i as f64)));
+      self.arr.push(interpolate(self.start_color.getG(), self.end_color.getG(), iter / (*&self.max_i as f64)));
+      self.arr.push(interpolate(self.start_color.getB(), self.end_color.getB(), iter / (*&self.max_i as f64)));
       self.arr.push(255);
     }
     return self.arr.as_ptr();

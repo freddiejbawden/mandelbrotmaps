@@ -46,9 +46,11 @@ export class Mandelbrot {
 * @param {number} julia_point_x 
 * @param {number} julia_point_y 
 * @param {number} fractal_type 
+* @param {any} start_color 
+* @param {any} end_color 
 * @returns {Mandelbrot} 
 */
-  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number, julia_point_x: number, julia_point_y: number, fractal_type: number): Mandelbrot;
+  static new(width: number, height: number, pixel_size: number, max_i: number, centre_coords_x: number, centre_coords_y: number, julia_point_x: number, julia_point_y: number, fractal_type: number, start_color: any, end_color: any): Mandelbrot;
 /**
 * @param {Uint8Array} new_arr 
 */
