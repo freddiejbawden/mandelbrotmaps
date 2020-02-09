@@ -1,5 +1,22 @@
 import * as wasm from './mmap_bg.wasm';
 
+const heap = new Array(32);
+
+heap.fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+let heap_next = heap.length;
+
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
+}
+
 let cachegetUint8Memory = null;
 function getUint8Memory() {
     if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
@@ -17,22 +34,7 @@ function passArray8ToWasm(arg) {
     return ptr;
 }
 
-const heap = new Array(32);
-
-heap.fill(undefined);
-
-heap.push(undefined, null, true, false);
-
-let heap_next = heap.length;
-
-function addHeapObject(obj) {
-    if (heap_next === heap.length) heap.push(heap.length + 1);
-    const idx = heap_next;
-    heap_next = heap[idx];
-
-    heap[idx] = obj;
-    return idx;
-}
+function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
 
 function getObject(idx) { return heap[idx]; }
 
@@ -175,10 +177,12 @@ export class Mandelbrot {
     * @param {number} julia_point_x
     * @param {number} julia_point_y
     * @param {number} fractal_type
+    * @param {any} start_color
+    * @param {any} end_color
     * @returns {Mandelbrot}
     */
-    static new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type) {
-        const ret = wasm.mandelbrot_new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type);
+    static new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type, start_color, end_color) {
+        const ret = wasm.mandelbrot_new(width, height, pixel_size, max_i, centre_coords_x, centre_coords_y, julia_point_x, julia_point_y, fractal_type, addHeapObject(start_color), addHeapObject(end_color));
         return Mandelbrot.__wrap(ret);
     }
     /**
@@ -225,19 +229,6 @@ export class Mandelbrot {
         wasm.mandelbrot_update(this.ptr, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
     }
     /**
-    * @param {number} pixel_size
-    * @param {number} width
-    * @param {number} height
-    * @param {number} centre_coords_x
-    * @param {number} centre_coords_y
-    * @param {number} max_i
-    * @returns {number}
-    */
-    render(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i) {
-        const ret = wasm.mandelbrot_render(this.ptr, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
-        return ret;
-    }
-    /**
     * @param {number} start
     * @param {number} end
     * @param {number} pixel_size
@@ -253,6 +244,27 @@ export class Mandelbrot {
         return ret;
     }
 }
+
+export const __wbg_log_f514957e1fd60c0f = typeof console.log == 'function' ? console.log : notDefined('console.log');
+
+export const __wbg_getR_dcb89bdcc1bec716 = function(arg0) {
+    const ret = getObject(arg0).getR();
+    return ret;
+};
+
+export const __wbg_getG_c7dbd1c2ab89504e = function(arg0) {
+    const ret = getObject(arg0).getG();
+    return ret;
+};
+
+export const __wbg_getB_8017451344fdf582 = function(arg0) {
+    const ret = getObject(arg0).getB();
+    return ret;
+};
+
+export const __wbindgen_object_drop_ref = function(arg0) {
+    takeObject(arg0);
+};
 
 export const __wbg_getWidth_1ae57a7e6157a6d6 = function(arg0) {
     const ret = getObject(arg0).getWidth();
@@ -272,10 +284,6 @@ export const __wbg_getTop_9e6975569e1a0019 = function(arg0) {
 export const __wbg_getHeight_37735ff51b725345 = function(arg0) {
     const ret = getObject(arg0).getHeight();
     return ret;
-};
-
-export const __wbindgen_object_drop_ref = function(arg0) {
-    takeObject(arg0);
 };
 
 export const __wbg_new_59cb74e423758ede = function() {

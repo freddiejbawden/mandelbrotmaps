@@ -1,6 +1,8 @@
 /* eslint-disable prefer-destructuring */
 import FractalType from '../../../utils/FractalType';
 import RendererColors from './RendererColors';
+import interpolate from './interpolate';
+import { Color } from '../../../utils/Color';
 
 class JSRenderer {
   constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
@@ -13,6 +15,39 @@ class JSRenderer {
     this.fractalLimitY = 0;
     this.maxIter = (maxIter) || 200;
     this.juliaPoint = juliaPoint || [0, 0];
+    this.startColor = new Color(0, 0, 0);
+    this.endColor = new Color(255, 255, 255);
+    this.colormap = RendererColors.map((x) => (x.map((el) => (el / 4))));
+  }
+
+  getRainbow(i) {
+    if (i === -1) {
+      return 0;
+    }
+    const red = Math.sin(0.3 * i);
+
+    return [
+      interpolate(this.startColor.r, this.endColor.r, red),
+      interpolate(this.startColor.g, this.endColor.g, red),
+      interpolate(this.startColor.b, this.endColor.b, red),
+    ];
+  }
+
+  setColor(i, val, showRenderTrace, wid) {
+    if (showRenderTrace) {
+      return this.colormap[wid][i] + (val / 4) * 3;
+    }
+    if (val === -2) {
+      return [0, 0, 0];
+    }
+    // return this.getRainbow(val)[i];
+
+    return interpolate(
+      this.startColor.getArr()[i],
+      this.endColor.getArr()[i],
+      // Stripy: (1 + Math.cos(2 * Math.PI * val)) / 2,
+      val / this.maxIter,
+    );
   }
 
   update(pixelSize, width, height, centreCoords, maxIter) {
@@ -53,13 +88,19 @@ class JSRenderer {
       y = startingPos[1];
       fractalPos = this.juliaPoint;
     }
-    while (x * x + y * y < 4 && i < this.maxIter) {
+    this.maxIter = Math.ceil(this.maxIter);
+    while (x * x + y * y < 10 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
       x = xtemp;
       i += 1;
     }
-    return i;
+    if (i === this.maxIter) {
+      return -1;
+    }
+
+    const q = (i - 1) - Math.log2(Math.log2(x * x + y * y)) + 4;
+    return q;
   }
 
   calculateFractalLimit() {
@@ -69,18 +110,11 @@ class JSRenderer {
 
   renderRow(y, xStart, xEnd, showRenderTrace, wid) {
     const row = [];
-    const c = RendererColors[wid % RendererColors.length];
-    const colormap = c.map((x) => Math.abs((x / 4) * 3));
-    let setColor = (i, iter) => iter;
-    if (showRenderTrace) {
-      setColor = (i, iter) => colormap[i] + iter / 4;
-    }
-    const colorScale = 255 / this.maxIter;
     for (let x = xStart; x < xEnd; x += 1) {
       const i = this.calculatePixelNum(x, y);
-      const iter = this.escapeAlgorithm(i) * colorScale;
+      const iter = this.escapeAlgorithm(i);
       for (let j = 0; j < 3; j += 1) {
-        row.push(setColor(j, iter)); // R value
+        row.push(this.setColor(j, iter, showRenderTrace, wid)); // R value
       }
       row.push(255); // A value
     }
@@ -133,18 +167,11 @@ class JSRenderer {
     this.calculateFractalLimit();
     const arr = new Uint8ClampedArray(arrSize);
     // Iterate through every pixel
-    const c = RendererColors[wid % RendererColors.length];
-    const colormap = c.map((x) => (x / 4) * 3);
-    let setColor = (i, iter) => iter;
-    if (showRenderTrace) {
-      setColor = (i, iter) => colormap[i] + iter / 4;
-    }
-    const colorScale = 255.0 / this.maxIter;
     this.calculateFractalLimit();
     for (let i = 0; i <= endPixel * 4 - startPixel * 4; i += 4) {
-      const iter = this.escapeAlgorithm((i / 4) + startPixel) * colorScale;
+      const iter = this.escapeAlgorithm((i / 4) + startPixel);
       for (let j = 0; j < 3; j += 1) {
-        arr[i + j] = setColor(j, iter);
+        arr[i + j] = this.setColor(j, iter, showRenderTrace, wid);
       }
       arr[i + 3] = 255;
     }

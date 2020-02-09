@@ -18,13 +18,14 @@ class WebWorkerManager {
     singleThread,
     renderer,
     showRenderTrace,
+    lowRes,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
       this.arr = new Uint8ClampedArray(height * width * 4);
       const hardwareConcurrency = navigator.hardwareConcurrency || 1;
       const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 250;
+      const nChunks = (singleThread) ? 1 : 4;
       this.pixelSplit = (height * width) / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
@@ -36,6 +37,7 @@ class WebWorkerManager {
       }
       const renderChunk = (w, startPixel, endPixel, wid) => {
         w.postMessage({
+          lowRes,
           showRenderTrace,
           wid,
           type: this.type,
@@ -110,7 +112,7 @@ class WebWorkerManager {
       this.height = height;
       const newArr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = (singleThread) ? 1 : navigator.hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 40;
+      const nChunks = (singleThread) ? 1 : 4;
       this.pixelSplit = height / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();

@@ -1,3 +1,5 @@
+import { Color } from '../../../utils/Color';
+
 /* eslint-disable import/no-unresolved */
 class WASMRenderer {
   constructor(pixelSize, width, height, centreCoords, maxIter, type) {
@@ -35,6 +37,8 @@ class WASMRenderer {
         this.juliaPoint[0],
         this.juliaPoint[1],
         this.type,
+        new Color(0, 0, 0),
+        new Color(255, 255, 255),
       );
       this.memory = memory;
       this.wasm_renderer.set_fractal_type(this.type);
@@ -56,7 +60,6 @@ class WASMRenderer {
           await this.loadWasm();
         }
         this.wasm_renderer.set_julia_point(juliaPoint[0], juliaPoint[1]);
-
         await this.wasm_renderer.set_max_i(maxIter);
         const arrPointer = await this.wasm_renderer.render_range(
           xRect,
