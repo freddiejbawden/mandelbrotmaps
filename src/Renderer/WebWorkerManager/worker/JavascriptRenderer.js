@@ -89,7 +89,7 @@ class JSRenderer {
       fractalPos = this.juliaPoint;
     }
     this.maxIter = Math.ceil(this.maxIter);
-    while (x * x + y * y < 1000 && i < this.maxIter) {
+    while (x * x + y * y < 10 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
       x = xtemp;
