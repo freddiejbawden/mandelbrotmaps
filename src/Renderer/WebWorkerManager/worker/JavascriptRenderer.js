@@ -20,10 +20,28 @@ class JSRenderer {
     this.colormap = RendererColors.map((x) => (x.map((el) => (el / 4))));
   }
 
+  getRainbow(i) {
+    if (i === -1) {
+      return 0;
+    }
+    const red = Math.sin(0.3 * i);
+
+    return [
+      interpolate(this.startColor.r, this.endColor.r, red),
+      interpolate(this.startColor.g, this.endColor.g, red),
+      interpolate(this.startColor.b, this.endColor.b, red),
+    ];
+  }
+
   setColor(i, val, showRenderTrace, wid) {
     if (showRenderTrace) {
       return this.colormap[wid][i] + (val / 4) * 3;
     }
+    if (val === -2) {
+      return [0, 0, 0];
+    }
+    // return this.getRainbow(val)[i];
+
     return interpolate(
       this.startColor.getArr()[i],
       this.endColor.getArr()[i],
