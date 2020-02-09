@@ -287,7 +287,7 @@ class FractalViewer extends React.Component {
         dualUpdateFlag: true,
       });
     }
-    this.renderer.pixelSize = 0.004;
+    this.renderer.pixelSize = 0.008;
     this.renderer.centreCoords = [0, 0];
     this.centreJulia();
     requestAnimationFrame(() => this.drawFractal());
