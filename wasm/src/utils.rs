@@ -13,8 +13,18 @@ pub fn interpolate(start_n: u8, end_n: u8, t: f64) -> u8 {
   if t < 0.0 {
     return 255;
   }
+  if t >= 1.0 {
+    return end_n;
+  }
   let start_n_f = start_n as f64;
   let end_n_f = end_n as f64;
-  return ((end_n_f - start_n_f) * t + start_n_f)  as u8;
+  let res = (end_n_f - start_n_f) * t + start_n_f;
+  // check for int wrap around
+  if res > 255.0 {
+    return 255;
+  } 
+  return res as u8;
+
+  
 
 }
