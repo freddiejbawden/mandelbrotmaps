@@ -29,6 +29,11 @@ class Settings extends Component {
           modalOpen: !prevState.modalOpen,
         }));
       }
+      if (e.keyCode === 72) {
+        const p = this.props;
+        const st = p.store;
+        st.toggle('controls');
+      }
     });
   }
 
