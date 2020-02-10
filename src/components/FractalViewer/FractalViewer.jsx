@@ -139,7 +139,7 @@ class FractalViewer extends React.Component {
           const movement = 5;
           this.dragging = true;
           this.keysDown[e.keyCode] = true;
-          if (this.shiftPressed) {
+          if (this.shiftPressed && this.focus === FractalType.MANDELBROT) {
             this.draggingPin = true;
             const newX = this.juliaPin.x + this.keysDown[37] * -1 * movement
               + this.keysDown[39] * movement;
