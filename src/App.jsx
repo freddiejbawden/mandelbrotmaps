@@ -10,6 +10,7 @@ import { checkSupported } from './utils/checkSupported';
 import preventZoom from './utils/preventZoom';
 import SideBar from './components/SideBar';
 import setUpFocusHandler from './focusHandler/focusHandler';
+import ControlsWindow from './components/ControlsWindow/ControlsWindow';
 
 class App extends Component {
   constructor(props) {
@@ -50,6 +51,7 @@ class App extends Component {
         <DebugBar
           showDebugBar={p.store.showDebugBar}
         />
+        <ControlsWindow />
         {unsupportedPopUp}
       </div>
     );

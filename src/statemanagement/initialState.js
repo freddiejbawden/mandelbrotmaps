@@ -12,6 +12,7 @@ const initialState = {
   dualUpdateFlag: false,
   forceUpdate: 100,
   focusHighlight: false,
+  controls: false,
   stats: {
     renderTime: {
       label: 'Render Time',
