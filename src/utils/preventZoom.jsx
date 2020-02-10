@@ -4,7 +4,11 @@ const preventZoom = (WrappedComponent) => class extends React.Component {
   componentDidMount() {
     // Disable for Chrome
     document.addEventListener('wheel', (event) => {
-      event.preventDefault();
+      if (event.toElement) {
+        if (event.toElement.nodeName === 'CANVAS') {
+          event.preventDefault();
+        }
+      }
     }, { passive: false });
 
     // Disable for Safari

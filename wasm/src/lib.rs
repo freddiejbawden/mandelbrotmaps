@@ -231,7 +231,7 @@ impl Mandelbrot {
       fractal_x = self.julia_point.0;
       fractal_y = self.julia_point.1;
     }
-    while x*x + y*y < 4.0 && i < *&self.max_i {
+    while x*x + y*y <= 4.0 && i < *&self.max_i {
       let xtemp = x*x - y*y + fractal_x;
       y = 2.0*x*y + fractal_y;
       x = xtemp;
