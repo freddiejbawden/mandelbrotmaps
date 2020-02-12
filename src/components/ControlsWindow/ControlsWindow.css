@@ -1,10 +1,19 @@
 .controls-window {
-  position: relative;
+  position: absolute !important;
   bottom: 5%;
   left: 1%;
   /* bring your own prefixes */
   background-color: white;
   min-width: 250px;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important;
+}
+
+.controls-modal {
+  padding: 20px;
 }
 .controls-container {
   width: 100%;
@@ -29,4 +38,20 @@
 }
 .divider {
   border: grey solid 0.5px;
+}
+.controls-close-button {
+  display: none !important;
+  justify-content: center;
+  align-self: center;
+  width: 100%;
+}
+@media only screen and (max-width: 600px) {
+ .controls-close-button {
+   display: block !important;
+ }
+
+ .details-container {
+  display: flex;
+  flex-direction: column;
+  }
 }
