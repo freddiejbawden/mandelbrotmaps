@@ -1,5 +1,8 @@
 mod utils;
 mod fractal_type;
+mod coloring_options;
+
+use coloring_options::ColorOptions;
 use fractal_type::FractalType;
 
 use wasm_bindgen::prelude::*;
@@ -95,6 +98,25 @@ pub struct Mandelbrot {
   end_color: Color,
 }
 impl Mandelbrot {
+  fn set_color(&self, i: i32, val: f64, coloring_method: ColorOptions) -> u8 {
+    if (coloring_method == ColorOptions::BLACKANDWHITE) {
+      return (interpolate(0, 255, val / (*&self.max_i as f64)));
+    }  
+    if (val == -1.0) {
+      return 0;
+    }
+    if (coloring_method == ColorOptions::RAINBOW) {
+      let reduced_iter = 0.3 * val + (i as f64)*2.0;
+      return ((reduced_iter.sin() * 127.0) + 128.0) as u8;
+    }
+    if (coloring_method == ColorOptions::STRIPY) {
+      let adjusted_val = 2.0 * val * std::f64::consts::PI;  
+      let t = (1.0 + adjusted_val.cos()) / 2.0;
+      return interpolate(0, 255, t) as u8;
+    } else {
+      return val as u8;
+    }
+  }
   fn pixels_to_coord(&self, pixel_num: i32) -> (f64,f64) {
     let (x,y) = &self.calculate_position(&pixel_num);
     let coord_x = &self.fractal_limit_x + &self.pixel_size*x;
@@ -106,16 +128,15 @@ impl Mandelbrot {
     let y = (pixel_num/&self.width) as f64;
     return (x,y);
   }
-  fn render_row(&self, y : i32, x_start : i32, x_end : i32) -> Vec<u8> {
-    log_i32(0);
+  fn render_row(&mut self, y : i32, x_start : i32, x_end : i32, coloring_method : ColorOptions) -> Vec<u8> {
     let mut row = Vec::new();
     let _color_scale = 255.0 / (self.max_i as f64);
     for x in x_start..x_end {
       let pixel_num = self.calculate_pixel_num(x,y);
       let iter = self.escape_algorithm(pixel_num);
-      row.push(interpolate(self.start_color.getR(), self.end_color.getR(), iter / (*&self.max_i as f64)));
-      row.push(interpolate(self.start_color.getG(), self.end_color.getG(), iter / (*&self.max_i as f64)));
-      row.push(interpolate(self.start_color.getB(), self.end_color.getB(), iter / (*&self.max_i as f64)));
+      for j in 0..3 {
+        row.push(self.set_color(j, iter, coloring_method));
+      }
       row.push(255);
     }
     return row;
@@ -177,7 +198,7 @@ impl Mandelbrot {
   pub fn set_arr(&mut self, new_arr : Vec<u8>) {
     self.arr = new_arr.to_vec();
   }
-  pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f64, centre_coords_y: f64) -> *const u8 {
+  pub fn render_range(&mut self,x_rect: Rectangle, y_rect: Rectangle, delta_x: i32, delta_y: i32, old_arr: Vec<u8>, start_row: i32, end_row: i32, width: i32, height: i32,centre_coords_x: f64, centre_coords_y: f64, coloring_method : ColorOptions) -> *const u8 {
 
     self.update(self.pixel_size, width, height, centre_coords_x, centre_coords_y, self.max_i);
     let w = *&self.width as f64;
@@ -196,11 +217,11 @@ impl Mandelbrot {
     }
     for y in start_row..end_row {
       if y >= y_rect.getTop() && y <= (y_rect.getTop() + y_rect.getHeight()) {
-        let row = self.render_row(y, 0, self.width);
+        let row = self.render_row(y, 0, self.width, coloring_method);
         new_arr.extend(&row);
       } else {
         // compute re rendered slice 
-        let mut re_rendered = self.render_row(y, x_rect.getLeft(), x_rect.getLeft() + x_rect.getWidth());
+        let mut re_rendered = self.render_row(y, x_rect.getLeft(), x_rect.getLeft() + x_rect.getWidth(), coloring_method);
         let y_offset = (y - delta_y) * (self.width as i32);
         let old_arr_start = ((y_offset + (x_start - delta_x)) * 4) as usize;
         let old_arr_end = ((y_offset + (x_end - delta_x)) * 4) as usize;
@@ -231,7 +252,7 @@ impl Mandelbrot {
       fractal_x = self.julia_point.0;
       fractal_y = self.julia_point.1;
     }
-    while x*x + y*y <= 4.0 && i < *&self.max_i {
+    while x*x + y*y <= 10.0 && i < *&self.max_i {
       let xtemp = x*x - y*y + fractal_x;
       y = 2.0*x*y + fractal_y;
       x = xtemp;
@@ -244,8 +265,10 @@ impl Mandelbrot {
     let mut mag = x*x + y*y;
     mag = mag.log2();
     mag = mag.log2();
-    return fi - mag + 4.0;
+    let smooth_i  = fi - mag + 4.0;
+    return smooth_i;
   }
+
   pub fn update(&mut self, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32)  {
     self.pixel_size = pixel_size;
     self.width = width;
@@ -254,7 +277,7 @@ impl Mandelbrot {
     self.centre_coords =  (centre_coords_x, centre_coords_y);
   }
 
-  pub fn render_from_to(&mut self, start: i32, end: i32, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32 ) -> *const u8 {
+  pub fn render_from_to(&mut self, start: i32, end: i32, pixel_size: f64, width: i32, height: i32, centre_coords_x: f64, centre_coords_y: f64, max_i: i32, coloring_method: ColorOptions) -> *const u8 {
     self.update(pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
     self.arr = Vec::new();
     let w = *&self.width as f64;
@@ -264,9 +287,10 @@ impl Mandelbrot {
     let _color_scale = 255.0/(self.max_i as f64);
     for i in start..end {
       let iter = self.escape_algorithm(i);
-      self.arr.push(interpolate(self.start_color.getR(), self.end_color.getR(), iter / (*&self.max_i as f64)));
-      self.arr.push(interpolate(self.start_color.getG(), self.end_color.getG(), iter / (*&self.max_i as f64)));
-      self.arr.push(interpolate(self.start_color.getB(), self.end_color.getB(), iter / (*&self.max_i as f64)));
+      for j in 0..3 {
+        self.arr.push(self.set_color(j, iter, coloring_method));
+      }
+
       self.arr.push(255);
     }
     return self.arr.as_ptr();

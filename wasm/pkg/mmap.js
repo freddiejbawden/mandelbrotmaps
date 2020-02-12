@@ -110,6 +110,9 @@ function getStringFromWasm(ptr, len) {
 }
 /**
 */
+export const ColorOptions = Object.freeze({ BLACKANDWHITE:0,RAINBOW:1,STRIPY:2, });
+/**
+*/
 export const FractalType = Object.freeze({ MANDELBROT:0,JULIA:1, });
 /**
 */
@@ -203,10 +206,11 @@ export class Mandelbrot {
     * @param {number} height
     * @param {number} centre_coords_x
     * @param {number} centre_coords_y
+    * @param {number} coloring_method
     * @returns {number}
     */
-    render_range(x_rect, y_rect, delta_x, delta_y, old_arr, start_row, end_row, width, height, centre_coords_x, centre_coords_y) {
-        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(x_rect), addHeapObject(y_rect), delta_x, delta_y, passArray8ToWasm(old_arr), WASM_VECTOR_LEN, start_row, end_row, width, height, centre_coords_x, centre_coords_y);
+    render_range(x_rect, y_rect, delta_x, delta_y, old_arr, start_row, end_row, width, height, centre_coords_x, centre_coords_y, coloring_method) {
+        const ret = wasm.mandelbrot_render_range(this.ptr, addHeapObject(x_rect), addHeapObject(y_rect), delta_x, delta_y, passArray8ToWasm(old_arr), WASM_VECTOR_LEN, start_row, end_row, width, height, centre_coords_x, centre_coords_y, coloring_method);
         return ret;
     }
     /**
@@ -237,30 +241,16 @@ export class Mandelbrot {
     * @param {number} centre_coords_x
     * @param {number} centre_coords_y
     * @param {number} max_i
+    * @param {number} coloring_method
     * @returns {number}
     */
-    render_from_to(start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i) {
-        const ret = wasm.mandelbrot_render_from_to(this.ptr, start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i);
+    render_from_to(start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i, coloring_method) {
+        const ret = wasm.mandelbrot_render_from_to(this.ptr, start, end, pixel_size, width, height, centre_coords_x, centre_coords_y, max_i, coloring_method);
         return ret;
     }
 }
 
 export const __wbg_log_f514957e1fd60c0f = typeof console.log == 'function' ? console.log : notDefined('console.log');
-
-export const __wbg_getR_dcb89bdcc1bec716 = function(arg0) {
-    const ret = getObject(arg0).getR();
-    return ret;
-};
-
-export const __wbg_getG_c7dbd1c2ab89504e = function(arg0) {
-    const ret = getObject(arg0).getG();
-    return ret;
-};
-
-export const __wbg_getB_8017451344fdf582 = function(arg0) {
-    const ret = getObject(arg0).getB();
-    return ret;
-};
 
 export const __wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);

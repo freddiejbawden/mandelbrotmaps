@@ -3,9 +3,10 @@ import FractalType from '../../../utils/FractalType';
 import RendererColors from './RendererColors';
 import interpolate from './interpolate';
 import { Color } from '../../../utils/Color';
+import ColorMode from '../../ColorOptions';
 
 class JSRenderer {
-  constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint, coloringMethod) {
     this.type = type;
     this.pixelSize = pixelSize;
     this.width = width;
@@ -18,18 +19,22 @@ class JSRenderer {
     this.startColor = new Color(0, 0, 0);
     this.endColor = new Color(255, 255, 255);
     this.colormap = RendererColors.map((x) => (x.map((el) => (el / 4))));
+    this.coloringMethod = coloringMethod || 0;
   }
 
-  getRainbow(i) {
-    if (i === -1) {
+  // eslint-disable-next-line class-methods-use-this
+  getRainbow(iter) {
+    if (iter === -1) {
       return 0;
     }
-    const red = Math.sin(0.3 * i);
+    const red = Math.sin(0.3 * iter) * 127 + 128;
+    const green = Math.sin(0.3 * iter + 2) * 127 + 128;
+    const blue = Math.sin(0.3 * iter + 4) * 127 + 128;
 
     return [
-      interpolate(this.startColor.r, this.endColor.r, red),
-      interpolate(this.startColor.g, this.endColor.g, red),
-      interpolate(this.startColor.b, this.endColor.b, red),
+      red,
+      green,
+      blue,
     ];
   }
 
@@ -40,12 +45,27 @@ class JSRenderer {
     if (val === -2) {
       return [0, 0, 0];
     }
-    // return this.getRainbow(val)[i];
+
+    if (this.coloringMethod === ColorMode.BLACKANDWHITE) {
+      return interpolate(
+        0,
+        255,
+        // Stripy: (1 + Math.cos(2 * Math.PI * val)) / 2,
+        val / this.maxIter,
+      );
+    } if (this.coloringMethod === ColorMode.RAINBOW) {
+      return this.getRainbow(val)[i];
+    } if (this.coloringMethod === ColorMode.STRIPES) {
+      return interpolate(
+        0,
+        255,
+        (1 + Math.cos(2 * Math.PI * val)) / 2,
+      );
+    }
 
     return interpolate(
       this.startColor.getArr()[i],
       this.endColor.getArr()[i],
-      // Stripy: (1 + Math.cos(2 * Math.PI * val)) / 2,
       val / this.maxIter,
     );
   }

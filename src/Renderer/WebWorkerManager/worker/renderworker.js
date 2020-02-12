@@ -15,6 +15,7 @@ const renderJS = (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.coloringMethod,
     );
     const arr = mr.render(
       data.wid,
@@ -47,6 +48,7 @@ const renderWasm = async (e) => {
     e.data.centreCoords,
     e.data.maxIter,
     e.data.juliaPoint,
+    e.data.coloringMethod,
   ).then((arr) => {
     postMessage({
       arr,
@@ -59,6 +61,7 @@ const renderWasm = async (e) => {
 const renderWasmRange = async (e) => {
   wasmRenderer.setFractalType(e.data.type);
   try {
+    console.log(e.data.coloringMethod);
     const xRectReconstructed = new Rectangle(
       e.data.xRect.l,
       e.data.xRect.t,
@@ -85,6 +88,7 @@ const renderWasmRange = async (e) => {
       e.data.centreCoords[0],
       e.data.centreCoords[1],
       e.data.juliaPoint,
+      e.data.coloringMethod,
     ).then((fractal) => {
       postMessage({
         success: true,
@@ -120,6 +124,7 @@ const renderJSRange = async (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.coloringMethod,
     );
     const fractal = await mr.renderRange(
       data.xRect,

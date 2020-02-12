@@ -52,7 +52,7 @@ class WASMRenderer {
   }
 
   async renderRange(xRect, yRect, dX, dY, arr, startRow, endRow,
-    width, height, maxIter, centreCoordsX, centreCoordsY, juliaPoint) {
+    width, height, maxIter, centreCoordsX, centreCoordsY, juliaPoint, coloringMode) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
@@ -73,7 +73,9 @@ class WASMRenderer {
           height,
           centreCoordsX,
           centreCoordsY,
+          coloringMode,
         );
+        console.log(coloringMode);
         const fractalArr = new Uint8ClampedArray(
           this.memory.buffer,
           arrPointer,
@@ -90,7 +92,17 @@ class WASMRenderer {
     });
   }
 
-  async renderFromTo(s, e, pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async renderFromTo(
+    s,
+    e,
+    pixelSize,
+    width,
+    height,
+    centreCoords,
+    maxIter,
+    juliaPoint,
+    coloringMode,
+  ) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       if (!this.wasm_renderer) {
@@ -106,6 +118,7 @@ class WASMRenderer {
         centreCoords[0],
         centreCoords[1],
         maxIter,
+        coloringMode,
       );
       try {
         const arr = new Uint8ClampedArray(this.memory.buffer, arrPointer, (e - s) * 4);
@@ -116,7 +129,7 @@ class WASMRenderer {
     });
   }
 
-  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint) {
+  async render(pixelSize, width, height, centreCoords, maxIter, juliaPoint, coloringMode) {
     if (!this.wasm_renderer) {
       await this.loadWasm();
     }
@@ -128,6 +141,7 @@ class WASMRenderer {
       centreCoords[0],
       centreCoords[1],
       maxIter,
+      coloringMode,
     );
     try {
       const arr = new Uint8ClampedArray(this.memory.buffer, arrPointer, width * height * 4);
