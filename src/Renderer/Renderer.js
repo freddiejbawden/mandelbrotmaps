@@ -3,7 +3,7 @@ import WebWorkerManager from './WebWorkerManager';
 import RendererType from './RendererType';
 
 class Renderer {
-  constructor(type, renderMethod, width, height, maxIter, juliaPoint) {
+  constructor(type, renderMethod, width, height, maxIter, juliaPoint, coloringMode) {
     this.mode = renderMethod;
     this.pixelSize = 0.008;
     this.maximumPixelSize = this.pixelSize * 2;
@@ -23,6 +23,7 @@ class Renderer {
     this.mtTimer = undefined;
     this.prev_arr = undefined;
     this.showRenderTrace = false;
+    this.coloringMode = coloringMode;
   }
 
   calculateFractalLimit() {
@@ -68,6 +69,7 @@ class Renderer {
         useSingleThread,
         RendererType.JAVASCRIPT,
         this.showRenderTrace,
+        this.coloringMode,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -89,6 +91,8 @@ class Renderer {
         this.juliaPoint,
         useSingleThread,
         RendererType.WASM,
+        this.showRenderTrace,
+        this.coloringMode,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -110,6 +114,7 @@ class Renderer {
         useSingleThread,
         RendererType.JAVASCRIPT,
         this.showRenderTrace,
+        this.coloringMode,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -132,6 +137,7 @@ class Renderer {
         useSingleThread,
         RendererType.WASM,
         this.showRenderTrace,
+        this.coloringMode,
       );
       this.prev_arr = fractal.arr;
       return fractal;
@@ -156,6 +162,7 @@ class Renderer {
           RendererType.JAVASCRIPT,
           this.showRenderTrace,
           lowRes,
+          this.coloringMode,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -173,6 +180,7 @@ class Renderer {
           RendererType.WASM,
           false,
           lowRes,
+          this.coloringMode,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -189,6 +197,7 @@ class Renderer {
           RendererType.JAVASCRIPT,
           this.showRenderTrace,
           lowRes,
+          this.coloringMode,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);
@@ -205,6 +214,7 @@ class Renderer {
           RendererType.WASM,
           this.showRenderTrace,
           lowRes,
+          this.coloringMode,
         ).then((fractal) => {
           this.prev_arr = fractal.arr;
           resolve(fractal);

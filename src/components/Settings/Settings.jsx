@@ -10,6 +10,7 @@ import { withStore } from '../../statemanagement/createStore';
 import OptionCheck from './OptionCheck/OptionCheck';
 import OptionSpinner from './OptionSpinner/OptionSpinner';
 import OptionText from './OptionText/OptionText';
+import ColorMode from '../../Renderer/ColorOptions';
 
 class Settings extends Component {
   constructor(props) {
@@ -74,16 +75,26 @@ class Settings extends Component {
     st.toggle('overrideIterations');
   }
 
+  updateColoringMethod(val) {
+    const p = this.props;
+    p.store.set({ coloringMode: parseInt(val, 10) });
+  }
+
   render() {
     const p = this.props;
     const st = p.store;
+    const s = this.state;
     const renderOptions = [
-      { key: 2, value: RenderMode.JAVASCRIPT, text: 'Javascript' },
+      { key: 1, value: RenderMode.JAVASCRIPT, text: 'Javascript' },
       { key: 3, value: RenderMode.WASM, text: 'Web Assembly' },
       { key: 4, value: RenderMode.JAVASCRIPTMT, text: 'Javascript (Multi Threaded)' },
       { key: 5, value: RenderMode.WASMMT, text: 'Web Assembly (Multi Threaded)' },
     ];
-    const s = this.state;
+    const colorOptions = [
+      { key: 1, value: ColorMode.BLACKANDWHITE, text: 'Black and White' },
+      { key: 2, value: ColorMode.RAINBOW, text: 'Rainbow' },
+      { key: 3, value: ColorMode.STRIPES, text: 'Striped' },
+    ];
     return (
       <Modal
         closeIcon
@@ -105,6 +116,7 @@ class Settings extends Component {
             <OptionCheck defaultChecked={st.overrideIterations} focus callback={() => this.toggleIterations()} name="Override Iteration Count" description="Override the automatic setting of iterations" />
             <OptionText placeholder={st.customIterations} focus={st.overrideIterations} callback={(iter) => this.updateIterations(iter)} disabled={!st.overrideIterations} name="Iteration Count" description="Set the number of iterations to a fixed value" />
             <OptionSpinner value={st.renderMode} callback={(data) => this.updateRenderMethod(data)} name="Render Mode" description="Method used to render the fractals" options={renderOptions} />
+            <OptionSpinner value={st.coloringMode} callback={(data) => this.updateColoringMethod(data)} name="Color Scheme" description="Coloring used to draw the fractals" options={colorOptions} />
             <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
             <OptionCheck defaultChecked={st.showRenderTrace} callback={() => st.toggle('showRenderTrace')} name="Show Renderer Trace" description="Tint pixel depending on which renderer it came from (JS Only)" />
             <OptionCheck defaultChecked={st.focusHighlight} callback={() => st.toggle('focusHighlight')} name="Show Focus Indicator" description="Display an icon to show which fractal is being interacted with" />

@@ -19,6 +19,7 @@ class WebWorkerManager {
     renderer,
     showRenderTrace,
     lowRes,
+    coloringMethod,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
@@ -52,10 +53,11 @@ class WebWorkerManager {
           maxIter,
           centreCoords,
           juliaPoint,
+          coloringMethod,
         });
         this.nextChunk += 1;
       };
-      for (let i = 0; i < nThreadsFree; i += 1) {
+      for (let i = 0; i < Math.min(nThreadsFree, nChunks); i += 1) {
         const w = this.workers[i];
         const id = i;
         w.onmessage = (e) => {
@@ -105,7 +107,9 @@ class WebWorkerManager {
     singleThread,
     renderer,
     showRenderTrace,
+    coloringMethod,
   ) {
+    console.log(coloringMethod);
     return new Promise((res) => {
       this.nextChunk = 0;
       this.width = width;
@@ -144,11 +148,12 @@ class WebWorkerManager {
           dY,
           juliaPoint,
           showRenderTrace,
+          coloringMethod,
         });
         this.nextChunk += 1;
       };
 
-      for (let i = 0; i < nThreadsFree; i += 1) {
+      for (let i = 0; i < Math.min(nThreadsFree, nChunks); i += 1) {
         const id = i;
         const w = this.workers[i];
         w.onmessage = (e) => {

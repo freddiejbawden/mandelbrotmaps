@@ -1,4 +1,5 @@
 import Mode from '../Renderer/RenderMode';
+import ColorMode from '../Renderer/ColorOptions';
 
 const initialState = {
   renderMode: Mode.JAVASCRIPT,
@@ -13,6 +14,7 @@ const initialState = {
   forceUpdate: 100,
   focusHighlight: false,
   controls: false,
+  coloringMode: ColorMode.RAINBOW,
   stats: {
     renderTime: {
       label: 'Render Time',
