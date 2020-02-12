@@ -55,7 +55,7 @@ class WebWorkerManager {
         });
         this.nextChunk += 1;
       };
-      for (let i = 0; i < nThreadsFree; i += 1) {
+      for (let i = 0; i < Math.min(nThreadsFree, nChunks); i += 1) {
         const w = this.workers[i];
         const id = i;
         w.onmessage = (e) => {
@@ -148,7 +148,7 @@ class WebWorkerManager {
         this.nextChunk += 1;
       };
 
-      for (let i = 0; i < nThreadsFree; i += 1) {
+      for (let i = 0; i < Math.min(nThreadsFree, nChunks); i += 1) {
         const id = i;
         const w = this.workers[i];
         w.onmessage = (e) => {
