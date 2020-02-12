@@ -88,6 +88,7 @@ class FractalViewer extends React.Component {
       this.height,
       parseInt(props.store.maxIter, 10),
       [-1, 0],
+      props.store.coloringMode,
     );
     this.previousIterations = props.store.customIterations;
     this.previousOverride = props.store.overrideIterations;
@@ -181,6 +182,10 @@ class FractalViewer extends React.Component {
     if (nextProps.store.stats.focus.value !== this.focus) {
       this.focus = nextProps.store.stats.focus.value;
       return true;
+    }
+    if (nextProps.store.coloringMode !== this.renderer.coloringMode) {
+      this.renderer.coloringMode = nextProps.store.coloringMode;
+      this.drawFractal();
     }
     if (nextProps.store.showRenderTrace !== this.renderer.showRenderTrace) {
       this.renderer.showRenderTrace = nextProps.store.showRenderTrace;

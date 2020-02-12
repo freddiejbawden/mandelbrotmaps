@@ -15,6 +15,7 @@ const renderJS = (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.coloringMethod,
     );
     const arr = mr.render(
       data.wid,
@@ -120,6 +121,7 @@ const renderJSRange = async (data) => {
       data.centreCoords,
       data.maxIter,
       data.juliaPoint,
+      data.coloringMethod,
     );
     const fractal = await mr.renderRange(
       data.xRect,

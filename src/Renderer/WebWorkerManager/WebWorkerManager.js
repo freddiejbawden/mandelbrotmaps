@@ -19,6 +19,7 @@ class WebWorkerManager {
     renderer,
     showRenderTrace,
     lowRes,
+    coloringMethod,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
@@ -52,6 +53,7 @@ class WebWorkerManager {
           maxIter,
           centreCoords,
           juliaPoint,
+          coloringMethod,
         });
         this.nextChunk += 1;
       };
@@ -105,6 +107,7 @@ class WebWorkerManager {
     singleThread,
     renderer,
     showRenderTrace,
+    coloringMethod,
   ) {
     return new Promise((res) => {
       this.nextChunk = 0;
@@ -144,6 +147,7 @@ class WebWorkerManager {
           dY,
           juliaPoint,
           showRenderTrace,
+          coloringMethod,
         });
         this.nextChunk += 1;
       };
