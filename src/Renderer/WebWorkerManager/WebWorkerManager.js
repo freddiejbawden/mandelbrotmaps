@@ -109,6 +109,7 @@ class WebWorkerManager {
     showRenderTrace,
     coloringMethod,
   ) {
+    console.log(coloringMethod);
     return new Promise((res) => {
       this.nextChunk = 0;
       this.width = width;

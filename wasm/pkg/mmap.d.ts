@@ -1,4 +1,11 @@
 /* tslint:disable */
+export enum ColorOptions {
+  BLACKANDWHITE,
+  RAINBOW,
+  STRIPY,
+}
+/**
+*/
 export enum FractalType {
   MANDELBROT,
   JULIA,
@@ -67,9 +74,10 @@ export class Mandelbrot {
 * @param {number} height 
 * @param {number} centre_coords_x 
 * @param {number} centre_coords_y 
+* @param {number} coloring_method 
 * @returns {number} 
 */
-  render_range(x_rect: any, y_rect: any, delta_x: number, delta_y: number, old_arr: Uint8Array, start_row: number, end_row: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number): number;
+  render_range(x_rect: any, y_rect: any, delta_x: number, delta_y: number, old_arr: Uint8Array, start_row: number, end_row: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number, coloring_method: number): number;
 /**
 * @param {number} pixel_num 
 * @returns {number} 
@@ -93,7 +101,8 @@ export class Mandelbrot {
 * @param {number} centre_coords_x 
 * @param {number} centre_coords_y 
 * @param {number} max_i 
+* @param {number} coloring_method 
 * @returns {number} 
 */
-  render_from_to(start: number, end: number, pixel_size: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number, max_i: number): number;
+  render_from_to(start: number, end: number, pixel_size: number, width: number, height: number, centre_coords_x: number, centre_coords_y: number, max_i: number, coloring_method: number): number;
 }

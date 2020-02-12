@@ -91,6 +91,7 @@ class Renderer {
         this.juliaPoint,
         useSingleThread,
         RendererType.WASM,
+        this.showRenderTrace,
         this.coloringMode,
       );
       this.prev_arr = fractal.arr;
