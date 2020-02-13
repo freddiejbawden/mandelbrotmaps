@@ -125,11 +125,12 @@ class FractalViewer extends React.Component {
       // TODO: change focus to be both regular and stat
       if (this.focus === this.type) {
         // + key
-        if (e.keyCode === 61) {
+        console.log(e.keyCode);
+        if (e.keyCode === 61 || e.keyCode === 187) {
           await this.zoom(-1, 0.05, true);
         }
         // - key
-        if (e.keyCode === 173) {
+        if (e.keyCode === 173 || e.keyCode === 189) {
           await this.zoom(1, 0.05, true);
         }
         // Arrow keys have keycodes 37 -> 40
