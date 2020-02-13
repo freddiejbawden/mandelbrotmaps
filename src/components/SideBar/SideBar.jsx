@@ -54,6 +54,12 @@ class SideBar extends Component {
     });
   }
 
+  toggleControls() {
+    const p = this.props;
+    const st = p.store;
+    st.toggle('controls');
+  }
+
   render() {
     let devTools = '';
     const s = this.state;
@@ -98,6 +104,15 @@ class SideBar extends Component {
             size="large"
             circular
             icon="undo"
+          />
+        </div>
+        <div>
+          <Button
+            onClick={() => this.toggleControls()}
+            className="side-button"
+            size="large"
+            circular
+            icon="help"
           />
         </div>
         {devTools}

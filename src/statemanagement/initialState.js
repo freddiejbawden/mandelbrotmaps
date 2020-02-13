@@ -13,6 +13,7 @@ const initialState = {
   dualUpdateFlag: false,
   forceUpdate: 100,
   focusHighlight: false,
+  controls: false,
   coloringMode: ColorMode.RAINBOW,
   stats: {
     renderTime: {

@@ -15,6 +15,7 @@
 }
 .debug-bar-hide {
   height: 0;
+  overflow: hidden;
 }
 .debug-bar-container > span {
   color: #EBFCFD;
