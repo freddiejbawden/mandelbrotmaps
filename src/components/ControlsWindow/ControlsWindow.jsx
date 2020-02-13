@@ -8,7 +8,6 @@ import './ControlsWindow.css';
 import Control from './Control/Control';
 import { withStore } from '../../statemanagement/createStore';
 
-// eslint-disable-next-line react/prefer-stateless-function
 class ControlsWindow extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +15,7 @@ class ControlsWindow extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    // only redraw when controls triggered
     if (nextProps.store.controls !== this.controls) {
       this.controls = nextProps.store.controls;
       return true;
