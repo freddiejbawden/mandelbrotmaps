@@ -1,7 +1,8 @@
 .controls-window {
   position: absolute !important;
-  bottom: 5%;
-  left: 1%;
+  bottom: 0%;
+  left: 0%;
+  margin: 10px !important;
   /* bring your own prefixes */
   background-color: white;
   min-width: 250px;
@@ -45,7 +46,7 @@
   align-self: center;
   width: 100%;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 700px) {
  .controls-close-button {
    display: block !important;
  }
@@ -55,3 +56,14 @@
   flex-direction: column;
   }
 }
+@media only screen and (max-height: 600px) {
+  .controls-close-button {
+    display: block !important;
+  }
+ 
+  .details-container {
+   display: flex;
+   flex-direction: column;
+   }
+ }
+ 

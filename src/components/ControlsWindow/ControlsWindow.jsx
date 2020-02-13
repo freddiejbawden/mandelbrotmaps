@@ -10,6 +10,11 @@ import { withStore } from '../../statemanagement/createStore';
 
 // eslint-disable-next-line react/prefer-stateless-function
 class ControlsWindow extends Component {
+  constructor(props) {
+    super(props);
+    this.content = React.createRef();
+  }
+
   shouldComponentUpdate(nextProps) {
     if (nextProps.store.controls !== this.controls) {
       this.controls = nextProps.store.controls;
@@ -29,7 +34,7 @@ class ControlsWindow extends Component {
     const p = this.props;
     const s = p.store;
     const controlsInfo = (
-      <div>
+      <div ref={this.content}>
         <div className="controls-top">
           <Header>Controls</Header>
           <Icon name="close" className="controls-close" onClick={(e) => this.handleClose(e)} />
@@ -72,8 +77,7 @@ class ControlsWindow extends Component {
         </Button>
       </div>
     );
-    console.log(window.innerWidth);
-    if (s.controls && window.innerWidth < 600) {
+    if (s.controls && (window.innerWidth < 700 || window.innerHeight < 700)) {
       content = (
         <Modal
           className="controls-modal"
