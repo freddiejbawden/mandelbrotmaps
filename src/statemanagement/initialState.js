@@ -1,5 +1,6 @@
 import Mode from '../Renderer/RenderMode';
 import ColorMode from '../Renderer/ColorOptions';
+import ViewOptions from '../utils/ViewOptions';
 
 const initialState = {
   renderMode: Mode.JAVASCRIPT,
@@ -15,6 +16,7 @@ const initialState = {
   focusHighlight: false,
   controls: false,
   coloringMode: ColorMode.RAINBOW,
+  viewMode: ViewOptions.JULIA_FULLSCREEN,
   stats: {
     renderTime: {
       label: 'Render Time',
