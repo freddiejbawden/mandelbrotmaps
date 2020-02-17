@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './FractalViewer.css';
 import { Icon } from 'semantic-ui-react';
+import Draggable from 'react-draggable';
 import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
@@ -11,6 +12,8 @@ import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
 import Mode from '../../Renderer/RenderMode';
+
+import Dragger from './Dragger.png';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -20,7 +23,6 @@ import Mode from '../../Renderer/RenderMode';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
-
     // if running in headless then set default
     if (window.screen.orientation) {
       this.orientation = window.screen.orientation.type;
@@ -49,11 +51,13 @@ class FractalViewer extends React.Component {
         this.focus = props.store.stats.focus.value;
       }
     }
+    this.container = React.createRef();
     this.dragging = false;
     this.deltaX = 0;
     this.deltaY = 0;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.paddingAmount = 10;
     this.keysDown = {
       37: false,
       38: false,
@@ -62,7 +66,7 @@ class FractalViewer extends React.Component {
     };
     this.dirty = false;
     this.renderID = undefined;
-    this.updateDimensions = this.updateDimensions.bind(this);
+    this.updateDimensionsTimer = this.updateDimensionsTimer.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.canvasZoom = 1;
@@ -115,17 +119,12 @@ class FractalViewer extends React.Component {
         this.previousLength = e.scale;
       }
     });
-    window.addEventListener('resize', this.updateDimensions);
-    requestAnimationFrame(() => {
-      this.drawFractal();
-    });
-
+    window.addEventListener('resize', this.updateDimensionsTimer);
     // accessibility fallback for keyboard
     document.addEventListener('keydown', async (e) => {
       // TODO: change focus to be both regular and stat
       if (this.focus === this.type) {
         // + key
-        console.log(e.keyCode);
         if (e.keyCode === 61 || e.keyCode === 187) {
           await this.zoom(-1, 0.05, true);
         }
@@ -165,9 +164,24 @@ class FractalViewer extends React.Component {
         this.shiftPressed = false;
       }
     });
+    this.drawFractal();
   }
 
   shouldComponentUpdate(nextProps) {
+    const p = this.props;
+    if (nextProps.store.viewMode !== this.viewMode) {
+      this.viewMode = nextProps.store.viewMode;
+      this.changeView = true;
+      return true;
+    }
+    if (nextProps.detatched !== p.detatched) {
+      this.changeView = true;
+      return true;
+    }
+    if (nextProps.hidden !== p.hidden) {
+      this.changeView = true;
+      return true;
+    }
     if (nextProps.store.forceUpdate === this.type) {
       this.forceUpdate();
       return false;
@@ -227,6 +241,25 @@ class FractalViewer extends React.Component {
     return false;
   }
 
+  componentDidUpdate() {
+    if (this.changeView) {
+      this.updateDimensions();
+      this.changeView = false;
+    }
+  }
+
+  getFractalPosition(pageX, pageY) {
+    const rect = this.container.current.getBoundingClientRect();
+    return [pageX - rect.x, pageY - rect.y];
+  }
+
+  getMouseViewerPosition(pageX, pageY) {
+    const [x, y] = this.getFractalPosition(pageX, pageY);
+    this.mouseX = x;
+    this.mouseY = y;
+  }
+
+
   loadWasm = async () => {
     try {
       // eslint-disable-next-line import/no-unresolved
@@ -266,18 +299,12 @@ class FractalViewer extends React.Component {
   }
 
   addTouch({ identifier, pageX, pageY }) {
-    let x;
-    let y;
-    if (this.orientation === 'portrait') {
-      x = pageX;
-      y = pageY - this.height * this.position;
-    } else {
-      x = pageX - this.width * this.position;
-      y = pageY;
-    }
+    const [x, y] = this.getFractalPosition(pageX, pageY);
     this.activeTouches[identifier] = {
-      pageX: x,
-      pageY: y,
+      pageX,
+      pageY,
+      fractalX: x,
+      fractalY: y,
     };
   }
 
@@ -377,7 +404,7 @@ class FractalViewer extends React.Component {
 
   updateCanvas() {
     const fractalContext = this.fractal.current.getContext('2d');
-    fractalContext.fillStyle = '#000000';
+    fractalContext.fillStyle = '#787878';
 
     // define a reference canvas for the image
     const newCanvas = document.createElement('canvas');
@@ -401,23 +428,9 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
-    let newWidth;
-    let newHeight;
-    if (window.screen.orientation) {
-      this.orientation = window.screen.orientation.type;
-    } else {
-      this.orientation = 'landscape-primary';
-    }
-    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
-      this.orientation = 'portrait';
-      newWidth = window.innerWidth;
-      newHeight = Math.floor(window.innerHeight / 2);
-    } else {
-      this.orientation = 'landscape';
-      newWidth = Math.floor(window.innerWidth / 2);
-      newHeight = window.innerHeight;
-    }
-
+    const newWidth = this.container.current.clientWidth;
+    // This is due to a stupid bug which I will fix SoonTM
+    const newHeight = this.container.current.clientHeight - 5;
     // keep julia pin in correct location
     this.juliaPin.move(
       this.juliaPin.x + (newWidth - this.width) / 2,
@@ -433,7 +446,6 @@ class FractalViewer extends React.Component {
     if (width && height) {
       if (!this.dragging || !this.dirty) {
         const fractalContext = this.fractal.current.getContext('2d');
-        this.updateWidthHeight();
         fractalContext.canvas.width = this.width;
         fractalContext.canvas.height = this.height;
         this.imageData = fractalContext.createImageData(width, height);
@@ -445,10 +457,15 @@ class FractalViewer extends React.Component {
   }
 
   updateDimensions() {
+    this.fractal.current.setAttribute('width', 'auto');
+    this.fractal.current.setAttribute('height', 'auto');
+    requestAnimationFrame(() => this.drawFractal());
+  }
+
+  updateDimensionsTimer() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
-      this.updateWidthHeight();
-      requestAnimationFrame(() => this.drawFractal());
+      this.updateDimensions();
     }, 100);
   }
 
@@ -490,16 +507,11 @@ class FractalViewer extends React.Component {
 
 
   handleMouseMove(e) {
+    e.preventDefault();
+    this.getMouseViewerPosition(e.pageX, e.pageY);
     // check if a key is pressed
     if (Object.values(this.keysDown).some((el) => el)) {
       return;
-    }
-    if (this.orientation === 'portrait') {
-      this.mouseX = e.pageX;
-      this.mouseY = e.pageY - this.height * this.position;
-    } else {
-      this.mouseX = e.pageX - this.width * this.position;
-      this.mouseY = e.pageY;
     }
     const coords = this.mouseToWorld();
     const p = this.props;
@@ -517,6 +529,7 @@ class FractalViewer extends React.Component {
       }
     }
   }
+
 
   safeUpdate() {
     if (!this.rendering) {
@@ -620,25 +633,16 @@ class FractalViewer extends React.Component {
       this.addTouch(touches[i]);
     }
     if (Object.keys(this.activeTouches).length === 1) {
-      this.mouseX = touches[0].pageX - this.width * this.position;
-      this.mouseY = touches[0].pageY - this.width * this.position;
+      this.getMouseViewerPosition(touches[0].pageX, touches[0].pageY);
     }
     this.handleClick();
   }
 
   touchPan(touches) {
     if (this.dragging) {
-      let pageX;
-      let pageY;
-      if (this.orientation === 'portrait') {
-        pageX = touches[0].pageX;
-        pageY = touches[0].pageY - this.height * this.position;
-      } else {
-        pageX = touches[0].pageX - this.width * this.position;
-        pageY = touches[0].pageY;
-      }
+      const [fractalX, fractalY] = this.getFractalPosition(touches[0].pageX, touches[0].pageY);
       if (this.draggingPin) {
-        this.juliaPin.move(pageX, pageY);
+        this.juliaPin.move(fractalX, fractalY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         const p = this.props;
         p.store.set({
@@ -648,10 +652,10 @@ class FractalViewer extends React.Component {
         requestAnimationFrame(() => this.safeUpdate());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
-        this.deltaX = Math.floor(pageX - (startTouch.pageX));
-        this.deltaY = Math.floor(pageY - startTouch.pageY);
-        this.mouseX = pageX;
-        this.mouseY = pageY;
+        this.deltaX = Math.floor(fractalX - startTouch.fractalX);
+        this.deltaY = Math.floor(fractalY - startTouch.fractalY);
+        this.mouseX = fractalX;
+        this.mouseY = fractalY;
         const coords = this.mouseToWorld();
         const p = this.props;
         p.store.setStat({
@@ -676,7 +680,7 @@ class FractalViewer extends React.Component {
       if (this.previousLength === -1) {
         this.previousLength = currentLength;
       }
-      const magnification = Math.abs((currentLength - this.previousLength) * 0.02);
+      const magnification = Math.abs((currentLength - this.previousLength) * 0.01);
       if (currentLength > this.previousLength) this.zoom(-1, magnification);
       if (currentLength < this.previousLength) this.zoom(1, magnification);
     }
@@ -732,7 +736,7 @@ class FractalViewer extends React.Component {
     if (this.rendering) {
       return;
     }
-    const magnificationDelta = (magnificationStep < 0.05) ? magnificationStep : 0.1;
+    const magnificationDelta = magnificationStep;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
@@ -803,24 +807,44 @@ class FractalViewer extends React.Component {
         />
       );
     }
-    return (
-      <div className="mandelbrot-viewer-container">
-        <canvas
-          onTouchStart={(e) => this.handleTouchStart(e)}
-          onTouchMove={(e) => this.handleTouchMove(e)}
-          onTouchEnd={(e) => this.handleTouchEnd(e)}
-          onMouseDown={(e) => this.handleClick(e)}
-          onMouseEnter={() => p.store.setStat({ focus: this.type })}
-          onMouseMove={(e) => this.handleMouseMove(e)}
-          onMouseUp={(e) => this.handleDragEnd(e)}
-          onMouseLeave={(e) => this.handleDragEnd(e)}
-          onWheel={(e) => this.handleScroll(e)}
-          id={`fractal-${this.type}`}
-          ref={this.fractal}
-        />
-        {focus}
+    let classes = (p.detatched) ? 'mandelbrot-viewer-container detatched draggable-exterior' : 'mandelbrot-viewer-container attached';
+    classes = (p.hidden) ? 'hide-viewer' : classes;
+    const handle = (p.detatched) ? (<img draggable="false" alt="handle" className="drag-icon" src={Dragger} />) : '';
+    const viewer = (
+      <div
+        className={classes}
+      >
+        {handle}
+        <div
+          ref={this.container}
+        >
+          <canvas
+            onTouchStart={(e) => this.handleTouchStart(e)}
+            onTouchMove={(e) => this.handleTouchMove(e)}
+            onTouchEnd={(e) => this.handleTouchEnd(e)}
+            onMouseDown={(e) => this.handleClick(e)}
+            onMouseEnter={() => p.store.setStat({ focus: this.type })}
+            onMouseMove={(e) => this.handleMouseMove(e)}
+            onMouseUp={(e) => this.handleDragEnd(e)}
+            onMouseLeave={(e) => this.handleDragEnd(e)}
+            onWheel={(e) => this.handleScroll(e)}
+            id={`fractal-${this.type}`}
+            ref={this.fractal}
+          />
+          {focus}
+        </div>
       </div>
     );
+    if (p.detatched) {
+      return (
+        <Draggable
+          onStart={() => ((!this.dragging))}
+        >
+          {viewer}
+        </Draggable>
+      );
+    }
+    return viewer;
   }
 }
 FractalViewer.propTypes = {
@@ -833,11 +857,15 @@ FractalViewer.propTypes = {
   mandelDragging: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
   store: PropTypes.object,
+  detatched: PropTypes.bool,
+  hidden: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
   juliaPoint: [0, 0],
   mandelDragging: false,
   store: {},
+  detatched: false,
+  hidden: false,
 };
 export default withStore(FractalViewer);

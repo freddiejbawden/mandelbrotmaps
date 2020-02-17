@@ -43,7 +43,6 @@ class ControlsWindow extends Component {
           <div>
             <Header as="h4">Keyboard</Header>
             <div className="controls-container">
-              <Control keys={['arrow left', 'arrow right', 'arrow up', 'arrow down']} description="Pan Fractal" />
               <Control keys={['Shift', 'Arrow']} description="Move Julia Pin" join />
               <Control keys={['+', '-']} description="Zoom" />
               <Control keys={['1']} description="Change focus to Mandelbrot" />

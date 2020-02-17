@@ -61,7 +61,6 @@ const renderWasm = async (e) => {
 const renderWasmRange = async (e) => {
   wasmRenderer.setFractalType(e.data.type);
   try {
-    console.log(e.data.coloringMethod);
     const xRectReconstructed = new Rectangle(
       e.data.xRect.l,
       e.data.xRect.t,
