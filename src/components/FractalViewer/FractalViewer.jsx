@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './FractalViewer.css';
 import { Icon } from 'semantic-ui-react';
+import Draggable from 'react-draggable';
 import Renderer from '../../Renderer';
 import Rectangle from '../../utils/Rectangle';
 import idGenerator from '../../utils/IDGenerator';
@@ -11,6 +12,8 @@ import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
 import Mode from '../../Renderer/RenderMode';
+
+import Dragger from './Dragger.png';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -20,7 +23,6 @@ import Mode from '../../Renderer/RenderMode';
 class FractalViewer extends React.Component {
   constructor(props) {
     super(props);
-
     // if running in headless then set default
     if (window.screen.orientation) {
       this.orientation = window.screen.orientation.type;
@@ -49,11 +51,13 @@ class FractalViewer extends React.Component {
         this.focus = props.store.stats.focus.value;
       }
     }
+    this.container = React.createRef();
     this.dragging = false;
     this.deltaX = 0;
     this.deltaY = 0;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.paddingAmount = 10;
     this.keysDown = {
       37: false,
       38: false,
@@ -95,6 +99,7 @@ class FractalViewer extends React.Component {
   }
 
   async componentDidMount() {
+    this.drawFractal();
     this.fractal.current.focus();
     // await this.loadWasm();
 
@@ -125,7 +130,6 @@ class FractalViewer extends React.Component {
       // TODO: change focus to be both regular and stat
       if (this.focus === this.type) {
         // + key
-        console.log(e.keyCode);
         if (e.keyCode === 61 || e.keyCode === 187) {
           await this.zoom(-1, 0.05, true);
         }
@@ -226,6 +230,13 @@ class FractalViewer extends React.Component {
     }
     return false;
   }
+
+  getMouseViewerPosition(pageX, pageY) {
+    const rect = this.container.current.getBoundingClientRect();
+    this.mouseX = pageX - rect.x;
+    this.mouseY = pageY - rect.y;
+  }
+
 
   loadWasm = async () => {
     try {
@@ -401,23 +412,9 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
-    let newWidth;
-    let newHeight;
-    if (window.screen.orientation) {
-      this.orientation = window.screen.orientation.type;
-    } else {
-      this.orientation = 'landscape-primary';
-    }
-    if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
-      this.orientation = 'portrait';
-      newWidth = window.innerWidth;
-      newHeight = Math.floor(window.innerHeight / 2);
-    } else {
-      this.orientation = 'landscape';
-      newWidth = Math.floor(window.innerWidth / 2);
-      newHeight = window.innerHeight;
-    }
-
+    this.orientation = 'portrait';
+    const newWidth = this.container.current.clientWidth;
+    const newHeight = this.container.current.clientHeight;
     // keep julia pin in correct location
     this.juliaPin.move(
       this.juliaPin.x + (newWidth - this.width) / 2,
@@ -490,16 +487,11 @@ class FractalViewer extends React.Component {
 
 
   handleMouseMove(e) {
+    e.preventDefault();
+    this.getMouseViewerPosition(e.pageX, e.pageY);
     // check if a key is pressed
     if (Object.values(this.keysDown).some((el) => el)) {
       return;
-    }
-    if (this.orientation === 'portrait') {
-      this.mouseX = e.pageX;
-      this.mouseY = e.pageY - this.height * this.position;
-    } else {
-      this.mouseX = e.pageX - this.width * this.position;
-      this.mouseY = e.pageY;
     }
     const coords = this.mouseToWorld();
     const p = this.props;
@@ -517,6 +509,7 @@ class FractalViewer extends React.Component {
       }
     }
   }
+
 
   safeUpdate() {
     if (!this.rendering) {
@@ -803,24 +796,43 @@ class FractalViewer extends React.Component {
         />
       );
     }
-    return (
-      <div className="mandelbrot-viewer-container">
-        <canvas
-          onTouchStart={(e) => this.handleTouchStart(e)}
-          onTouchMove={(e) => this.handleTouchMove(e)}
-          onTouchEnd={(e) => this.handleTouchEnd(e)}
-          onMouseDown={(e) => this.handleClick(e)}
-          onMouseEnter={() => p.store.setStat({ focus: this.type })}
-          onMouseMove={(e) => this.handleMouseMove(e)}
-          onMouseUp={(e) => this.handleDragEnd(e)}
-          onMouseLeave={(e) => this.handleDragEnd(e)}
-          onWheel={(e) => this.handleScroll(e)}
-          id={`fractal-${this.type}`}
-          ref={this.fractal}
-        />
-        {focus}
+    const classes = (p.detatched) ? 'mandelbrot-viewer-container detatched draggable-exterior' : 'mandelbrot-viewer-container attached';
+    const handle = (p.detatched) ? (<img draggable="false" alt="handle" className="drag-icon" src={Dragger} />) : '';
+    const viewer = (
+      <div
+        className={classes}
+      >
+        {handle}
+        <div
+          ref={this.container}
+        >
+          <canvas
+            onTouchStart={(e) => this.handleTouchStart(e)}
+            onTouchMove={(e) => this.handleTouchMove(e)}
+            onTouchEnd={(e) => this.handleTouchEnd(e)}
+            onMouseDown={(e) => this.handleClick(e)}
+            onMouseEnter={() => p.store.setStat({ focus: this.type })}
+            onMouseMove={(e) => this.handleMouseMove(e)}
+            onMouseUp={(e) => this.handleDragEnd(e)}
+            onMouseLeave={(e) => this.handleDragEnd(e)}
+            onWheel={(e) => this.handleScroll(e)}
+            id={`fractal-${this.type}`}
+            ref={this.fractal}
+          />
+          {focus}
+        </div>
       </div>
     );
+    if (p.detatched) {
+      return (
+        <Draggable
+          onStart={() => ((!this.dragging))}
+        >
+          {viewer}
+        </Draggable>
+      );
+    }
+    return viewer;
   }
 }
 FractalViewer.propTypes = {
@@ -833,11 +845,13 @@ FractalViewer.propTypes = {
   mandelDragging: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
   store: PropTypes.object,
+  detatched: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
   juliaPoint: [0, 0],
   mandelDragging: false,
   store: {},
+  detatched: false,
 };
 export default withStore(FractalViewer);

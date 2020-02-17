@@ -75,7 +75,6 @@ class WASMRenderer {
           centreCoordsY,
           coloringMode,
         );
-        console.log(coloringMode);
         const fractalArr = new Uint8ClampedArray(
           this.memory.buffer,
           arrPointer,
