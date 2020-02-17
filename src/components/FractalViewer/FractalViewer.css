@@ -7,7 +7,9 @@
 .hide-viewer {
   display: none;
 }
-
+.detatched > canvas {
+  width: 300px;
+}
 .detatched {
   position: absolute !important;
   padding: 10px;
@@ -25,7 +27,7 @@
   width: 100%;
 }
 .detatched > div {
-  width: 100%;
+  width: 400px;
 }
 
 @media only screen and (max-width: 700px) {
@@ -41,10 +43,7 @@
 .detatched:hover {
   cursor: grab;
 }
-.detatched:focus {
-  cursor: grabbing;
-  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-}
+
 .detatched:active {
   cursor: grabbing;
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);

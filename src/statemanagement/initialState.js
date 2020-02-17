@@ -16,7 +16,7 @@ const initialState = {
   focusHighlight: false,
   controls: false,
   coloringMode: ColorMode.RAINBOW,
-  viewMode: ViewOptions.JULIA_FULLSCREEN,
+  viewMode: ViewOptions.JULIA_DETATCHED,
   stats: {
     renderTime: {
       label: 'Render Time',

@@ -9,9 +9,9 @@ export default function Key(props) {
   for (let i = 0; i < p.keys.length; i += 1) {
     let keySymb;
     if (p.keys[i].includes(' ')) {
-      keySymb = <span className="key"><Icon name={p.keys[i]} size="small" /></span>;
+      keySymb = <span key={i} className="key"><Icon name={p.keys[i]} size="small" /></span>;
     } else {
-      keySymb = <span className="key">{p.keys[i]}</span>;
+      keySymb = <span key={i} className="key">{p.keys[i]}</span>;
     }
     keys.push(
       <span className="key-wrapper">

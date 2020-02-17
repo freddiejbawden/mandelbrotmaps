@@ -11,6 +11,7 @@ import OptionCheck from './OptionCheck/OptionCheck';
 import OptionSpinner from './OptionSpinner/OptionSpinner';
 import OptionText from './OptionText/OptionText';
 import ColorMode from '../../Renderer/ColorOptions';
+import ViewOptions from '../../utils/ViewOptions';
 
 class Settings extends Component {
   constructor(props) {
@@ -80,6 +81,11 @@ class Settings extends Component {
     p.store.set({ coloringMode: parseInt(val, 10) });
   }
 
+  updateViewMode(val) {
+    const p = this.props;
+    p.store.set({ viewMode: parseInt(val, 10) });
+  }
+
   render() {
     const p = this.props;
     const st = p.store;
@@ -95,6 +101,25 @@ class Settings extends Component {
       { key: 2, value: ColorMode.RAINBOW, text: 'Rainbow' },
       { key: 3, value: ColorMode.STRIPES, text: 'Striped' },
     ];
+    const viewOptions = [
+      { key: 1, value: ViewOptions.SIDEBYSIDE, text: 'Side by Side' },
+      { key: 2, value: ViewOptions.JULIA_DETATCHED, text: 'Detatched Viewer' },
+      { key: 3, value: ViewOptions.MANDELBROT_FULLSCREEN, text: 'Fullscreen' },
+    ];
+    let defaultViewOption;
+    if (
+      st.viewMode === ViewOptions.JULIA_DETATCHED
+      || st.viewMode === ViewOptions.MANDELBROT_DETATCHED
+    ) {
+      defaultViewOption = ViewOptions.JULIA_DETATCHED;
+    } else if (
+      st.viewMode === ViewOptions.MANDELBROT_FULLSCREEN
+      || st.viewMode === ViewOptions.JULIA_FULLSCREEN
+    ) {
+      defaultViewOption = ViewOptions.MANDELBROT_FULLSCREEN;
+    } else {
+      defaultViewOption = ViewOptions.SIDEBYSIDE;
+    }
     return (
       <Modal
         closeIcon
@@ -117,6 +142,7 @@ class Settings extends Component {
             <OptionText placeholder={st.customIterations} focus={st.overrideIterations} callback={(iter) => this.updateIterations(iter)} disabled={!st.overrideIterations} name="Iteration Count" description="Set the number of iterations to a fixed value" />
             <OptionSpinner value={st.renderMode} callback={(data) => this.updateRenderMethod(data)} name="Render Mode" description="Method used to render the fractals" options={renderOptions} />
             <OptionSpinner value={st.coloringMode} callback={(data) => this.updateColoringMethod(data)} name="Color Scheme" description="Coloring used to draw the fractals" options={colorOptions} />
+            <OptionSpinner value={defaultViewOption} callback={(data) => this.updateViewMode(data)} name="Layout Type" description="Change the arrangement of the fractal viewers" options={viewOptions} />
             <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
             <OptionCheck defaultChecked={st.showRenderTrace} callback={() => st.toggle('showRenderTrace')} name="Show Renderer Trace" description="Tint pixel depending on which renderer it came from (JS Only)" />
             <OptionCheck defaultChecked={st.focusHighlight} callback={() => st.toggle('focusHighlight')} name="Show Focus Indicator" description="Display an icon to show which fractal is being interacted with" />

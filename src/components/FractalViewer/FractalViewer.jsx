@@ -66,7 +66,7 @@ class FractalViewer extends React.Component {
     };
     this.dirty = false;
     this.renderID = undefined;
-    this.updateDimensions = this.updateDimensions.bind(this);
+    this.updateDimensionsTimer = this.updateDimensionsTimer.bind(this);
     this.zoomTimeout = undefined;
     this.activeTouches = {};
     this.canvasZoom = 1;
@@ -119,7 +119,7 @@ class FractalViewer extends React.Component {
         this.previousLength = e.scale;
       }
     });
-    window.addEventListener('resize', this.updateDimensions);
+    window.addEventListener('resize', this.updateDimensionsTimer);
     // accessibility fallback for keyboard
     document.addEventListener('keydown', async (e) => {
       // TODO: change focus to be both regular and stat
@@ -168,6 +168,20 @@ class FractalViewer extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    const p = this.props;
+    if (nextProps.store.viewMode !== this.viewMode) {
+      this.viewMode = nextProps.store.viewMode;
+      this.changeView = true;
+      return true;
+    }
+    if (nextProps.detatched !== p.detatched) {
+      this.changeView = true;
+      return true;
+    }
+    if (nextProps.hidden !== p.hidden) {
+      this.changeView = true;
+      return true;
+    }
     if (nextProps.store.forceUpdate === this.type) {
       this.forceUpdate();
       return false;
@@ -225,6 +239,13 @@ class FractalViewer extends React.Component {
       }
     }
     return false;
+  }
+
+  componentDidUpdate() {
+    if (this.changeView) {
+      this.updateDimensions();
+      this.changeView = false;
+    }
   }
 
   getFractalPosition(pageX, pageY) {
@@ -383,7 +404,7 @@ class FractalViewer extends React.Component {
 
   updateCanvas() {
     const fractalContext = this.fractal.current.getContext('2d');
-    fractalContext.fillStyle = '#000000';
+    fractalContext.fillStyle = '#787878';
 
     // define a reference canvas for the image
     const newCanvas = document.createElement('canvas');
@@ -408,7 +429,8 @@ class FractalViewer extends React.Component {
 
   updateWidthHeight() {
     const newWidth = this.container.current.clientWidth;
-    const newHeight = this.container.current.clientHeight;
+    // This is due to a stupid bug which I will fix SoonTM
+    const newHeight = this.container.current.clientHeight - 5;
     // keep julia pin in correct location
     this.juliaPin.move(
       this.juliaPin.x + (newWidth - this.width) / 2,
@@ -435,12 +457,15 @@ class FractalViewer extends React.Component {
   }
 
   updateDimensions() {
+    this.fractal.current.setAttribute('width', 'auto');
+    this.fractal.current.setAttribute('height', 'auto');
+    requestAnimationFrame(() => this.drawFractal());
+  }
+
+  updateDimensionsTimer() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
-      this.fractal.current.setAttribute('width', '100%');
-      this.fractal.current.setAttribute('height', '100%');
-      this.updateWidthHeight();
-      requestAnimationFrame(() => this.drawFractal());
+      this.updateDimensions();
     }, 100);
   }
 
@@ -608,8 +633,7 @@ class FractalViewer extends React.Component {
       this.addTouch(touches[i]);
     }
     if (Object.keys(this.activeTouches).length === 1) {
-      this.mouseX = touches[0].pageX;
-      this.mouseY = touches[0].pageY;
+      this.getMouseViewerPosition(touches[0].pageX, touches[0].pageY);
     }
     this.handleClick();
   }
@@ -628,8 +652,8 @@ class FractalViewer extends React.Component {
         requestAnimationFrame(() => this.safeUpdate());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
-        this.deltaX = Math.floor(fractalX - (startTouch.pageX));
-        this.deltaY = Math.floor(fractalY - startTouch.pageY);
+        this.deltaX = Math.floor(fractalX - startTouch.fractalX);
+        this.deltaY = Math.floor(fractalY - startTouch.fractalY);
         this.mouseX = fractalX;
         this.mouseY = fractalY;
         const coords = this.mouseToWorld();

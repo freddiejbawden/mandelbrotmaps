@@ -22,7 +22,7 @@ Control.propTypes = {
 };
 
 Control.defaultProps = {
-  type: PropTypes.string,
-  text: PropTypes.string,
+  type: '',
+  text: '',
   description: PropTypes.string,
 };
