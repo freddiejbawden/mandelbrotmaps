@@ -99,7 +99,6 @@ class FractalViewer extends React.Component {
   }
 
   async componentDidMount() {
-    this.drawFractal();
     this.fractal.current.focus();
     // await this.loadWasm();
 
@@ -121,10 +120,6 @@ class FractalViewer extends React.Component {
       }
     });
     window.addEventListener('resize', this.updateDimensions);
-    requestAnimationFrame(() => {
-      this.drawFractal();
-    });
-
     // accessibility fallback for keyboard
     document.addEventListener('keydown', async (e) => {
       // TODO: change focus to be both regular and stat
@@ -169,6 +164,7 @@ class FractalViewer extends React.Component {
         this.shiftPressed = false;
       }
     });
+    this.drawFractal();
   }
 
   shouldComponentUpdate(nextProps) {
@@ -411,7 +407,6 @@ class FractalViewer extends React.Component {
   }
 
   updateWidthHeight() {
-    this.orientation = 'portrait';
     const newWidth = this.container.current.clientWidth;
     const newHeight = this.container.current.clientHeight;
     // keep julia pin in correct location
@@ -429,7 +424,6 @@ class FractalViewer extends React.Component {
     if (width && height) {
       if (!this.dragging || !this.dirty) {
         const fractalContext = this.fractal.current.getContext('2d');
-        this.updateWidthHeight();
         fractalContext.canvas.width = this.width;
         fractalContext.canvas.height = this.height;
         this.imageData = fractalContext.createImageData(width, height);
@@ -443,6 +437,8 @@ class FractalViewer extends React.Component {
   updateDimensions() {
     if (this.renderTimer) clearTimeout(this.renderTimer);
     this.renderTimer = setTimeout(() => {
+      this.fractal.current.setAttribute('width', '100%');
+      this.fractal.current.setAttribute('height', '100%');
       this.updateWidthHeight();
       requestAnimationFrame(() => this.drawFractal());
     }, 100);

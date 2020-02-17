@@ -47,7 +47,6 @@ class App extends Component {
             type={FractalType.JULIA}
             position={1}
             appRef={this.appRef}
-            hidden
           />
 
         </div>
