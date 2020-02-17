@@ -4,6 +4,9 @@
   position: relative;
   display: flex;
 }
+.hide-viewer {
+  display: none;
+}
 .detatched {
   position: absolute !important;
   padding: 10px;
@@ -36,6 +39,10 @@
 }
 .detatched:hover {
   cursor: grab;
+}
+.detatched:focus {
+  cursor: grabbing;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .detatched:active {
   cursor: grabbing;

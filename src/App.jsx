@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Draggable from 'react-draggable';
 
 import './App.css';
 import PropTypes from 'prop-types';
@@ -42,18 +41,14 @@ class App extends Component {
             position={0}
             numberOfFractals={2}
             appRef={this.appRef}
-            detatched
-
           />
-          <Draggable>
-            <FractalViewer
-              id="fractal-viewer"
-              type={FractalType.JULIA}
-              position={1}
-              appRef={this.appRef}
-
-            />
-          </Draggable>
+          <FractalViewer
+            id="fractal-viewer"
+            type={FractalType.JULIA}
+            position={1}
+            appRef={this.appRef}
+            hidden
+          />
 
         </div>
         <SideBar />

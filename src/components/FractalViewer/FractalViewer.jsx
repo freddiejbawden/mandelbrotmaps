@@ -231,10 +231,15 @@ class FractalViewer extends React.Component {
     return false;
   }
 
-  getMouseViewerPosition(pageX, pageY) {
+  getFractalPosition(pageX, pageY) {
     const rect = this.container.current.getBoundingClientRect();
-    this.mouseX = pageX - rect.x;
-    this.mouseY = pageY - rect.y;
+    return [pageX - rect.x, pageY - rect.y];
+  }
+
+  getMouseViewerPosition(pageX, pageY) {
+    const [x, y] = this.getFractalPosition(pageX, pageY);
+    this.mouseX = x;
+    this.mouseY = y;
   }
 
 
@@ -277,18 +282,12 @@ class FractalViewer extends React.Component {
   }
 
   addTouch({ identifier, pageX, pageY }) {
-    let x;
-    let y;
-    if (this.orientation === 'portrait') {
-      x = pageX;
-      y = pageY - this.height * this.position;
-    } else {
-      x = pageX - this.width * this.position;
-      y = pageY;
-    }
+    const [x, y] = this.getFractalPosition(pageX, pageY);
     this.activeTouches[identifier] = {
-      pageX: x,
-      pageY: y,
+      pageX,
+      pageY,
+      fractalX: x,
+      fractalY: y,
     };
   }
 
@@ -613,25 +612,17 @@ class FractalViewer extends React.Component {
       this.addTouch(touches[i]);
     }
     if (Object.keys(this.activeTouches).length === 1) {
-      this.mouseX = touches[0].pageX - this.width * this.position;
-      this.mouseY = touches[0].pageY - this.width * this.position;
+      this.mouseX = touches[0].pageX;
+      this.mouseY = touches[0].pageY;
     }
     this.handleClick();
   }
 
   touchPan(touches) {
     if (this.dragging) {
-      let pageX;
-      let pageY;
-      if (this.orientation === 'portrait') {
-        pageX = touches[0].pageX;
-        pageY = touches[0].pageY - this.height * this.position;
-      } else {
-        pageX = touches[0].pageX - this.width * this.position;
-        pageY = touches[0].pageY;
-      }
+      const [fractalX, fractalY] = this.getFractalPosition(touches[0].pageX, touches[0].pageY);
       if (this.draggingPin) {
-        this.juliaPin.move(pageX, pageY);
+        this.juliaPin.move(fractalX, fractalY);
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         const p = this.props;
         p.store.set({
@@ -641,10 +632,10 @@ class FractalViewer extends React.Component {
         requestAnimationFrame(() => this.safeUpdate());
       } else {
         const startTouch = this.activeTouches[touches[0].identifier];
-        this.deltaX = Math.floor(pageX - (startTouch.pageX));
-        this.deltaY = Math.floor(pageY - startTouch.pageY);
-        this.mouseX = pageX;
-        this.mouseY = pageY;
+        this.deltaX = Math.floor(fractalX - (startTouch.pageX));
+        this.deltaY = Math.floor(fractalY - startTouch.pageY);
+        this.mouseX = fractalX;
+        this.mouseY = fractalY;
         const coords = this.mouseToWorld();
         const p = this.props;
         p.store.setStat({
@@ -669,7 +660,7 @@ class FractalViewer extends React.Component {
       if (this.previousLength === -1) {
         this.previousLength = currentLength;
       }
-      const magnification = Math.abs((currentLength - this.previousLength) * 0.02);
+      const magnification = Math.abs((currentLength - this.previousLength) * 0.01);
       if (currentLength > this.previousLength) this.zoom(-1, magnification);
       if (currentLength < this.previousLength) this.zoom(1, magnification);
     }
@@ -725,7 +716,7 @@ class FractalViewer extends React.Component {
     if (this.rendering) {
       return;
     }
-    const magnificationDelta = (magnificationStep < 0.05) ? magnificationStep : 0.1;
+    const magnificationDelta = magnificationStep;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
@@ -796,7 +787,8 @@ class FractalViewer extends React.Component {
         />
       );
     }
-    const classes = (p.detatched) ? 'mandelbrot-viewer-container detatched draggable-exterior' : 'mandelbrot-viewer-container attached';
+    let classes = (p.detatched) ? 'mandelbrot-viewer-container detatched draggable-exterior' : 'mandelbrot-viewer-container attached';
+    classes = (p.hidden) ? 'hide-viewer' : classes;
     const handle = (p.detatched) ? (<img draggable="false" alt="handle" className="drag-icon" src={Dragger} />) : '';
     const viewer = (
       <div
@@ -846,6 +838,7 @@ FractalViewer.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   store: PropTypes.object,
   detatched: PropTypes.bool,
+  hidden: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
@@ -853,5 +846,6 @@ FractalViewer.defaultProps = {
   mandelDragging: false,
   store: {},
   detatched: false,
+  hidden: false,
 };
 export default withStore(FractalViewer);
