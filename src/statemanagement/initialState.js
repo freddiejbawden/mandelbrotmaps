@@ -1,6 +1,7 @@
 import Mode from '../Renderer/RenderMode';
 import ColorMode from '../Renderer/ColorOptions';
 import ViewOptions from '../utils/ViewOptions';
+import FractalType from '../utils/FractalType';
 
 const initialState = {
   renderMode: Mode.JAVASCRIPT,
@@ -14,6 +15,7 @@ const initialState = {
   dualUpdateFlag: false,
   forceUpdate: 100,
   focusHighlight: false,
+  focus: FractalType.MANDELBROT,
   controls: false,
   coloringMode: ColorMode.RAINBOW,
   viewMode: ViewOptions.JULIA_DETATCHED,

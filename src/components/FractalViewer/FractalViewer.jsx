@@ -14,6 +14,8 @@ import { withStore } from '../../statemanagement/createStore';
 import Mode from '../../Renderer/RenderMode';
 
 import Dragger from './Dragger.png';
+import ColorMode from '../../Renderer/ColorOptions';
+import ViewOptions from '../../utils/ViewOptions';
 /*
   TODO:
     * Fix long zoom jump issue
@@ -29,10 +31,8 @@ class FractalViewer extends React.Component {
     } else {
       this.orientation = 'landscape-primary';
     }
-    this.showFocus = props.store.focusHighlight;
+    this.showFocus = props.focusHighlight;
     this.shiftPressed = false;
-    this.position = props.position;
-    this.appRef = props.appRef;
     this.fractal = React.createRef();
     this.last_arr = undefined;
     if (this.orientation === 'portrait-secondary' || this.orientation === 'portrait-primary' || (window.innerWidth < 800 && window.innerHeight > 600)) {
@@ -44,13 +44,7 @@ class FractalViewer extends React.Component {
       this.width = Math.floor(window.innerWidth / 2);
       this.height = window.innerHeight;
     }
-
-    // does not exist under test
-    if (props.store) {
-      if (props.store.stats) {
-        this.focus = props.store.stats.focus.value;
-      }
-    }
+    this.focus = props.focus;
     this.container = React.createRef();
     this.dragging = false;
     this.deltaX = 0;
@@ -82,7 +76,7 @@ class FractalViewer extends React.Component {
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
     this.previousLength = -1;
-    this.renderMode = props.store.renderMode;
+    this.renderMode = props.renderMode;
     this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
     this.draggingPin = false;
     this.renderer = new Renderer(
@@ -90,12 +84,12 @@ class FractalViewer extends React.Component {
       parseInt(this.renderMode, 10),
       this.width,
       this.height,
-      parseInt(props.store.maxIter, 10),
+      parseInt(props.maxIter, 10),
       [-1, 0],
-      props.store.coloringMode,
+      props.coloringMode,
     );
-    this.previousIterations = props.store.customIterations;
-    this.previousOverride = props.store.overrideIterations;
+    this.previousIterations = props.customIterations;
+    this.previousOverride = props.overrideIterations;
   }
 
   async componentDidMount() {
@@ -104,9 +98,7 @@ class FractalViewer extends React.Component {
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
-      const p = this.props;
-      const { store } = p;
-      if (store.stats.focus.value === this.position && !this.rendering) {
+      if (this.focus === this.type && !this.rendering) {
         if (this.previousLength === -1) {
           this.previousLength = e.scale;
         }
@@ -169,8 +161,8 @@ class FractalViewer extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const p = this.props;
-    if (nextProps.store.viewMode !== this.viewMode) {
-      this.viewMode = nextProps.store.viewMode;
+    if (nextProps.viewMode !== this.viewMode) {
+      this.viewMode = nextProps.viewMode;
       this.changeView = true;
       return true;
     }
@@ -182,58 +174,58 @@ class FractalViewer extends React.Component {
       this.changeView = true;
       return true;
     }
-    if (nextProps.store.forceUpdate === this.type) {
+    if (nextProps.forceUpdate === this.type) {
       this.forceUpdate();
       return false;
     }
-    if (nextProps.store.focusHighlight !== this.focusHighlight) {
-      this.focusHighlight = nextProps.store.focusHighlight;
+    if (nextProps.focusHighlight !== this.focusHighlight) {
+      this.focusHighlight = nextProps.focusHighlight;
       return true;
     }
-    if (nextProps.store.resetFractal) {
+    if (nextProps.resetFractal) {
       this.reset();
       return false;
     }
-    if (nextProps.store.stats.focus.value !== this.focus) {
-      this.focus = nextProps.store.stats.focus.value;
+    if (nextProps.focus !== this.focus) {
+      this.focus = nextProps.focus;
       return true;
     }
-    if (nextProps.store.coloringMode !== this.renderer.coloringMode) {
-      this.renderer.coloringMode = nextProps.store.coloringMode;
+    if (nextProps.coloringMode !== this.renderer.coloringMode) {
+      this.renderer.coloringMode = nextProps.coloringMode;
       this.drawFractal();
     }
-    if (nextProps.store.showRenderTrace !== this.renderer.showRenderTrace) {
-      this.renderer.showRenderTrace = nextProps.store.showRenderTrace;
+    if (nextProps.showRenderTrace !== this.renderer.showRenderTrace) {
+      this.renderer.showRenderTrace = nextProps.showRenderTrace;
       this.drawFractal();
       return false;
     }
-    if (nextProps.store.centreJulia) {
+    if (nextProps.centreJulia) {
       if (this.type === FractalType.MANDELBROT) this.centreJulia();
       return false;
     }
-    if (this.renderMode !== nextProps.store.renderMode) {
-      this.renderMode = nextProps.store.renderMode;
-      this.renderer.mode = nextProps.store.renderMode;
+    if (this.renderMode !== nextProps.renderMode) {
+      this.renderMode = nextProps.renderMode;
+      this.renderer.mode = nextProps.renderMode;
       this.drawFractal();
       return false;
     }
     if (
-      this.previousIterations !== nextProps.store.customIterations
-      && nextProps.store.overrideIterations) {
-      this.previousIterations = nextProps.store.customIterations;
+      this.previousIterations !== nextProps.customIterations
+      && nextProps.overrideIterations) {
+      this.previousIterations = nextProps.customIterations;
       this.drawFractal();
       return false;
     }
-    if (this.previousOverride !== nextProps.store.overrideIterations) {
-      this.previousOverride = nextProps.store.overrideIterations;
+    if (this.previousOverride !== nextProps.overrideIterations) {
+      this.previousOverride = nextProps.overrideIterations;
       this.drawFractal();
       return false;
     }
     if (this.type === FractalType.JULIA && !this.rendering) {
-      if (nextProps.store.juliaPoint !== this.renderer.juliaPoint
-        || nextProps.store.mandelDragging !== this.mandelbrotDragging) {
-        this.renderer.juliaPoint = nextProps.store.juliaPoint;
-        this.mandelbrotDragging = nextProps.store.mandelDragging;
+      if (nextProps.juliaPoint !== this.renderer.juliaPoint
+        || nextProps.mandelDragging !== this.mandelbrotDragging) {
+        this.renderer.juliaPoint = nextProps.juliaPoint;
+        this.mandelbrotDragging = nextProps.mandelDragging;
         this.drawFractal();
         return false;
       }
@@ -246,6 +238,7 @@ class FractalViewer extends React.Component {
       this.updateDimensions();
       this.changeView = false;
     }
+    console.log(`${this.type} updated`);
   }
 
   getFractalPosition(pageX, pageY) {
@@ -274,7 +267,7 @@ class FractalViewer extends React.Component {
         s.maxIter,
       );
       const p = this.props;
-      if (p.store.renderMode === Mode.WASM || p.store.renderMode === Mode.WASMMT) {
+      if (p.renderMode === Mode.WASM || p.renderMode === Mode.WASMMT) {
         requestAnimationFrame(() => this.drawFractal());
       }
     } catch (err) {
@@ -314,7 +307,7 @@ class FractalViewer extends React.Component {
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
     });
-    if (p.store.get('dualUpdateFlag')) {
+    if (p.dualUpdateFlag) {
       p.store.set({
         resetFractal: false,
         dualUpdateFlag: false,
@@ -371,10 +364,9 @@ class FractalViewer extends React.Component {
     if (!this.dragging || !this.dirty) {
       let iterationCount;
       const p = this.props;
-      const s = p.store;
       const iters = iterationCalc(this.zoomLevel);
-      if (s.overrideIterations && !this.mandelbrotDragging) {
-        iterationCount = s.customIterations;
+      if (p.overrideIterations && !this.mandelbrotDragging) {
+        iterationCount = p.customIterations;
       } else if (this.type === FractalType.MANDELBROT) {
         iterationCount = iters;
       } else if (this.mandelbrotDragging) {
@@ -383,6 +375,7 @@ class FractalViewer extends React.Component {
         iterationCount = iters;
       }
       this.renderer.render(iterationCount, this.mandelbrotDragging).then((fractal) => {
+        console.log(`${this.type} rendered`);
         this.rendering = false;
         this.canvasOffsetX = 0;
         this.canvasOffsetY = 0;
@@ -623,7 +616,7 @@ class FractalViewer extends React.Component {
   handleTouchStart(e) {
     const touches = e.changedTouches;
     const p = this.props;
-    p.store.setStat({
+    p.store.set({
       focus: this.type,
     });
     if (touches.length > 0) {
@@ -795,6 +788,7 @@ class FractalViewer extends React.Component {
   render() {
     const p = this.props;
     let focus = '';
+    console.log(this.focusHighlight, this.focus);
     if (this.focus === this.type && this.focusHighlight) {
       focus = (
         <Icon
@@ -823,7 +817,9 @@ class FractalViewer extends React.Component {
             onTouchMove={(e) => this.handleTouchMove(e)}
             onTouchEnd={(e) => this.handleTouchEnd(e)}
             onMouseDown={(e) => this.handleClick(e)}
-            onMouseEnter={() => p.store.setStat({ focus: this.type })}
+            onMouseEnter={() => {
+              p.store.set({ focus: this.type });
+            }}
             onMouseMove={(e) => this.handleMouseMove(e)}
             onMouseUp={(e) => this.handleDragEnd(e)}
             onMouseLeave={(e) => this.handleDragEnd(e)}
@@ -849,9 +845,6 @@ class FractalViewer extends React.Component {
 }
 FractalViewer.propTypes = {
   type: PropTypes.number.isRequired,
-  position: PropTypes.number.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  appRef: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   juliaPoint: PropTypes.array,
   mandelDragging: PropTypes.bool,
@@ -859,6 +852,19 @@ FractalViewer.propTypes = {
   store: PropTypes.object,
   detatched: PropTypes.bool,
   hidden: PropTypes.bool,
+  renderMode: PropTypes.number,
+  overrideIterations: PropTypes.bool,
+  focusHighlight: PropTypes.bool,
+  focus: PropTypes.number,
+  maxIter: PropTypes.number,
+  coloringMode: PropTypes.number,
+  customIterations: PropTypes.number,
+  viewMode: PropTypes.number,
+  forceUpdate: PropTypes.bool,
+  resetFractal: PropTypes.bool,
+  showRenderTrace: PropTypes.bool,
+  centreJulia: PropTypes.bool,
+  dualUpdateFlag: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
@@ -867,5 +873,19 @@ FractalViewer.defaultProps = {
   store: {},
   detatched: false,
   hidden: false,
+  renderMode: Mode.JAVASCRIPT,
+  overrideIterations: false,
+  focusHighlight: false,
+  focus: FractalType.MANDELBROT,
+  maxIter: 200,
+  coloringMode: ColorMode.RAINBOW,
+  customIterations: 200,
+  viewMode: ViewOptions.JULIA_DETATCHED,
+  forceUpdate: false,
+  resetFractal: false,
+  showRenderTrace: false,
+  centreJulia: false,
+  dualUpdateFlag: false,
+
 };
 export default withStore(FractalViewer);
