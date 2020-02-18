@@ -251,6 +251,18 @@ class FractalViewer extends React.Component {
     this.mouseY = y;
   }
 
+  attachRefs = (el) => {
+    // pass ref up to anyone who is asking
+    this.fractal.current = el;
+    const p = this.props;
+    if (p.innerRef) {
+      if (typeof p.innerRef === 'function') {
+        p.innerRef(el);
+      } else {
+        p.innerRef.current = el;
+      }
+    }
+  }
 
   loadWasm = async () => {
     try {
@@ -783,6 +795,7 @@ class FractalViewer extends React.Component {
     this.zoom(e.deltaY, Math.abs(e.deltaY) / 100);
   }
 
+
   render() {
     const p = this.props;
     let focus = '';
@@ -822,7 +835,7 @@ class FractalViewer extends React.Component {
             onMouseLeave={(e) => this.handleDragEnd(e)}
             onWheel={(e) => this.handleScroll(e)}
             id={`fractal-${this.type}`}
-            ref={this.fractal}
+            ref={this.attachRefs}
           />
           {focus}
         </div>
@@ -857,11 +870,12 @@ FractalViewer.propTypes = {
   coloringMode: PropTypes.number,
   customIterations: PropTypes.number,
   viewMode: PropTypes.number,
-  forceUpdate: PropTypes.bool,
+  forceUpdate: PropTypes.number,
   resetFractal: PropTypes.bool,
   showRenderTrace: PropTypes.bool,
   centreJulia: PropTypes.bool,
   dualUpdateFlag: PropTypes.bool,
+  innerRef: PropTypes.func,
 };
 
 FractalViewer.defaultProps = {
@@ -878,11 +892,12 @@ FractalViewer.defaultProps = {
   coloringMode: ColorMode.RAINBOW,
   customIterations: 200,
   viewMode: ViewOptions.JULIA_DETATCHED,
-  forceUpdate: false,
+  forceUpdate: -1,
   resetFractal: false,
   showRenderTrace: false,
   centreJulia: false,
   dualUpdateFlag: false,
+  innerRef: null,
 
 };
 export default withStore(FractalViewer);

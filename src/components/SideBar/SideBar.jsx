@@ -6,6 +6,7 @@ import './SideBar.css';
 import { withStore } from '../../statemanagement/createStore';
 import FractalType from '../../utils/FractalType';
 import ViewOptions from '../../utils/ViewOptions';
+import SaveDialog from '../Save Dialog';
 
 class SideBar extends Component {
   constructor(props) {
@@ -148,6 +149,9 @@ class SideBar extends Component {
             circular
             icon="help"
           />
+        </div>
+        <div>
+          <SaveDialog />
         </div>
         {exchangeButton}
         {devTools}
