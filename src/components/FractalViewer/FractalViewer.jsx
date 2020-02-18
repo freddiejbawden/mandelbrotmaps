@@ -238,7 +238,6 @@ class FractalViewer extends React.Component {
       this.updateDimensions();
       this.changeView = false;
     }
-    console.log(`${this.type} updated`);
   }
 
   getFractalPosition(pageX, pageY) {
@@ -375,7 +374,6 @@ class FractalViewer extends React.Component {
         iterationCount = iters;
       }
       this.renderer.render(iterationCount, this.mandelbrotDragging).then((fractal) => {
-        console.log(`${this.type} rendered`);
         this.rendering = false;
         this.canvasOffsetX = 0;
         this.canvasOffsetY = 0;
@@ -788,7 +786,6 @@ class FractalViewer extends React.Component {
   render() {
     const p = this.props;
     let focus = '';
-    console.log(this.focusHighlight, this.focus);
     if (this.focus === this.type && this.focusHighlight) {
       focus = (
         <Icon
