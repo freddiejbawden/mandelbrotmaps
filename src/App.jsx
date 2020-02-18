@@ -39,20 +39,18 @@ class App extends Component {
           <FractalViewer
             id="fractal-viewer"
             type={FractalType.MANDELBROT}
-            position={0}
-            numberOfFractals={2}
-            appRef={this.appRef}
             detatched={p.store.viewMode === ViewOptions.MANDELBROT_DETATCHED}
             hidden={p.store.viewMode === ViewOptions.JULIA_FULLSCREEN}
-
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...p.store}
           />
           <FractalViewer
             id="fractal-viewer"
             type={FractalType.JULIA}
-            position={1}
-            appRef={this.appRef}
             detatched={p.store.viewMode === ViewOptions.JULIA_DETATCHED}
             hidden={p.store.viewMode === ViewOptions.MANDELBROT_FULLSCREEN}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...p.store}
 
 
           />
