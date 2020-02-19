@@ -6,13 +6,13 @@ function isDark(colors) {
 }
 
 class JuliaPin {
-  constructor(x, y, size) {
+  constructor(x, y, size, enabled) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.collisonBox = size + 20;
     this.color = '#ff0000';
-    this.enabled = true;
+    this.enabled = enabled || true;
   }
 
   isClicked(mouseX, mouseY) {
