@@ -76,7 +76,7 @@ class SideBar extends Component {
   toggleControls() {
     const p = this.props;
     const st = p.store;
-    st.toggle('controls');
+    st.toggle('help');
   }
 
   render() {

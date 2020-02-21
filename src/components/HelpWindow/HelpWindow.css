@@ -1,7 +1,7 @@
-.controls-window {
+.help-window {
   position: absolute !important;
   bottom: 0%;
-  left: 0%;
+  left: 50px;
   margin: 10px !important;
   /* bring your own prefixes */
   background-color: white;
@@ -13,41 +13,47 @@
   overflow: visible !important;
 }
 
-.controls-modal {
+.help-links {
+  display: flex;
+  flex-direction: row;
+}
+.help-links > a {
+  margin-bottom: 5px;
+}
+.help-modal {
   padding: 20px;
 }
-.controls-container {
+.help-container {
   width: 100%;
 }
-.controls-close {
+.help-close {
   position: absolute;
   right: 1%;
   top: 0%;
 }
 
-.controls-top {
+.help-top {
   width: 100%;
   position: relative;
-  margin-left: 1em;
 }
 .details-container {
   display: flex;
   flex-direction: row;
 }
 .details-container > div{
-  margin: 1em;
+  margin: 1em 1em 1em 0;
 }
 .divider {
   border: grey solid 0.5px;
 }
-.controls-close-button {
+.help-close-button {
   display: none !important;
   justify-content: center;
   align-self: center;
   width: 100%;
 }
 @media only screen and (max-width: 700px) {
- .controls-close-button {
+ .help-close-button {
    display: block !important;
  }
 
@@ -57,7 +63,7 @@
   }
 }
 @media only screen and (max-height: 600px) {
-  .controls-close-button {
+  .help-close-button {
     display: block !important;
   }
  
