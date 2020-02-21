@@ -73,7 +73,7 @@ class FractalViewer extends React.Component {
     this.canvasOffsetY = 0;
     this.rendering = false;
     this.type = props.type;
-
+    this.lastMouse = [];
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
     this.previousLength = -1;
@@ -471,7 +471,23 @@ class FractalViewer extends React.Component {
     }, 100);
   }
 
-  handleClick() {
+  async easeInOutZoom() {
+    let count = 0;
+    // eslint-disable-next-line no-param-reassign
+    const easeInOutQuad = (t) => {
+      const tminus = t - 1;
+      return tminus * t * t + 1;
+    };
+    const interval = setInterval(() => {
+      if (count >= 10) {
+        clearInterval(interval);
+      }
+      this.zoom(-1, easeInOutQuad(count / 10) / 2, false);
+      count += 1;
+    }, 15);
+  }
+
+  async handleMouseDown() {
     if (this.type !== FractalType.JULIA) {
       // Make sure the Julia Pin can only be picked up by another fractal
       if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
@@ -479,6 +495,10 @@ class FractalViewer extends React.Component {
       }
     }
     this.dragging = true;
+  }
+
+  handleMouseUp(e) {
+    this.handleDragEnd(e);
   }
 
   coordsToWorld(x, y) {
@@ -652,7 +672,7 @@ class FractalViewer extends React.Component {
     if (Object.keys(this.activeTouches).length === 1) {
       this.getMouseViewerPosition(touches[0].pageX, touches[0].pageY);
     }
-    this.handleClick();
+    this.handleMouseDown();
   }
 
   touchPan(touches) {
@@ -849,13 +869,14 @@ class FractalViewer extends React.Component {
             onTouchStart={(e) => this.handleTouchStart(e)}
             onTouchMove={(e) => this.handleTouchMove(e)}
             onTouchEnd={(e) => this.handleTouchEnd(e)}
-            onMouseDown={(e) => this.handleClick(e)}
+            onMouseDown={(e) => this.handleMouseDown(e)}
             onMouseEnter={() => {
               p.store.set({ focus: this.type });
             }}
+            onDoubleClick={() => this.easeInOutZoom()}
             onMouseMove={(e) => this.handleMouseMove(e)}
-            onMouseUp={(e) => this.handleDragEnd(e)}
-            onMouseLeave={(e) => this.handleDragEnd(e)}
+            onMouseUp={(e) => this.handleMouseUp(e)}
+            onMouseLeave={(e) => this.handleMouseUp(e)}
             onWheel={(e) => this.handleScroll(e)}
             id={`fractal-${this.type}`}
             ref={this.fractal}
