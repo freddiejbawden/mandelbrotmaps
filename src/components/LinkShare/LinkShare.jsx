@@ -31,6 +31,8 @@ class LinkShare extends Component {
   render() {
     const s = this.state;
     const p = this.props;
+    const defaultValue = (p.store.toURL) ? p.store.toURL() : '';
+
     return (
       <div>
         <Button
@@ -53,6 +55,7 @@ class LinkShare extends Component {
             <Header>Share Fractal</Header>
             <p>Send this link to share the current fractals</p>
             <Input
+              disabled={!p.store.toURL}
               ref={this.copyInput}
               action={{
                 onClick: this.copyLink,
@@ -61,7 +64,7 @@ class LinkShare extends Component {
                 icon: 'copy',
                 content: s.buttonText,
               }}
-              defaultValue={p.store.toURL()}
+              defaultValue={defaultValue}
             />
             <br />
             <Button
