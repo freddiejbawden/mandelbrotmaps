@@ -8,7 +8,6 @@ class Renderer {
     this.pixelSize = 0.01;
     this.maximumPixelSize = this.pixelSize * 4;
     this.basePixelSize = this.pixelSize;
-    this.zoomLevel = 0;
     this.width = width;
     this.height = height;
     this.centreCoords = [0, 0];

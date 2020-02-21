@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import './FractalViewer.css';
@@ -72,12 +73,11 @@ class FractalViewer extends React.Component {
     this.canvasOffsetY = 0;
     this.rendering = false;
     this.type = props.type;
-    this.zoomLevel = 1;
+
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
     this.previousLength = -1;
     this.renderMode = props.renderMode;
-    this.juliaPin = new JuliaPin(this.width / 2, this.height / 2, 20);
     this.draggingPin = false;
     this.showJuliaPin = props.showJuliaPin;
     this.renderer = new Renderer(
@@ -86,9 +86,20 @@ class FractalViewer extends React.Component {
       this.width,
       this.height,
       parseInt(props.maxIter, 10),
-      [-1, 0],
+      props.juliaPoint,
       props.coloringMode,
     );
+    if (this.type === FractalType.MANDELBROT) {
+      this.renderer.centreCoords = props.mandelbrotCentre;
+      this.renderer.pixelSize = props.mandelbrotZoom;
+    }
+    if (this.type === FractalType.JULIA && props.juliaCentre) {
+      this.renderer.centreCoords = props.juliaCentre;
+      this.renderer.pixelSize = props.juliaZoom;
+    }
+    this.zoomLevel = (this.renderer.basePixelSize / this.renderer.pixelSize);
+    const jpointWorld = this.worldToCoords(props.juliaPoint[0], props.juliaPoint[1]);
+    this.juliaPin = new JuliaPin(jpointWorld[0], jpointWorld[1], 20);
     this.previousIterations = props.customIterations;
     this.previousOverride = props.overrideIterations;
   }
@@ -486,6 +497,13 @@ class FractalViewer extends React.Component {
     return { x: worldX, y: worldY };
   }
 
+  worldToCoords(worldX, worldY) {
+    const limits = this.renderer.calculateFractalLimit();
+    const x = ((worldX - limits.fractalLimitX) * this.canvasZoom) / this.renderer.pixelSize;
+    const y = ((worldY - limits.fractalLimitY) * this.canvasZoom) / this.renderer.pixelSize;
+    return [x, y];
+  }
+
   mouseToWorld() {
     return this.coordsToWorld(this.mouseX, this.mouseY);
   }
@@ -542,13 +560,13 @@ class FractalViewer extends React.Component {
       this.dragging = false;
       this.deltaX = this.deltaX / this.canvasZoom;
       this.deltaY = this.deltaY / this.canvasZoom;
+      const p = this.props;
       if (this.draggingPin) {
         this.juliaPin.move(this.juliaPin.x - this.deltaX, this.juliaPin.y - this.deltaY);
         this.deltaX = 0;
         this.deltaY = 0;
         const worldJulia = this.coordsToWorld(this.juliaPin.x, this.juliaPin.y);
         this.draggingPin = false;
-        const p = this.props;
         p.store.set({
           juliaPin: [worldJulia.x, worldJulia.y],
           mandelDragging: false,
@@ -564,6 +582,15 @@ class FractalViewer extends React.Component {
       );
       this.renderer.centreCoords[0] += -1 * this.deltaX * this.renderer.pixelSize;
       this.renderer.centreCoords[1] += -1 * this.deltaY * this.renderer.pixelSize;
+      if (this.type === FractalType.MANDELBROT) {
+        p.store.set({
+          mandelbrotCentre: this.renderer.centreCoords,
+        });
+      } else if (this.type === FractalType.JULIA) {
+        p.store.set({
+          juliaCentre: this.renderer.centreCoords,
+        });
+      }
       let xRect;
       let yRect;
       if (this.deltaX > 0) {
@@ -612,7 +639,6 @@ class FractalViewer extends React.Component {
       this.dragging = false;
       this.deltaX = 0;
       this.deltaY = 0;
-      const p = this.props;
       p.store.setStat({
         renderTime: (Date.now() - startTime),
       });
@@ -722,6 +748,16 @@ class FractalViewer extends React.Component {
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
       this.juliaPin.move(this.juliaPin.x + jRX, this.juliaPin.y + jRY);
       await this.drawFractal();
+      const p = this.props;
+      if (this.type === FractalType.MANDELBROT) {
+        p.store.set({
+          mandelbrotZoom: this.renderer.pixelSize,
+        });
+      } else if (this.type === FractalType.JULIA) {
+        p.store.set({
+          juliaZoom: this.renderer.pixelSize,
+        });
+      }
       this.prevStepZoom = 1;
       this.previousLength = -1;
       this.originX = 0;
@@ -866,16 +902,21 @@ FractalViewer.propTypes = {
   coloringMode: PropTypes.number,
   customIterations: PropTypes.number,
   viewMode: PropTypes.number,
-  forceUpdate: PropTypes.bool,
+  forceUpdate: PropTypes.number,
   resetFractal: PropTypes.bool,
   showRenderTrace: PropTypes.bool,
   centreJulia: PropTypes.bool,
   dualUpdateFlag: PropTypes.bool,
-  showJuliaPin: PropTypes.bool,
+
+  showJuliaPin: PropTypes.bool
 };
 
 FractalViewer.defaultProps = {
   showJuliaPin: true,
+  mandelbrotZoom: 0.01,
+  juliaZoom: 0.01,
+  mandelbrotCentre: [0, 0],
+  juliaCentre: [0, 0],
   juliaPoint: [0, 0],
   mandelDragging: false,
   store: {},
@@ -889,7 +930,7 @@ FractalViewer.defaultProps = {
   coloringMode: ColorMode.RAINBOW,
   customIterations: 200,
   viewMode: ViewOptions.JULIA_DETATCHED,
-  forceUpdate: false,
+  forceUpdate: -1,
   resetFractal: false,
   showRenderTrace: false,
   centreJulia: false,

@@ -11,7 +11,25 @@ const createStore = (WrappedComponent) => class extends React.Component {
     // eslint-disable-next-line react/state-in-constructor
     state = {
       // eslint-disable-next-line react/destructuring-assignment
-      get: (key) => this.state[key],
+
+      toURL: () => {
+        const serialize = (obj) => {
+          const str = [];
+          Object.keys(obj).forEach((p) => {
+            if (typeof obj[p] !== 'function' && p !== 'stats') {
+              if (p in obj) {
+                str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);
+              }
+            }
+          });
+          return str.join('&');
+        };
+        return `${window.location.host}/?${serialize(this.state)}`;
+      },
+      get: (key) => {
+        const { state } = this.state;
+        return state[key];
+      },
       set: (updates) => {
         const { state } = this;
         Object.keys(updates).forEach((key) => {
@@ -38,6 +56,30 @@ const createStore = (WrappedComponent) => class extends React.Component {
         this.setState(state);
       },
       ...initialState,
+      ...this.getParams(),
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    getParams() {
+      const search = window.location.href.split('?')[1];
+      if (!search || search === '') return {};
+      const jsonifiedSearch = search.replace(/&/g, '","').replace(/=/g, '":"');
+      const j = JSON.parse(`{"${jsonifiedSearch}"}`, (key, value) => (key === '' ? value : decodeURIComponent(value)));
+      Object.keys(j).forEach((key) => {
+        const value = j[key];
+        // is it a number?
+        // eslint-disable-next-line no-restricted-globals
+        if (!isNaN(value)) {
+          j[key] = parseFloat(value);
+        } else if (value === 'false') {
+          j[key] = false;
+        } else if (value === 'true') {
+          j[key] = true;
+        } else if (value.match(/(-?([0-9](.[0-9]+)*,? *))+/g)) {
+          j[key] = value.split(',').map((x) => parseFloat(x, 10));
+        }
+      });
+      return j;
     }
 
     render() {
