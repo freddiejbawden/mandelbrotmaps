@@ -25,6 +25,7 @@ class App extends Component {
     setUpFocusHandler(p.store);
   }
 
+
   render() {
     const p = this.props;
     let unsupportedPopUp = '';

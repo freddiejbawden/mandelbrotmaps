@@ -6,6 +6,7 @@ import './SideBar.css';
 import { withStore } from '../../statemanagement/createStore';
 import FractalType from '../../utils/FractalType';
 import ViewOptions from '../../utils/ViewOptions';
+import LinkShare from '../LinkShare';
 
 class SideBar extends Component {
   constructor(props) {
@@ -149,6 +150,7 @@ class SideBar extends Component {
             icon="help"
           />
         </div>
+        <LinkShare />
         {exchangeButton}
         {devTools}
       </div>
