@@ -4,8 +4,13 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from 'react-router-dom';
 import App from './App';
+import About from './static/About';
+import Learn from './static/Learn';
+import Help from './static/Help';
+
 import { createStore } from './statemanagement/createStore';
 
 const AppWithStore = createStore(App);
@@ -13,8 +18,20 @@ const AppWithStore = createStore(App);
 const AppRouter = () => (
   <Router>
     <Switch>
-      <Route path="/:renderMode?/:iterations?">
+      <Route path="/about">
+        <About />
+      </Route>
+      <Route path="/learn">
+        <Learn />
+      </Route>
+      <Route path="/help">
+        <Help />
+      </Route>
+      <Route path="/app">
         <AppWithStore id="app" />
+      </Route>
+      <Route path="/">
+        <Redirect push to="/app" />
       </Route>
     </Switch>
   </Router>

@@ -34,7 +34,7 @@ class Settings extends Component {
       if (e.keyCode === 72) {
         const p = this.props;
         const st = p.store;
-        st.toggle('controls');
+        st.toggle('help');
       }
     });
   }
