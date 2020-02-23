@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Button, Menu, Icon,
 } from 'semantic-ui-react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import './navbar.css';
 
 class NavBar extends React.Component {
@@ -38,6 +39,10 @@ class NavBar extends React.Component {
   redirect = (link) => {
     // some action...
     // then redirect
+    const p = this.props;
+    if (link === p.location.pathname.substring(1)) {
+      return;
+    }
     this.setState({ redirect: link });
   }
 
@@ -84,4 +89,12 @@ class NavBar extends React.Component {
   }
 }
 
-export default NavBar;
+NavBar.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  location: PropTypes.object,
+};
+
+NavBar.defaultProps = {
+  location: '',
+};
+export default withRouter(NavBar);

@@ -49,6 +49,8 @@ class HelpWindow extends Component {
           <Button onClick={() => this.redirect('about')} basic color="black">About</Button>
           <Button onClick={() => this.redirect('learn')} basic color="black">Learn More</Button>
           <Button onClick={() => this.redirect('help')} basic color="black">Tutorial</Button>
+          <Button onClick={() => this.redirect('feedback')} basic color="black">Feedback</Button>
+
         </div>
         <Header style={{ margin: '1em 0 0 0' }}>Controls</Header>
         <Controls />
