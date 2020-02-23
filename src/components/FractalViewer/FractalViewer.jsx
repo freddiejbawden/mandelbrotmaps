@@ -907,8 +907,11 @@ FractalViewer.propTypes = {
   showRenderTrace: PropTypes.bool,
   centreJulia: PropTypes.bool,
   dualUpdateFlag: PropTypes.bool,
-
-  showJuliaPin: PropTypes.bool
+  mandelbrotZoom: PropTypes.number,
+  juliaZoom: PropTypes.number,
+  mandelbrotCentre: PropTypes.array,
+  juliaCentre: PropTypes.array,
+  showJuliaPin: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
