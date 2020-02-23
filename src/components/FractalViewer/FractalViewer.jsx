@@ -79,6 +79,7 @@ class FractalViewer extends React.Component {
     this.previousLength = -1;
     this.renderMode = props.renderMode;
     this.draggingPin = false;
+    this.showJuliaPin = props.showJuliaPin;
     this.renderer = new Renderer(
       props.type,
       parseInt(this.renderMode, 10),
@@ -172,6 +173,11 @@ class FractalViewer extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const p = this.props;
+    if (nextProps.showJuliaPin !== this.showJuliaPin) {
+      this.showJuliaPin = nextProps.showJuliaPin;
+      this.drawFractal();
+      return false;
+    }
     if (nextProps.viewMode !== this.viewMode) {
       this.viewMode = nextProps.viewMode;
       this.changeView = true;
@@ -418,7 +424,8 @@ class FractalViewer extends React.Component {
     fractalContext.translate(this.originX, this.originY);
     fractalContext.drawImage(newCanvas, 0, 0);
     fractalContext.setTransform(1, 0, 0, 1, 0, 0);
-    if (this.type === FractalType.MANDELBROT) {
+    if (this.type === FractalType.MANDELBROT && this.showJuliaPin) {
+      this.juliaPin.enable();
       const jRX = this.juliaShiftX * this.canvasZoom - this.juliaShiftX;
       const jRY = this.juliaShiftY * this.canvasZoom - this.juliaShiftY;
       this.juliaPin.render(
@@ -426,6 +433,8 @@ class FractalViewer extends React.Component {
         jRX + this.deltaX,
         jRY + this.deltaY,
       );
+    } else {
+      this.juliaPin.disable();
     }
   }
 
@@ -898,14 +907,15 @@ FractalViewer.propTypes = {
   showRenderTrace: PropTypes.bool,
   centreJulia: PropTypes.bool,
   dualUpdateFlag: PropTypes.bool,
-  mandelbrotCentre: PropTypes.array,
-  juliaCentre: PropTypes.array,
   mandelbrotZoom: PropTypes.number,
   juliaZoom: PropTypes.number,
-
+  mandelbrotCentre: PropTypes.array,
+  juliaCentre: PropTypes.array,
+  showJuliaPin: PropTypes.bool,
 };
 
 FractalViewer.defaultProps = {
+  showJuliaPin: true,
   mandelbrotZoom: 0.01,
   juliaZoom: 0.01,
   mandelbrotCentre: [0, 0],
