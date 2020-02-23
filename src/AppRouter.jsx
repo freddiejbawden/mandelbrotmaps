@@ -12,6 +12,7 @@ import Learn from './static/Learn';
 import Help from './static/Help';
 
 import { createStore } from './statemanagement/createStore';
+import Feedback from './static/Feedback/Feedback';
 
 const AppWithStore = createStore(App);
 
@@ -26,6 +27,9 @@ const AppRouter = () => (
       </Route>
       <Route path="/help">
         <Help />
+      </Route>
+      <Route path="/feedback">
+        <Feedback />
       </Route>
       <Route path="/app">
         <AppWithStore id="app" />

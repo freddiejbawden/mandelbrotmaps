@@ -61,6 +61,9 @@ class NavBar extends React.Component {
         <Menu.Item onClick={() => this.redirect('help')}>
           Help
         </Menu.Item>
+        <Menu.Item onClick={() => this.redirect('feedback')}>
+          Feedback
+        </Menu.Item>
         <Menu.Item>
           <Button onClick={() => this.redirect('app')} className="open-app-button" primary>
           Open App
@@ -68,7 +71,7 @@ class NavBar extends React.Component {
         </Menu.Item>
       </Menu>
     );
-    const hamburger = (<Icon size="large" name="sidebar" onClick={this.toggleMenu} />);
+    const hamburger = (<Icon size="large" name={(s.visible) ? 'close' : 'bars'} onClick={this.toggleMenu} />);
     return (
       <div>
         <div className="navbar">
