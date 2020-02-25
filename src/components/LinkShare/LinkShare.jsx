@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, Portal, Segment, Header, Input,
+  Button, Portal, Segment, Header, Input, Popup,
 } from 'semantic-ui-react';
 
 import { withStore } from '../../statemanagement/createStore';
@@ -35,13 +35,18 @@ class LinkShare extends Component {
 
     return (
       <div>
-        <Button
-          size="large"
-          onClick={this.handleOpen}
-          circular
-          icon="share"
+        <Popup
+          position="right center"
+          content="Share Current Fractal"
+          trigger={(
+            <Button
+              size="large"
+              onClick={this.handleOpen}
+              circular
+              icon="share"
+            />
+           )}
         />
-
         <Portal onClose={this.handleClose} open={s.modalOpen}>
           <Segment
             style={{
