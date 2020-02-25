@@ -24,7 +24,7 @@ const createStore = (WrappedComponent) => class extends React.Component {
           });
           return str.join('&');
         };
-        return `${window.location.host}/?${serialize(this.state)}`;
+        return `${window.location.host}/app/?${serialize(this.state)}`;
       },
       get: (key) => {
         const { state } = this.state;
