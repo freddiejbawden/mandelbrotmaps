@@ -5,6 +5,7 @@
 .about-container {
   max-width: 600px;
   margin-bottom: 30px;
+  width: 100%;
 }
 .about-wrapper {
   width: 100%;
