@@ -9,6 +9,7 @@ export default function Controls() {
         <Header as="h4">Keyboard</Header>
         <div className="help-container">
           <Control keys={['Shift', 'Arrow']} description="Move Julia Pin" join />
+          <Control keys={['Arrow']} description="Move focused fracal" join />
           <Control keys={['+', '-']} description="Zoom" />
           <Control keys={['1']} description="Change focus to Mandelbrot" />
           <Control keys={['2']} description="Change focus to Julia" />

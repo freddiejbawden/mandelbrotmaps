@@ -16,12 +16,14 @@
 .help-links {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
-.help-links > a {
-  margin-bottom: 5px;
+.help-links > button {
+  margin-bottom: 5px !important;
 }
 .help-modal {
   padding: 20px;
+  margin-bottom: 20px !important;
 }
 .help-container {
   width: 100%;
