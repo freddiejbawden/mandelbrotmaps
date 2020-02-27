@@ -13,6 +13,7 @@ import SideBar from './components/SideBar';
 import setUpFocusHandler from './focusHandler/focusHandler';
 import ViewOptions from './utils/ViewOptions';
 import HelpWindow from './components/HelpWindow/HelpWindow';
+import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 
 class App extends Component {
   constructor(props) {
@@ -33,6 +34,10 @@ class App extends Component {
       if (!window.localStorage.getItem('understandUnsupported')) {
         unsupportedPopUp = (<UnsupportedBrowser />);
       }
+    }
+    let welcomeScreen = '';
+    if (!window.localStorage.getItem('firstTime')) {
+      welcomeScreen = (<WelcomeModal />);
     }
     return (
       <div className="App">
@@ -63,6 +68,7 @@ class App extends Component {
         />
         <HelpWindow />
         {unsupportedPopUp}
+        {welcomeScreen}
       </div>
     );
   }
