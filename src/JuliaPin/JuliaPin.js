@@ -6,15 +6,17 @@ function isDark(colors) {
 }
 
 class JuliaPin {
-  constructor(x, y, size) {
+  constructor(x, y, size, enabled) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.collisonBox = size + 20;
     this.color = '#ff0000';
+    this.enabled = enabled || true;
   }
 
   isClicked(mouseX, mouseY) {
+    if (!this.enabled) return false;
     if (mouseX > this.x - this.collisonBox / 2 && mouseX < this.x + this.collisonBox / 2) {
       if (mouseY > this.y - this.collisonBox / 2 && mouseY < this.y + this.collisonBox / 2) {
         return true;
@@ -23,6 +25,13 @@ class JuliaPin {
     return false;
   }
 
+  disable() {
+    this.enabled = false;
+  }
+
+  enable() {
+    this.enabled = true;
+  }
 
   move(x, y) {
     this.x = x;

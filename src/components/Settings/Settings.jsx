@@ -34,7 +34,7 @@ class Settings extends Component {
       if (e.keyCode === 72) {
         const p = this.props;
         const st = p.store;
-        st.toggle('controls');
+        st.toggle('help');
       }
     });
   }
@@ -146,6 +146,7 @@ class Settings extends Component {
             <OptionCheck defaultChecked={st.showDebugBar} callback={() => st.toggle('showDebugBar')} name="Enable Debug Bar" description="Displays additional information about the fractal viewer" />
             <OptionCheck defaultChecked={st.showRenderTrace} callback={() => st.toggle('showRenderTrace')} name="Show Renderer Trace" description="Tint pixel depending on which renderer it came from (JS Only)" />
             <OptionCheck defaultChecked={st.focusHighlight} callback={() => st.toggle('focusHighlight')} name="Show Focus Indicator" description="Display an icon to show which fractal is being interacted with" />
+            <OptionCheck defaultChecked={st.showJuliaPin} focus callback={() => st.toggle('showJuliaPin')} name="Show Julia Pin" description="Display the Julia Pin on the Mandelbrot Fractal (useful for screenshotting)" />
 
             {
               // Save button

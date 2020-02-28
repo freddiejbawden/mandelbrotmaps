@@ -76,7 +76,7 @@ class SideBar extends Component {
   toggleControls() {
     const p = this.props;
     const st = p.store;
-    st.toggle('controls');
+    st.toggle('help');
   }
 
   render() {
@@ -141,6 +141,8 @@ class SideBar extends Component {
             icon="undo"
           />
         </div>
+        <LinkShare />
+        {exchangeButton}
         <div>
           <Button
             onClick={() => this.toggleControls()}
@@ -150,8 +152,6 @@ class SideBar extends Component {
             icon="help"
           />
         </div>
-        <LinkShare />
-        {exchangeButton}
         {devTools}
       </div>
     );

@@ -16,9 +16,10 @@ const initialState = {
   forceUpdate: 100,
   focusHighlight: false,
   focus: FractalType.MANDELBROT,
-  controls: false,
+  help: false,
   coloringMode: ColorMode.RAINBOW,
   viewMode: ViewOptions.JULIA_DETATCHED,
+  showJuliaPin: true,
   stats: {
     renderTime: {
       label: 'Render Time',

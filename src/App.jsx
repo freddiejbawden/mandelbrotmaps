@@ -11,8 +11,9 @@ import { checkSupported } from './utils/checkSupported';
 import preventZoom from './utils/preventZoom';
 import SideBar from './components/SideBar';
 import setUpFocusHandler from './focusHandler/focusHandler';
-import ControlsWindow from './components/ControlsWindow/ControlsWindow';
 import ViewOptions from './utils/ViewOptions';
+import HelpWindow from './components/HelpWindow/HelpWindow';
+import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 
 class App extends Component {
   constructor(props) {
@@ -33,6 +34,10 @@ class App extends Component {
       if (!window.localStorage.getItem('understandUnsupported')) {
         unsupportedPopUp = (<UnsupportedBrowser />);
       }
+    }
+    let welcomeScreen = '';
+    if (!window.localStorage.getItem('firstTime')) {
+      welcomeScreen = (<WelcomeModal />);
     }
     return (
       <div className="App">
@@ -61,8 +66,9 @@ class App extends Component {
         <DebugBar
           showDebugBar={p.store.showDebugBar}
         />
-        <ControlsWindow />
+        <HelpWindow />
         {unsupportedPopUp}
+        {welcomeScreen}
       </div>
     );
   }

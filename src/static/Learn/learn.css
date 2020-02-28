@@ -1,0 +1,17 @@
+
+
+
+
+.about-container {
+  max-width: 100%;
+}
+.about-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-top: 50px;
+  padding-left: 100px;
+  padding-right: 100px;
+}

@@ -1,0 +1,22 @@
+.unsupported-browser-message-container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2em;
+  width: 100%;
+}
+
+.dont-remind {
+  color: grey;
+}
+.dont-remind > input {
+  margin-left: 1em;
+}
+.continue-button {
+  padding: 1em;
+  background-color: red;
+  border-radius: 20px;
+  font-weight: bold;
+}
