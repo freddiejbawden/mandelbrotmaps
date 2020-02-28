@@ -57,7 +57,7 @@ class App extends Component {
             hidden={p.store.viewMode === ViewOptions.MANDELBROT_FULLSCREEN}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...p.store}
-
+            juliaZoom={(window.innerWidth < 600) ? 0.03 : 0.01}
 
           />
 

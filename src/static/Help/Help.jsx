@@ -51,7 +51,12 @@ button
         />
         <HelpCard
           title="Zoom"
-          description={<p>Scroll or pinch to zoom the fractal</p>}
+          description={(
+            <p>
+Scroll or pinch to zoom the fractal.
+            Alternativly double tap/click to zoom
+            </p>
+)}
           image={['zoom']}
         />
         <HelpCard

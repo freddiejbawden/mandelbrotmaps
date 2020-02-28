@@ -938,7 +938,7 @@ FractalViewer.propTypes = {
 FractalViewer.defaultProps = {
   showJuliaPin: true,
   mandelbrotZoom: 0.01,
-  juliaZoom: 0.01,
+  juliaZoom: 0.03,
   mandelbrotCentre: [0, 0],
   juliaCentre: [0, 0],
   juliaPoint: [0, 0],
