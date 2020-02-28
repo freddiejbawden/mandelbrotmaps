@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './Settings.css';
 import {
-  Modal, Grid, Button,
+  Modal, Grid, Button, Popup,
 } from 'semantic-ui-react';
 
 import RenderMode from '../../Renderer/RenderMode';
@@ -124,12 +124,7 @@ class Settings extends Component {
       <Modal
         closeIcon
         trigger={(
-          <Button
-            size="large"
-            onClick={this.handleOpen}
-            circular
-            icon="settings"
-          />
+          <Popup position="right center" content="Open Settings Menu" trigger={(<Button size="large" onClick={this.handleOpen} circular icon="settings" />)} />
         )}
         className="options-container"
         open={s.modalOpen}

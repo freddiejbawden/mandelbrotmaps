@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Popup } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import Settings from '../Settings/Settings';
 import './SideBar.css';
@@ -108,12 +108,18 @@ class SideBar extends Component {
     if (p.store.viewMode !== ViewOptions.SIDEBYSIDE) {
       exchangeButton = (
         <div>
-          <Button
-            onClick={() => this.swapView()}
-            className="side-button"
-            size="large"
-            circular
-            icon="exchange"
+          <Popup
+            position="right center"
+            content="Swap Views"
+            trigger={(
+              <Button
+                onClick={() => this.swapView()}
+                className="side-button"
+                size="large"
+                circular
+                icon="exchange"
+              />
+          )}
           />
         </div>
       );
@@ -121,36 +127,56 @@ class SideBar extends Component {
     return (
       <div className="side-bar-container">
         <div>
-          <Settings />
-        </div>
-        <div>
-          <Button
-            onClick={() => this.centreJulia()}
-            className="side-button"
-            size="large"
-            circular
-            icon="crosshairs"
+          <Popup
+            position="right center"
+            content="Centre Julia Pin"
+            trigger={(
+              <Button
+                onClick={() => this.centreJulia()}
+                className="side-button"
+                size="large"
+                circular
+                icon="crosshairs"
+              />
+           )}
           />
         </div>
         <div>
-          <Button
-            onClick={() => this.resetZoom()}
-            className="side-button"
-            size="large"
-            circular
-            icon="undo"
+          <Popup
+            position="right center"
+            content="Reset Zoom"
+            trigger={(
+              <Button
+                onClick={() => this.resetZoom()}
+                className="side-button"
+                size="large"
+                circular
+                icon="undo"
+              />
+          )}
           />
+
         </div>
         <LinkShare />
         {exchangeButton}
         <div>
-          <Button
-            onClick={() => this.toggleControls()}
-            className="side-button"
-            size="large"
-            circular
-            icon="help"
+          <Popup
+            position="right center"
+            content="Open Help Menu"
+            trigger={(
+              <Button
+                onClick={() => this.toggleControls()}
+                className="side-button"
+                size="large"
+                circular
+                icon="help"
+              />
+)}
           />
+
+        </div>
+        <div>
+          <Settings />
         </div>
         {devTools}
       </div>
