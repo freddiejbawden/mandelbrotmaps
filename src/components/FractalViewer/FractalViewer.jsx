@@ -805,10 +805,6 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    if (this.zoomLevel < 0.5) {
-      this.zoomLevel = 0.5;
-      return;
-    }
     const p = this.props;
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
@@ -846,7 +842,7 @@ class FractalViewer extends React.Component {
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
-    // The fractal has changed so if we drag we will cannot use the 
+    // The fractal has changed so if we drag we will cannot use the
     // cached one. We mark this using the dirty flag
     this.dirty = true;
     requestAnimationFrame(() => this.safeUpdate());
