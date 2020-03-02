@@ -2,7 +2,9 @@
 /* eslint-disable max-classes-per-file */
 
 import React from 'react';
+import parser from 'ua-parser-js';
 import initialState from './initialState';
+import Mode from '../Renderer/RenderMode';
 
 const StoreContext = React.createContext();
 // Adapted From https://itnext.io/manage-react-state-without-redux-a1d03403d360
@@ -56,7 +58,9 @@ const createStore = (WrappedComponent) => class extends React.Component {
         this.setState(state);
       },
       ...initialState,
+      ...this.defaultRenderer(),
       ...this.getParams(),
+      ...this.defaultRenderer(),
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -80,6 +84,15 @@ const createStore = (WrappedComponent) => class extends React.Component {
         }
       });
       return j;
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    defaultRenderer() {
+      const uaData = parser(navigator.userAgent);
+      const isBlink = uaData.engine.name === 'Blink';
+      return {
+        renderMode: (isBlink) ? Mode.JAVASCRIPTMT : Mode.WASMMT,
+      };
     }
 
     render() {
