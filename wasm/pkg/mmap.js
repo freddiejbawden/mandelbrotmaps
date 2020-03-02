@@ -34,8 +34,6 @@ function passArray8ToWasm(arg) {
     return ptr;
 }
 
-function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
-
 function getObject(idx) { return heap[idx]; }
 
 function dropObject(idx) {
@@ -249,8 +247,6 @@ export class Mandelbrot {
         return ret;
     }
 }
-
-export const __wbg_log_f514957e1fd60c0f = typeof console.log == 'function' ? console.log : notDefined('console.log');
 
 export const __wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);

@@ -6,7 +6,6 @@ import FractalType from '../utils/FractalType';
 class Renderer {
   constructor(type, renderMethod, width, height, maxIter, juliaPoint, coloringMode) {
     this.mode = renderMethod;
-    console.log(type);
     this.basePixelSize = (type === FractalType.MANDELBROT) ? 0.05 : 0.05;
     this.maximumPixelSize = this.basePixelSize * 4;
     this.pixelSize = this.basePixelSize;
@@ -147,7 +146,6 @@ class Renderer {
   }
 
   render(level, lowRes) {
-    console.log(this.pixelSize);
     this.maxIter = level;
     // eslint-disable-next-line no-async-promise-executor
     const renderPromise = new Promise(async (resolve, reject) => {

@@ -507,7 +507,9 @@ class FractalViewer extends React.Component {
   }
 
   handleMouseUp(e) {
-    this.handleDragEnd(e);
+    if (!this.rendering) {
+      this.handleDragEnd(e);
+    }
   }
 
   coordsToWorld(x, y) {
@@ -563,6 +565,8 @@ class FractalViewer extends React.Component {
       } else {
         this.deltaX += e.movementX;
         this.deltaY += e.movementY;
+        this.imageOffsetX += e.movementX;
+        this.imageOffsetY += e.movementY;
         this.safeUpdate();
       }
     }
@@ -574,6 +578,23 @@ class FractalViewer extends React.Component {
       this.updateCanvas();
     }
   }
+
+  renderRange = async (xRect, yRect, roundID) => {
+    this.rendering = true;
+    const result = await this.renderer.renderRange(
+      xRect,
+      yRect,
+      this.deltaX,
+      this.deltaY,
+    );
+    if (result === []) {
+      this.drawFractal();
+    }
+    if (this.renderID === roundID) {
+      this.putImage(result.arr, result.width, result.height);
+    }
+    this.rendering = false;
+  };
 
   async handleDragEnd() {
     if (this.dragging) {
@@ -626,21 +647,6 @@ class FractalViewer extends React.Component {
       const roundID = idGenerator();
       this.renderID = roundID;
       const startTime = Date.now();
-      const renderRange = async () => {
-        const result = await this.renderer.renderRange(
-          xRect,
-          yRect,
-          this.deltaX,
-          this.deltaY,
-        );
-        if (result === []) {
-          this.drawFractal();
-        }
-        if (this.renderID === roundID) {
-          this.putImage(result.arr, result.width, result.height);
-        }
-      };
-
       if (this.dirty) {
         this.renderer.zoomOnPoint(
           this.canvasZoom / this.prevStepZoom,
@@ -654,7 +660,7 @@ class FractalViewer extends React.Component {
         this.canvasZoom = 1;
         await this.drawFractal();
       } else {
-        await renderRange();
+        await this.renderRange(xRect, yRect, roundID);
       }
       this.dragging = false;
       this.deltaX = 0;
@@ -799,10 +805,6 @@ class FractalViewer extends React.Component {
       return;
     }
     this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    if (this.zoomLevel < 0.5) {
-      this.zoomLevel = 0.5;
-      return;
-    }
     const p = this.props;
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
@@ -840,6 +842,8 @@ class FractalViewer extends React.Component {
     this.canvasZoom = newCanvasZoom;
     this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
     this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
+    // The fractal has changed so if we drag we will cannot use the
+    // cached one. We mark this using the dirty flag
     this.dirty = true;
     requestAnimationFrame(() => this.safeUpdate());
   }
