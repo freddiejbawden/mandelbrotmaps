@@ -1,0 +1,32 @@
+.navbar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.navbar-text {
+  font-size: x-large;
+  font-weight: medium;
+}
+.navbar-link {
+  margin-right: 16px;
+  color: black;
+}
+.open-app-button {
+  justify-self: end;
+}
+@media only screen and (max-width: 600px) {
+  .navbar-menu {
+    position: absolute;
+    right: 0;
+    top: 40px;
+  }
+  .navbar {
+    padding: 20px;
+  }
+}

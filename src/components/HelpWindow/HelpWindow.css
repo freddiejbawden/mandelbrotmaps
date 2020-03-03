@@ -1,0 +1,77 @@
+.help-window {
+  position: absolute !important;
+  bottom: 0%;
+  left: 50px;
+  margin: 10px !important;
+  /* bring your own prefixes */
+  background-color: white;
+  min-width: 250px;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important;
+}
+
+.help-links {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.help-links > button {
+  margin-bottom: 5px !important;
+}
+.help-modal {
+  padding: 20px;
+  margin-bottom: 20px !important;
+}
+.help-container {
+  width: 100%;
+}
+.help-close {
+  position: absolute;
+  right: 1%;
+  top: 0%;
+}
+
+.help-top {
+  width: 100%;
+  position: relative;
+}
+.details-container {
+  display: flex;
+  flex-direction: row;
+}
+.details-container > div{
+  margin: 1em 1em 1em 0;
+}
+.divider {
+  border: grey solid 0.5px;
+}
+.help-close-button {
+  display: none !important;
+  justify-content: center;
+  align-self: center;
+  width: 100%;
+}
+@media only screen and (max-width: 700px) {
+ .help-close-button {
+   display: block !important;
+ }
+
+ .details-container {
+  display: flex;
+  flex-direction: column;
+  }
+}
+@media only screen and (max-height: 600px) {
+  .help-close-button {
+    display: block !important;
+  }
+ 
+  .details-container {
+   display: flex;
+   flex-direction: column;
+   }
+ }
+ 

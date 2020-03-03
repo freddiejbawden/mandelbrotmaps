@@ -1,0 +1,14 @@
+.control-row {
+  width: 100%;
+  display: flex;
+  margin-bottom: 1em;
+}
+.control-desc {
+  padding-left: 2em;
+  text-align: right;
+  width: 100%;
+}
+.control-text{
+  text-align: left;
+  width: 100%;
+}
