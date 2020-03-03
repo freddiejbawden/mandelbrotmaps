@@ -819,7 +819,6 @@ class FractalViewer extends React.Component {
       return;
     }
     if (!this.zoomPointX) {
-      console.log(this.zoomPointX);
       this.zoomPointX = this.mouseX;
       this.zoomPointY = this.mouseY;
     }
