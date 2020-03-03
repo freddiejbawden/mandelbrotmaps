@@ -55,6 +55,11 @@ class SideBar extends Component {
     let newOption;
     if (p.store.viewMode === ViewOptions.SIDEBYSIDE) {
       newOption = ViewOptions.JULIA_DETATCHED;
+    } else if (
+      p.store.viewMode === ViewOptions.JULIA_DETATCHED
+      || p.store.viewMode === ViewOptions.MANDELBROT_DETATCHED
+    ) {
+      newOption = ViewOptions.MANDELBROT_FULLSCREEN;
     } else {
       newOption = ViewOptions.SIDEBYSIDE;
     }
@@ -97,12 +102,20 @@ class SideBar extends Component {
     let devTools = '';
     const p = this.props;
     const s = this.state;
-    const view = (p.store.viewMode === ViewOptions.SIDEBYSIDE) ? 'detatch.png' : 'sidebyside.png';
+    let viewIcon;
     let viewText;
     if (p.store.viewMode === ViewOptions.SIDEBYSIDE) {
-      viewText = 'Change to detatched viewer';
+      viewIcon = 'detatch.png';
+      viewText = 'Change to Detatched Mode';
+    } else if (
+      p.store.viewMode === ViewOptions.JULIA_DETATCHED
+        || p.store.viewMode === ViewOptions.MANDELBROT_DETATCHED
+    ) {
+      viewIcon = 'fullscreen.png';
+      viewText = 'Change to Fullscreen Mode';
     } else {
-      viewText = 'Change to side by side viewer';
+      viewIcon = 'sidebyside.png';
+      viewText = 'Change to Side By Side Mopde';
     }
     if (s.devMode) {
       devTools = (
@@ -152,9 +165,11 @@ class SideBar extends Component {
                 className="side-button"
                 size="large"
                 circular
-                style={{ padding: '12px', height: '42px', width: '42px' }}
+                style={{
+                  padding: '12px', height: '42px', width: '42px', display: 'flex', alignItems: 'centre', justifyContent: 'centre',
+                }}
               >
-                <img alt="viewbutton" src={view} className="sidebyside" />
+                <img alt="viewbutton" src={viewIcon} className="sidebyside" />
               </Button>
            )}
           />
