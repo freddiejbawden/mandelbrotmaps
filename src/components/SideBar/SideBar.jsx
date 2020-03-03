@@ -8,6 +8,7 @@ import FractalType from '../../utils/FractalType';
 import ViewOptions from '../../utils/ViewOptions';
 import LinkShare from '../LinkShare';
 
+
 class SideBar extends Component {
   constructor(props) {
     super(props);
@@ -49,6 +50,24 @@ class SideBar extends Component {
     });
   }
 
+  changeView() {
+    const p = this.props;
+    let newOption;
+    if (p.store.viewMode === ViewOptions.SIDEBYSIDE) {
+      newOption = ViewOptions.JULIA_DETATCHED;
+    } else if (
+      p.store.viewMode === ViewOptions.JULIA_DETATCHED
+      || p.store.viewMode === ViewOptions.MANDELBROT_DETATCHED
+    ) {
+      newOption = ViewOptions.MANDELBROT_FULLSCREEN;
+    } else {
+      newOption = ViewOptions.SIDEBYSIDE;
+    }
+    p.store.set({
+      viewMode: newOption,
+    });
+  }
+
   centreJulia() {
     const p = this.props;
     const st = p.store;
@@ -83,6 +102,21 @@ class SideBar extends Component {
     let devTools = '';
     const p = this.props;
     const s = this.state;
+    let viewIcon;
+    let viewText;
+    if (p.store.viewMode === ViewOptions.SIDEBYSIDE) {
+      viewIcon = 'detatch.png';
+      viewText = 'Change to Detatched Mode';
+    } else if (
+      p.store.viewMode === ViewOptions.JULIA_DETATCHED
+        || p.store.viewMode === ViewOptions.MANDELBROT_DETATCHED
+    ) {
+      viewIcon = 'fullscreen.png';
+      viewText = 'Change to Fullscreen Mode';
+    } else {
+      viewIcon = 'sidebyside.png';
+      viewText = 'Change to Side By Side Mopde';
+    }
     if (s.devMode) {
       devTools = (
         <div>
@@ -104,26 +138,6 @@ class SideBar extends Component {
       );
     }
 
-    let exchangeButton = '';
-    if (p.store.viewMode !== ViewOptions.SIDEBYSIDE) {
-      exchangeButton = (
-        <div>
-          <Popup
-            position="right center"
-            content="Swap Views"
-            trigger={(
-              <Button
-                onClick={() => this.swapView()}
-                className="side-button"
-                size="large"
-                circular
-                icon="exchange"
-              />
-          )}
-          />
-        </div>
-      );
-    }
     return (
       <div className="side-bar-container">
         <div>
@@ -144,6 +158,25 @@ class SideBar extends Component {
         <div>
           <Popup
             position="right center"
+            content={viewText}
+            trigger={(
+              <Button
+                onClick={() => this.changeView()}
+                className="side-button"
+                size="large"
+                circular
+                style={{
+                  padding: '12px', height: '42px', width: '42px', display: 'flex', alignItems: 'centre', justifyContent: 'centre',
+                }}
+              >
+                <img alt="viewbutton" src={viewIcon} className="sidebyside" />
+              </Button>
+           )}
+          />
+        </div>
+        <div>
+          <Popup
+            position="right center"
             content="Reset Zoom"
             trigger={(
               <Button
@@ -158,7 +191,22 @@ class SideBar extends Component {
 
         </div>
         <LinkShare />
-        {exchangeButton}
+        <div>
+          <Popup
+            position="right center"
+            content="Swap Views"
+            trigger={(
+              <Button
+                onClick={() => this.swapView()}
+                className="side-button"
+                size="large"
+                circular
+                icon="exchange"
+                disabled={(p.store.viewMode === ViewOptions.SIDEBYSIDE)}
+              />
+          )}
+          />
+        </div>
         <div>
           <Popup
             position="right center"

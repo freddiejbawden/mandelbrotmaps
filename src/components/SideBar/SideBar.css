@@ -9,3 +9,8 @@
 .side-bar-container div {
   margin-bottom: 10px;
 }
+.sidebyside {
+    height: auto;
+    width: 20px;
+    display: block;
+}
