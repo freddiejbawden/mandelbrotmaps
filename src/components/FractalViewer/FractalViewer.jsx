@@ -79,6 +79,8 @@ class FractalViewer extends React.Component {
     this.lastMouse = [];
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
+    this.zoomPointX = null;
+    this.zoomPointY = null;
     this.previousLength = -1;
     this.renderMode = props.renderMode;
     this.draggingPin = false;
@@ -804,6 +806,8 @@ class FractalViewer extends React.Component {
       this.previousLength = -1;
       this.originX = 0;
       this.originY = 0;
+      this.zoomPointX = null;
+      this.zoomPointY = null;
       this.canvasZoom = 1;
       this.dirty = false;
     }
@@ -813,6 +817,11 @@ class FractalViewer extends React.Component {
   zoom(direction, magnificationStep, centred) {
     if (this.rendering) {
       return;
+    }
+    if (!this.zoomPointX) {
+      console.log(this.zoomPointX);
+      this.zoomPointX = this.mouseX;
+      this.zoomPointY = this.mouseY;
     }
     this.zooming = true;
     const magnificationDelta = magnificationStep;
@@ -835,8 +844,8 @@ class FractalViewer extends React.Component {
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
-    this.mouseX = (this.mouseX && !centred) ? this.mouseX : this.width / 2;
-    this.mouseY = (this.mouseY && !centred) ? this.mouseY : this.height / 2;
+    this.mouseX = (this.zoomPointX && !centred) ? this.zoomPointX : this.width / 2;
+    this.mouseY = (this.zoomPointY && !centred) ? this.zoomPointY : this.height / 2;
 
     const centreX = this.mouseX;
     const centreY = this.mouseY;
