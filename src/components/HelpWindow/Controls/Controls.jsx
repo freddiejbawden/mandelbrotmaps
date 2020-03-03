@@ -24,6 +24,11 @@ export default function Controls() {
         <Header as="h4">Mouse</Header>
         <div className="help-container">
           <Control type="text" text="Click + Drag" description={'Pan Fractal /\n Move Julia Pin'} />
+          <Control type="text" text="Scroll" description="Zoom Fractal" />
+        </div>
+        <Header as="h4">Trackpad</Header>
+        <div className="help-container">
+          <Control type="text" text="Click + Drag" description={'Pan Fractal /\n Move Julia Pin'} />
           <Control type="text" text="Scroll / Pinch" description="Zoom Fractal" />
         </div>
         <Header as="h4">Touch</Header>
