@@ -13,7 +13,7 @@ import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
 import Mode from '../../Renderer/RenderMode';
-
+import LoaderPopUp from './LoaderPopUp/LoaderPopUp';
 import Dragger from './Dragger.png';
 import ColorMode from '../../Renderer/ColorOptions';
 import ViewOptions from '../../utils/ViewOptions';
@@ -59,6 +59,9 @@ class FractalViewer extends React.Component {
       39: false,
       40: false,
     };
+    this.state = {
+      showSpinner: false,
+    };
     this.dirty = false;
     this.renderID = undefined;
     this.updateDimensionsTimer = this.updateDimensionsTimer.bind(this);
@@ -76,6 +79,8 @@ class FractalViewer extends React.Component {
     this.lastMouse = [];
     this.juliaShiftX = 0;
     this.juliaShiftY = 0;
+    this.zoomPointX = null;
+    this.zoomPointY = null;
     this.previousLength = -1;
     this.renderMode = props.renderMode;
     this.draggingPin = false;
@@ -247,7 +252,7 @@ class FractalViewer extends React.Component {
         return false;
       }
     }
-    return false;
+    return true;
   }
 
   componentDidUpdate() {
@@ -390,6 +395,12 @@ class FractalViewer extends React.Component {
       } else {
         iterationCount = iters;
       }
+      clearTimeout(this.spinnerTimeout);
+      this.spinnerTimeout = setTimeout(() => {
+        this.setState({
+          showSpinner: true,
+        });
+      }, 300);
       this.renderer.render(iterationCount, this.mandelbrotDragging).then((fractal) => {
         this.rendering = false;
         this.canvasOffsetX = 0;
@@ -401,6 +412,11 @@ class FractalViewer extends React.Component {
         // (`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
         p.store.setStat({
           renderTime: (Date.now() - startTime),
+        });
+        clearTimeout(this.spinnerTimeout);
+
+        this.setState({
+          showSpinner: false,
         });
       }).catch((err) => {
         // TODO: alert user
@@ -497,13 +513,15 @@ class FractalViewer extends React.Component {
   }
 
   async handleMouseDown() {
-    if (this.type !== FractalType.JULIA) {
-      // Make sure the Julia Pin can only be picked up by another fractal
-      if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
-        this.draggingPin = true;
+    if (!this.rendering && !this.zooming) {
+      if (this.type !== FractalType.JULIA) {
+        // Make sure the Julia Pin can only be picked up by another fractal
+        if (this.juliaPin.isClicked(this.mouseX, this.mouseY)) {
+          this.draggingPin = true;
+        }
       }
+      this.dragging = true;
     }
-    this.dragging = true;
   }
 
   handleMouseUp(e) {
@@ -788,6 +806,8 @@ class FractalViewer extends React.Component {
       this.previousLength = -1;
       this.originX = 0;
       this.originY = 0;
+      this.zoomPointX = null;
+      this.zoomPointY = null;
       this.canvasZoom = 1;
       this.dirty = false;
     }
@@ -798,13 +818,24 @@ class FractalViewer extends React.Component {
     if (this.rendering) {
       return;
     }
+    if (!this.zoomPointX) {
+      this.zoomPointX = this.mouseX;
+      this.zoomPointY = this.mouseY;
+    }
+    this.zooming = true;
     const magnificationDelta = magnificationStep;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
       return;
     }
-    this.zoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
+    const newZoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
+    if (newZoomLevel > 302039146) {
+      this.zoomLevel = 302039146;
+      this.zooming = false;
+      return;
+    }
+    this.zoomLevel = newZoomLevel;
     const p = this.props;
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
@@ -812,8 +843,8 @@ class FractalViewer extends React.Component {
     if (newCanvasZoom < 0.1) {
       newCanvasZoom = 0.1;
     }
-    this.mouseX = (this.mouseX && !centred) ? this.mouseX : this.width / 2;
-    this.mouseY = (this.mouseY && !centred) ? this.mouseY : this.height / 2;
+    this.mouseX = (this.zoomPointX && !centred) ? this.zoomPointX : this.width / 2;
+    this.mouseY = (this.zoomPointY && !centred) ? this.zoomPointY : this.height / 2;
 
     const centreX = this.mouseX;
     const centreY = this.mouseY;
@@ -837,6 +868,7 @@ class FractalViewer extends React.Component {
     this.zoomTimeout = setTimeout(() => {
       this.juliaShiftX = this.juliaPin.x - this.callBackMouse[0];
       this.juliaShiftY = this.juliaPin.y - this.callBackMouse[1];
+      this.zooming = false;
       this.resetZoomAndRender();
     }, 300);
     this.canvasZoom = newCanvasZoom;
@@ -854,6 +886,7 @@ class FractalViewer extends React.Component {
 
   render() {
     const p = this.props;
+    const st = this.state;
     let focus = '';
     if (this.focus === this.type && this.focusHighlight) {
       focus = (
@@ -894,6 +927,7 @@ class FractalViewer extends React.Component {
             id={`fractal-${this.type}`}
             ref={this.fractal}
           />
+          <LoaderPopUp show={st.showSpinner} />
           {focus}
         </div>
       </div>
