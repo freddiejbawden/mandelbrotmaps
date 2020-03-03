@@ -13,7 +13,7 @@ import FractalType from '../../utils/FractalType';
 import distance, { centre } from '../../utils/TouchUtils';
 import { withStore } from '../../statemanagement/createStore';
 import Mode from '../../Renderer/RenderMode';
-
+import LoaderPopUp from './LoaderPopUp/LoaderPopUp';
 import Dragger from './Dragger.png';
 import ColorMode from '../../Renderer/ColorOptions';
 import ViewOptions from '../../utils/ViewOptions';
@@ -58,6 +58,9 @@ class FractalViewer extends React.Component {
       38: false,
       39: false,
       40: false,
+    };
+    this.state = {
+      showSpinner: false,
     };
     this.dirty = false;
     this.renderID = undefined;
@@ -247,7 +250,7 @@ class FractalViewer extends React.Component {
         return false;
       }
     }
-    return false;
+    return true;
   }
 
   componentDidUpdate() {
@@ -390,6 +393,12 @@ class FractalViewer extends React.Component {
       } else {
         iterationCount = iters;
       }
+      clearTimeout(this.spinnerTimeout);
+      this.spinnerTimeout = setTimeout(() => {
+        this.setState({
+          showSpinner: true,
+        });
+      }, 300);
       this.renderer.render(iterationCount, this.mandelbrotDragging).then((fractal) => {
         this.rendering = false;
         this.canvasOffsetX = 0;
@@ -401,6 +410,11 @@ class FractalViewer extends React.Component {
         // (`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
         p.store.setStat({
           renderTime: (Date.now() - startTime),
+        });
+        clearTimeout(this.spinnerTimeout);
+
+        this.setState({
+          showSpinner: false,
         });
       }).catch((err) => {
         // TODO: alert user
@@ -864,6 +878,7 @@ class FractalViewer extends React.Component {
 
   render() {
     const p = this.props;
+    const st = this.state;
     let focus = '';
     if (this.focus === this.type && this.focusHighlight) {
       focus = (
@@ -904,6 +919,7 @@ class FractalViewer extends React.Component {
             id={`fractal-${this.type}`}
             ref={this.fractal}
           />
+          <LoaderPopUp show={st.showSpinner} />
           {focus}
         </div>
       </div>
