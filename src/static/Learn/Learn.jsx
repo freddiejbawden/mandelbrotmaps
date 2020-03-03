@@ -9,18 +9,18 @@ function Learn() {
   return (
     <div>
       <Header as="h1">Learn</Header>
+      <Header as="h2">Text Resources</Header>
+        David E. Joyce provides a brief yet well explained background about
+      {' '}
+
+        the Mandelbrot and Julia Sets, you can read their article
+      {' '}
+      <a href="https://mathcs.clarku.edu/~djoyce/julia/julia.html">here.</a>
+      <Header as="h2">Video Resources</Header>
       <p>
-        <strong>
-              This page will contain information about the fractals and how they are formed
-        </strong>
-      </p>
-      <Header>Mandelbrot And Julia Sets</Header>
-      <p><strong>Will dump Mathematical Background section here</strong></p>
-      <Header>Additonal Resources</Header>
-      <p>
-Many great videos have been published discussing the Mandelbrot and Julia set,
+Many great videos have been published discussing the Mandelbrot and Julia set;
             during my research I watched quite a few of them! Below is a collection of resources
-             which I found useful in my understanding of the subject
+             which I found useful in my understanding of the subject.
       </p>
       <VideoCard
         title="What's so special about the Mandelbrot Set? - Numberphile"
