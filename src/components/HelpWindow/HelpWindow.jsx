@@ -46,6 +46,7 @@ class HelpWindow extends Component {
           <Icon name="close" className="help-close" onClick={(e) => this.handleClose(e)} />
         </div>
         <div className="help-links">
+          {/* This is not the way to do it! Maybe fix this */}
           <Link to="about" target="_blank" onClick={(event) => { event.preventDefault(); window.open(`http://${window.location.host}/about`); }}>
             <Button basic color="black">About</Button>
           </Link>

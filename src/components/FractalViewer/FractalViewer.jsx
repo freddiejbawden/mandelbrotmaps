@@ -428,6 +428,7 @@ class FractalViewer extends React.Component {
 
   updateCanvas() {
     const fractalContext = this.fractal.current.getContext('2d');
+    if (!fractalContext) return;
     fractalContext.fillStyle = '#787878';
 
     // define a reference canvas for the image
