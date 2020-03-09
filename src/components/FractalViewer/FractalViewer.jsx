@@ -105,7 +105,7 @@ class FractalViewer extends React.Component {
     this.zoomLevel = (this.renderer.basePixelSize / this.renderer.pixelSize);
     const jpointWorld = this.worldToCoords(props.juliaPoint[0], props.juliaPoint[1]);
     this.juliaPin = new JuliaPin(jpointWorld[0], jpointWorld[1], 20);
-    this.previousIterations = props.customIterations;
+    this.previousIterations = -1;
     this.previousOverride = props.overrideIterations;
   }
 
@@ -233,7 +233,7 @@ class FractalViewer extends React.Component {
     }
     if (
       this.previousIterations !== nextProps.customIterations
-      && nextProps.overrideIterations) {
+      && this.previousOverride) {
       this.previousIterations = nextProps.customIterations;
       this.drawFractal();
       return false;
@@ -252,7 +252,7 @@ class FractalViewer extends React.Component {
         return false;
       }
     }
-    return true;
+    return false;
   }
 
   componentDidUpdate() {
@@ -374,7 +374,7 @@ class FractalViewer extends React.Component {
       const p = this.props;
       const s = p.store;
       s.setStat({
-        iterations: newIter,
+        iterations: Math.floor(newIter),
       });
       return Math.floor(newIter);
     };
@@ -385,15 +385,17 @@ class FractalViewer extends React.Component {
     if (!this.dragging || !this.dirty) {
       let iterationCount;
       const p = this.props;
-      const iters = iterationCalc(this.zoomLevel);
-      if (p.overrideIterations && !this.mandelbrotDragging) {
-        iterationCount = p.customIterations;
-      } else if (this.type === FractalType.MANDELBROT) {
-        iterationCount = iters;
-      } else if (this.mandelbrotDragging) {
-        iterationCount = Math.min(100, iters / 2);
+      if (this.previousOverride && !this.mandelbrotDragging) {
+        iterationCount = this.previousIterations;
       } else {
-        iterationCount = iters;
+        const iters = iterationCalc(this.zoomLevel);
+        if (this.type === FractalType.MANDELBROT) {
+          iterationCount = iters;
+        } else if (this.mandelbrotDragging) {
+          iterationCount = Math.min(100, iters / 2);
+        } else {
+          iterationCount = iters;
+        }
       }
       clearTimeout(this.spinnerTimeout);
       this.spinnerTimeout = setTimeout(() => {
@@ -1005,7 +1007,7 @@ FractalViewer.defaultProps = {
   focus: FractalType.MANDELBROT,
   maxIter: 200,
   coloringMode: ColorMode.RAINBOW,
-  customIterations: 200,
+  customIterations: -1,
   viewMode: ViewOptions.JULIA_DETATCHED,
   forceUpdate: -1,
   resetFractal: false,

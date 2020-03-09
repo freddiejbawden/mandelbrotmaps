@@ -74,6 +74,11 @@ class Settings extends Component {
     const p = this.props;
     const st = p.store;
     st.toggle('overrideIterations');
+    if (st.overrideIterations) {
+      st.setStat({
+        iterations: st.customIterations,
+      });
+    }
   }
 
   updateColoringMethod(val) {
