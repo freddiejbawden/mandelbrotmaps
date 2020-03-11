@@ -851,8 +851,8 @@ class FractalViewer extends React.Component {
       return;
     }
     const newZoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    if (newZoomLevel > 302039146) {
-      this.zoomLevel = 302039146;
+    if (newZoomLevel >= 100000000) {
+      this.zoomLevel = 100000000;
       this.zooming = false;
       return;
     }
