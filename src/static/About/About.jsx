@@ -23,7 +23,7 @@ function About() {
       <p>
         <a href="https://jmaio.github.io/Joao Maio">Joao Maio</a>
         {' '}
-        developed a similar project in parallel using WebGL as the render engine. Their application is super fast and looks beautiful, [check it out!](https://jmaio.github.io/mandelbrot-maps/)
+        developed a similar project in parallel using WebGL as the render engine. Their application is super fast and looks beautiful, <a href="https://jmaio.github.io/mandelbrot-maps/">check it out!</a>
       </p>
 
       <p>
