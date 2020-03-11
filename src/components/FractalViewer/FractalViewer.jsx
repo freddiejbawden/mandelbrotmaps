@@ -111,7 +111,6 @@ class FractalViewer extends React.Component {
 
   async componentDidMount() {
     this.fractal.current.focus();
-    // await this.loadWasm();
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
@@ -166,8 +165,11 @@ class FractalViewer extends React.Component {
     });
     document.addEventListener('keyup', async (e) => {
       if (e.keyCode >= 37 && e.keyCode <= 40) {
-        this.keysDown[e.keyCode] = false;
-        await this.handleDragEnd();
+        clearTimeout(this.keyupTimeout);
+        this.keyupTimeout = setTimeout(() => {
+          this.keysDown[e.keyCode] = false;
+          this.handleDragEnd();
+        }, 300);
       }
       if (e.keyCode === 16) {
         this.shiftPressed = false;
