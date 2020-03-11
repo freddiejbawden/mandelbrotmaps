@@ -44,29 +44,33 @@ class JuliaPin {
     const translatedY = this.y + dY;
     const topLeftX = translatedX - this.size / 2;
     const topLeftY = translatedY - this.size / 2;
+    try {
+      const colors = fractalContext.getImageData(
+        topLeftX,
+        topLeftY,
+        this.size,
+        this.size,
+      ).data || [255, 0, 0];
 
-    const colors = fractalContext.getImageData(
-      topLeftX,
-      topLeftY,
-      this.size,
-      this.size,
-    ).data || [255, 0, 0];
+      const invertedColors = colors.map((c) => 255 - c);
+      const darkArea = isDark(invertedColors);
 
-    const invertedColors = colors.map((c) => 255 - c);
-    const darkArea = isDark(invertedColors);
+      // Draw background circle
+      fractalContext.fillStyle = (darkArea) ? 'rgba(200,200,200,0.5)' : 'rgba(0,0,0,0.5)';
+      fractalContext.beginPath();
+      fractalContext.arc(this.x + dX, this.y + dY, this.size, 0, 2 * Math.PI, false);
+      fractalContext.fill();
 
-    // Draw background circle
-    fractalContext.fillStyle = (darkArea) ? 'rgba(200,200,200,0.5)' : 'rgba(0,0,0,0.5)';
-    fractalContext.beginPath();
-    fractalContext.arc(this.x + dX, this.y + dY, this.size, 0, 2 * Math.PI, false);
-    fractalContext.fill();
-
-    // Draw solid color circle
-    const hex = (darkArea) ? 'rgba(255,255,255,1)' : 'rgba(0,0,0,1)';
-    fractalContext.fillStyle = hex;
-    fractalContext.beginPath();
-    fractalContext.arc(this.x + dX, this.y + dY, this.size / 2, 0, 2 * Math.PI, false);
-    fractalContext.fill();
+      // Draw solid color circle
+      const hex = (darkArea) ? 'rgba(255,255,255,1)' : 'rgba(0,0,0,1)';
+      fractalContext.fillStyle = hex;
+      fractalContext.beginPath();
+      fractalContext.arc(this.x + dX, this.y + dY, this.size / 2, 0, 2 * Math.PI, false);
+      fractalContext.fill();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
   }
 }
 

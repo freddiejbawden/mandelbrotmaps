@@ -3,7 +3,7 @@ import {
   Segment, Modal, Header, Icon, Button,
 } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import './HelpWindow.css';
 import { withStore } from '../../statemanagement/createStore';
 import Controls from './Controls/Controls';
@@ -34,7 +34,7 @@ class HelpWindow extends Component {
   render() {
     const s = this.state;
     if (s.redirect) {
-      return <Redirect push to={`/${s.redirect}`} />;
+      return <Redirect push target="_black" to={`/${s.redirect}`} />;
     }
     let content;
     const p = this.props;
@@ -46,11 +46,19 @@ class HelpWindow extends Component {
           <Icon name="close" className="help-close" onClick={(e) => this.handleClose(e)} />
         </div>
         <div className="help-links">
-          <Button onClick={() => this.redirect('about')} basic color="black">About</Button>
-          <Button onClick={() => this.redirect('learn')} basic color="black">Learn More</Button>
-          <Button onClick={() => this.redirect('help')} basic color="black">Tutorial</Button>
-          <Button onClick={() => this.redirect('feedback')} basic color="black">Feedback</Button>
-
+          {/* This is not the way to do it! Maybe fix this */}
+          <Link to="about" target="_blank" onClick={(event) => { event.preventDefault(); window.open(`http://${window.location.host}/about`); }}>
+            <Button basic color="black">About</Button>
+          </Link>
+          <Link to="learn" target="_blank" onClick={(event) => { event.preventDefault(); window.open(`http://${window.location.host}/learn`); }}>
+            <Button basic color="black">Learn</Button>
+          </Link>
+          <Link to="about" target="_blank" onClick={(event) => { event.preventDefault(); window.open(`http://${window.location.host}/help`); }}>
+            <Button basic color="black">Tutorial</Button>
+          </Link>
+          <Link to="about" target="_blank" onClick={(event) => { event.preventDefault(); window.open(`http://${window.location.host}/feedback`); }}>
+            <Button basic color="black">Feedback</Button>
+          </Link>
         </div>
         <Header style={{ margin: '1em 0 0 0' }}>Controls</Header>
         <Controls />

@@ -50,7 +50,6 @@ class JSRenderer {
       return interpolate(
         0,
         255,
-        // Stripy: (1 + Math.cos(2 * Math.PI * val)) / 2,
         val / this.maxIter,
       );
     } if (this.coloringMethod === ColorMode.RAINBOW) {

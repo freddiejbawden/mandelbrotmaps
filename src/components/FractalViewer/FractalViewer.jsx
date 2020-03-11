@@ -105,13 +105,12 @@ class FractalViewer extends React.Component {
     this.zoomLevel = (this.renderer.basePixelSize / this.renderer.pixelSize);
     const jpointWorld = this.worldToCoords(props.juliaPoint[0], props.juliaPoint[1]);
     this.juliaPin = new JuliaPin(jpointWorld[0], jpointWorld[1], 20);
-    this.previousIterations = props.customIterations;
+    this.previousIterations = -1;
     this.previousOverride = props.overrideIterations;
   }
 
   async componentDidMount() {
     this.fractal.current.focus();
-    // await this.loadWasm();
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
@@ -166,8 +165,11 @@ class FractalViewer extends React.Component {
     });
     document.addEventListener('keyup', async (e) => {
       if (e.keyCode >= 37 && e.keyCode <= 40) {
-        this.keysDown[e.keyCode] = false;
-        await this.handleDragEnd();
+        clearTimeout(this.keyupTimeout);
+        this.keyupTimeout = setTimeout(() => {
+          this.keysDown[e.keyCode] = false;
+          this.handleDragEnd();
+        }, 300);
       }
       if (e.keyCode === 16) {
         this.shiftPressed = false;
@@ -233,7 +235,7 @@ class FractalViewer extends React.Component {
     }
     if (
       this.previousIterations !== nextProps.customIterations
-      && nextProps.overrideIterations) {
+      && this.previousOverride) {
       this.previousIterations = nextProps.customIterations;
       this.drawFractal();
       return false;
@@ -252,7 +254,7 @@ class FractalViewer extends React.Component {
         return false;
       }
     }
-    return true;
+    return false;
   }
 
   componentDidUpdate() {
@@ -374,7 +376,7 @@ class FractalViewer extends React.Component {
       const p = this.props;
       const s = p.store;
       s.setStat({
-        iterations: newIter,
+        iterations: Math.floor(newIter),
       });
       return Math.floor(newIter);
     };
@@ -385,15 +387,17 @@ class FractalViewer extends React.Component {
     if (!this.dragging || !this.dirty) {
       let iterationCount;
       const p = this.props;
-      const iters = iterationCalc(this.zoomLevel);
-      if (p.overrideIterations && !this.mandelbrotDragging) {
-        iterationCount = p.customIterations;
-      } else if (this.type === FractalType.MANDELBROT) {
-        iterationCount = iters;
-      } else if (this.mandelbrotDragging) {
-        iterationCount = Math.min(100, iters / 2);
+      if (this.previousOverride && !this.mandelbrotDragging) {
+        iterationCount = this.previousIterations;
       } else {
-        iterationCount = iters;
+        const iters = iterationCalc(this.zoomLevel);
+        if (this.type === FractalType.MANDELBROT) {
+          iterationCount = iters;
+        } else if (this.mandelbrotDragging) {
+          iterationCount = Math.min(100, iters / 2);
+        } else {
+          iterationCount = iters;
+        }
       }
       clearTimeout(this.spinnerTimeout);
       this.spinnerTimeout = setTimeout(() => {
@@ -428,6 +432,7 @@ class FractalViewer extends React.Component {
 
   updateCanvas() {
     const fractalContext = this.fractal.current.getContext('2d');
+    if (!fractalContext) return;
     fractalContext.fillStyle = '#787878';
 
     // define a reference canvas for the image
@@ -599,12 +604,25 @@ class FractalViewer extends React.Component {
 
   renderRange = async (xRect, yRect, roundID) => {
     this.rendering = true;
+    clearTimeout(this.spinnerTimeout);
+    this.spinnerTimeout = setTimeout(() => {
+      this.setState({
+        showSpinner: true,
+      });
+    }, 300);
     const result = await this.renderer.renderRange(
       xRect,
       yRect,
       this.deltaX,
       this.deltaY,
     );
+    clearTimeout(this.spinnerTimeout);
+    const st = this.state;
+    if (st.showSpinner) {
+      this.setState({
+        showSpinner: false,
+      });
+    }
     if (result === []) {
       this.drawFractal();
     }
@@ -826,12 +844,15 @@ class FractalViewer extends React.Component {
     const magnificationDelta = magnificationStep;
     const deltaZoom = magnificationDelta * -1 * Math.sign(direction);
     let newCanvasZoom = this.canvasZoom + deltaZoom;
+    if (newCanvasZoom < 0.1) {
+      newCanvasZoom = 0.1;
+    }
     if (this.renderer.maximumPixelSize < this.renderer.pixelSize / newCanvasZoom) {
       return;
     }
     const newZoomLevel = (this.renderer.basePixelSize / (this.renderer.pixelSize / newCanvasZoom));
-    if (newZoomLevel > 302039146) {
-      this.zoomLevel = 302039146;
+    if (newZoomLevel >= 100000000) {
+      this.zoomLevel = 100000000;
       this.zooming = false;
       return;
     }
@@ -840,9 +861,7 @@ class FractalViewer extends React.Component {
     p.store.setStat({
       zoomLevel: round(this.zoomLevel, 2),
     });
-    if (newCanvasZoom < 0.1) {
-      newCanvasZoom = 0.1;
-    }
+
     this.mouseX = (this.zoomPointX && !centred) ? this.zoomPointX : this.width / 2;
     this.mouseY = (this.zoomPointY && !centred) ? this.zoomPointY : this.height / 2;
 
@@ -990,7 +1009,7 @@ FractalViewer.defaultProps = {
   focus: FractalType.MANDELBROT,
   maxIter: 200,
   coloringMode: ColorMode.RAINBOW,
-  customIterations: 200,
+  customIterations: -1,
   viewMode: ViewOptions.JULIA_DETATCHED,
   forceUpdate: -1,
   resetFractal: false,
