@@ -2,10 +2,11 @@
 import idGenerator from '../../utils/IDGenerator';
 
 class WebWorkerManager {
-  constructor(type) {
+  constructor(type, nChunks) {
     this.remaining_chunks = 0;
     this.workers = [];
     this.type = type;
+    this.chunkLimit = nChunks || 4;
   }
 
   async render(
@@ -26,7 +27,7 @@ class WebWorkerManager {
       this.arr = new Uint8ClampedArray(height * width * 4);
       const hardwareConcurrency = navigator.hardwareConcurrency || 1;
       const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
-      const nChunks = (singleThread) ? 1 : 4;
+      const nChunks = (singleThread) ? 1 : this.chunkLimit;
       this.pixelSplit = (height * width) / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
@@ -115,7 +116,7 @@ class WebWorkerManager {
       this.height = height;
       const newArr = new Uint8ClampedArray(height * width * 4);
       const nThreadsFree = (singleThread) ? 1 : (navigator.hardwareConcurrency || 1);
-      const nChunks = (singleThread) ? 1 : 4;
+      const nChunks = (singleThread) ? 1 : this.chunkLimit;
       this.pixelSplit = height / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();

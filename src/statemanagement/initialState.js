@@ -20,6 +20,7 @@ const initialState = {
   coloringMode: ColorMode.RAINBOW,
   viewMode: ViewOptions.JULIA_DETATCHED,
   showJuliaPin: true,
+  nChunks: 4,
   stats: {
     renderTime: {
       label: 'Render Time',
