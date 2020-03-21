@@ -4,7 +4,7 @@ import RendererType from './RendererType';
 import FractalType from '../utils/FractalType';
 
 class Renderer {
-  constructor(type, renderMethod, width, height, maxIter, juliaPoint, coloringMode) {
+  constructor(type, renderMethod, width, height, maxIter, juliaPoint, coloringMode, nChunks) {
     this.mode = renderMethod;
     this.basePixelSize = (type === FractalType.MANDELBROT) ? 0.05 : 0.05;
     this.maximumPixelSize = this.basePixelSize * 4;
@@ -19,6 +19,7 @@ class Renderer {
     this.juliaPoint = juliaPoint;
     this.webWorkerManager = new WebWorkerManager(
       type,
+      nChunks,
     );
     this.mtTimer = undefined;
     this.prev_arr = undefined;

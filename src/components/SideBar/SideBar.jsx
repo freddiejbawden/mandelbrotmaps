@@ -30,6 +30,9 @@ class SideBar extends Component {
       if (e.keyCode === 82) {
         this.resetZoom();
       }
+      if (e.keyCode === 81) {
+        this.forceUpdate(FractalType.MANDELBROT);
+      }
     });
   }
 

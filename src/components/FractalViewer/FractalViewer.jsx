@@ -93,6 +93,7 @@ class FractalViewer extends React.Component {
       parseInt(props.maxIter, 10),
       props.juliaPoint,
       props.coloringMode,
+      props.store.nChunks,
     );
     if (this.type === FractalType.MANDELBROT) {
       this.renderer.centreCoords = props.mandelbrotCentre;
@@ -413,7 +414,6 @@ class FractalViewer extends React.Component {
         this.putImage(fractal.arr, fractal.width, fractal.height);
         window.performance.mark('fractal_rendered_end');
         window.performance.measure('fractal_render_time', 'fractal_rendered_start', 'fractal_rendered_end');
-        // (`${window.performance.getEntriesByName('fractal_render_time').pop().duration}`);
         p.store.setStat({
           renderTime: (Date.now() - startTime),
         });
@@ -437,6 +437,7 @@ class FractalViewer extends React.Component {
 
     // define a reference canvas for the image
     const newCanvas = document.createElement('canvas');
+    if (this.imageData === undefined) return;
     newCanvas.setAttribute('width', this.imageData.width);
     newCanvas.setAttribute('height', this.imageData.height);
     fractalContext.fillRect(0, 0, this.width, this.height);
