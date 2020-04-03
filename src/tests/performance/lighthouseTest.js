@@ -53,10 +53,10 @@ const testFractalTime = async (url, iterations) => {
   // Possible race condition.
 };
 
-const testZoomLevel = async (file, zoom) => {
+const testChunkSize = async (file, nChunks) => {
   console.log('Starting JS Test');
-  const iterations = parseInt(config.iterations, 10);
-  const generateURL = (mode) => `localhost:3000/app/?renderMode=${mode}&nChunks=8&viewMode=3&mandelbrotZoom=${zoom}`;
+  const iterations = 50;
+  const generateURL = (mode) => `localhost:3000/app/?renderMode=${mode}&nChunks=${nChunks}&viewMode=3&mandelbrotZoom=0.000005&mandelbrotCentre=-0.338042163991894%2C-0.6107961982247965`;
   let url = generateURL(3);
   const jsRender = await testFractalTime(url, iterations, pptrFirefox);
   console.log('JS Test Complete');
@@ -66,7 +66,7 @@ const testZoomLevel = async (file, zoom) => {
   const wasmRender = await testFractalTime(url, iterations, pptrFirefox);
   console.log('WASM Test Complete');
   for (let i = 0; i < iterations; i += 1) {
-    fs.appendFile(file, `${zoom},${jsRender[i]},${wasmRender[i]}\n`, (err) => {
+    fs.appendFile(file, `${nChunks},${jsRender[i]},${wasmRender[i]}\n`, (err) => {
       if (err) throw err;
       console.log('Saved ');
     });
@@ -86,18 +86,19 @@ const loadConfig = () => {
 
 (async () => {
   loadConfig();
+  console.log(config);
   const file = `./src/tests/performance/${config.filename}.csv`;
-  fs.writeFile(file, '', (err) => {
+  /* fs.writeFile(file, '', (err) => {
     if (err) throw err;
     console.log('Saved!');
   });
   fs.appendFile(file, 'nChunks,JS,WASM\n', (err) => {
     if (err) throw err;
     console.log('Saved!');
-  });
-  for (let i = 0; i < parseInt(config.numberOfSteps, 10); i += 1) {
+  }); */
+  for (let i = 5; i < 11; i += 1) {
     console.log(`Chunk Size ${2 ** i}`);
     // eslint-disable-next-line no-await-in-loop
-    await testZoomLevel(file, parseInt(config.stepsize, 10) ** i);
+    await testChunkSize(file, 2 ** i, config);
   }
 })();
