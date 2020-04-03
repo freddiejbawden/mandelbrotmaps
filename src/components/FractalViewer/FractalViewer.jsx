@@ -111,7 +111,9 @@ class FractalViewer extends React.Component {
   }
 
   async componentDidMount() {
-    this.fractal.current.focus();
+    if (this.fractal.current) {
+      this.fractal.current.focus();
+    }
 
     // Safari support
     document.addEventListener('gesturechange', (e) => {
@@ -431,6 +433,7 @@ class FractalViewer extends React.Component {
   }
 
   updateCanvas() {
+    if (this.fractal.current === null || this.fractal.current === undefined) return;
     const fractalContext = this.fractal.current.getContext('2d');
     if (!fractalContext) return;
     fractalContext.fillStyle = '#787878';
@@ -478,6 +481,7 @@ class FractalViewer extends React.Component {
   putImage(arr, width, height) {
     if (width && height) {
       if (!this.dragging || !this.dirty) {
+        if (this.fractal.current === null || this.fractal.current === undefined) return;
         const fractalContext = this.fractal.current.getContext('2d');
         fractalContext.canvas.width = this.width;
         fractalContext.canvas.height = this.height;
@@ -490,6 +494,7 @@ class FractalViewer extends React.Component {
   }
 
   updateDimensions() {
+    if (this.fractal.current === null || this.fractal.current === undefined) return;
     this.fractal.current.setAttribute('width', 'auto');
     this.fractal.current.setAttribute('height', 'auto');
     requestAnimationFrame(() => this.drawFractal());
@@ -572,7 +577,9 @@ class FractalViewer extends React.Component {
 
   handleMouseMove(e) {
     e.preventDefault();
-    this.getMouseViewerPosition(e.pageX, e.pageY);
+    if (e.pageX && e.pageY) {
+      this.getMouseViewerPosition(e.pageX, e.pageY);
+    }
     // check if a key is pressed
     if (Object.values(this.keysDown).some((el) => el)) {
       return;
