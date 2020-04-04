@@ -643,8 +643,8 @@ class FractalViewer extends React.Component {
   async handleDragEnd() {
     if (this.dragging) {
       this.dragging = false;
-      this.deltaX /= this.canvasZoom;
-      this.deltaY /= this.canvasZoom;
+      this.deltaX = this.deltaX / this.canvasZoom;
+      this.deltaY = this.deltaY / this.canvasZoom;
       const p = this.props;
       if (this.draggingPin) {
         this.juliaPin.move(this.juliaPin.x - this.deltaX, this.juliaPin.y - this.deltaY);
