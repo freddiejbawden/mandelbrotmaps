@@ -537,6 +537,7 @@ class FractalViewer extends React.Component {
     if (this.fractal.current === null || this.fractal.current === undefined) return;
     this.fractal.current.setAttribute('width', 'auto');
     this.fractal.current.setAttribute('height', 'auto');
+    requestAnimationFrame(() => this.drawFractal());
   }
 
   /**
