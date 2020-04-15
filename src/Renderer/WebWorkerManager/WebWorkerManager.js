@@ -2,6 +2,10 @@
 import idGenerator from '../../utils/IDGenerator';
 
 class WebWorkerManager {
+  /**
+   * @param {FractalType} type which fractal to render
+   * @param {int} nChunks number of chunks to split the fractal into
+   */
   constructor(type, nChunks) {
     this.remaining_chunks = 0;
     this.workers = [];
@@ -9,6 +13,20 @@ class WebWorkerManager {
     this.chunkLimit = nChunks || 4;
   }
 
+  /**
+   * Uses webworkers to render the image
+   * @param {*} pixelSize the size of the world space that one pixel represents
+   * @param {*} width the width of the fractal in pixels
+   * @param {*} height the height of the fractal in pixels
+   * @param {*} centreCoords world space centre coordinates
+   * @param {*} maxIter the iteration limit
+   * @param {*} juliaPoint x and y point of the julia point
+   * @param {*} singleThread override web workers to only use one
+   * @param {RenderMode} renderer render mode to use
+   * @param {*} showRenderTrace flag to show the render trace
+   * @param {*} lowRes flag to do a low iteration pass
+   * @param {ColorOptions} coloringMethod method to color the fractal by
+   */
   async render(
     pixelSize,
     width,
@@ -25,12 +43,15 @@ class WebWorkerManager {
     return new Promise((res) => {
       this.nextChunk = 0;
       this.arr = new Uint8ClampedArray(height * width * 4);
+      // Find the number of web workers available
       const hardwareConcurrency = navigator.hardwareConcurrency || 1;
       const nThreadsFree = (singleThread) ? 1 : hardwareConcurrency;
       const nChunks = (singleThread) ? 1 : this.chunkLimit;
+      // number of pixels per chunk
       this.pixelSplit = (height * width) / nChunks;
       this.remaining_chunks = nChunks;
       const roundID = idGenerator();
+      // spin up the web workers
       if (this.workers.length < nThreadsFree) {
         for (let i = this.workers.length; i < nThreadsFree; i += 1) {
           const w = new Worker('./worker/renderworker.js', { name: 'w', type: 'module' });
@@ -38,6 +59,7 @@ class WebWorkerManager {
         }
       }
       const renderChunk = (w, startPixel, endPixel, wid) => {
+        // send chunk to worker
         w.postMessage({
           lowRes,
           showRenderTrace,
@@ -61,6 +83,7 @@ class WebWorkerManager {
       for (let i = 0; i < Math.min(nThreadsFree, nChunks); i += 1) {
         const w = this.workers[i];
         const id = i;
+        // set up call back function for when worker is done
         w.onmessage = (e) => {
           if (e.data.id === roundID) {
             this.arr.set(e.data.arr, e.data.offset);
@@ -74,6 +97,7 @@ class WebWorkerManager {
                 },
               );
             } else if (this.remaining_chunks >= nThreadsFree) {
+              // if more chunks are needed to be processed, take another one
               renderChunk(
                 w,
                 Math.floor((this.nextChunk) * this.pixelSplit),
@@ -93,6 +117,24 @@ class WebWorkerManager {
     });
   }
 
+  /**
+   * Uses webworkers to render range the image
+    * @param {*} pixelSize the size of the world space that one pixel represents
+   * @param {*} width the width of the fractal in pixels
+   * @param {*} height the height of the fractal in pixels
+   * @param {*} centreCoords world space centre coordinates
+   * @param {*} maxIter the iteration limit
+   * @param {*} oldArr the last image that was rendered
+   * @param {*} xRect the horizontal protion to re-redner
+   * @param {*} yRect the vertical portion to re render
+   * @param {*} dX the X offset of the image
+   * @param {*} dY the Y offset of the image
+   * @param {*} juliaPoint x and y point of the julia point
+   * @param {*} singleThread override web workers to only use one
+   * @param {*} renderer render mode to use
+   * @param {*} showRenderTrace flag to show the render trace
+   * @param {ColorOptions} coloringMethod method to color the fractal by
+   */
   async renderRange(
     pixelSize,
     width,
@@ -127,6 +169,7 @@ class WebWorkerManager {
         }
       }
       const renderChunk = (w, startRow, endRow, wid) => {
+        // send message to webworker
         w.postMessage({
           wid,
           type: this.type,

@@ -6,6 +6,17 @@ import { Color } from '../../../utils/Color';
 import ColorMode from '../../ColorOptions';
 
 class JSRenderer {
+  /**
+   * Constructor for an instance of Javascript Renderer
+   * @param {*} pixelSize the size of the world space that one pixel represents
+   * @param {*} width the width of the fractal in pixels
+   * @param {*} height the height of the fractal in pixels
+   * @param {*} centreCoords world space centre coordinates
+   * @param {*} maxIter the iteration limit
+   * @param {*} juliaPoint x and y point of the julia point
+   * @param {FractalType} type the type of fractal to render
+   * @param {ColorOptions} coloringMethod the coloring method to use
+   */
   constructor(type, pixelSize, width, height, centreCoords, maxIter, juliaPoint, coloringMethod) {
     this.type = type;
     this.pixelSize = pixelSize;
@@ -22,6 +33,10 @@ class JSRenderer {
     this.coloringMethod = coloringMethod || 0;
   }
 
+  /**
+   * Return the rainbow color based on iterations
+   * @param {*} iter
+   */
   // eslint-disable-next-line class-methods-use-this
   getRainbow(iter) {
     if (iter === -1) {
@@ -38,8 +53,16 @@ class JSRenderer {
     ];
   }
 
+  /**
+   * Set color of a pixel
+   * @param {*} i the index to set
+   * @param {*} val the value to put
+   * @param {*} showRenderTrace whether to tint the renderer
+   * @param {*} wid worker id
+   */
   setColor(i, val, showRenderTrace, wid) {
     if (showRenderTrace) {
+      // tint color based on which worker it came from
       return this.colormap[wid][i] + (val / 4) * 3;
     }
     if (val === -2) {
@@ -69,30 +92,40 @@ class JSRenderer {
     );
   }
 
-  update(pixelSize, width, height, centreCoords, maxIter) {
-    this.pixelSize = pixelSize;
-    this.width = width;
-    this.height = height;
-    this.centreCoords = centreCoords;
-    this.maxIter = maxIter;
-  }
-
+  /**
+   * Convert the pixel position to the world position
+   * @param {*} x pixel X
+   * @param {*} y pixel Y
+   */
   pixelsToCoord(x, y) {
     const coordX = this.fractalLimitX + this.pixelSize * x;
     const coordY = this.fractalLimitY + this.pixelSize * y;
     return [coordX, coordY];
   }
 
+  /**
+   * Calculate the x,y pixel position from a 1D index
+   * @param {*} pixelNum 1D index
+   */
   calculatePosition(pixelNum) {
     const x = (pixelNum % this.width);
     const y = Math.floor((pixelNum / this.width));
     return [x, y];
   }
 
+  /**
+   * Find the pixel number from x,y, pixels
+   * @param {*} x x pixel
+   * @param {*} y y pixel
+   */
   calculatePixelNum(x, y) {
     return y * this.width + x;
   }
 
+  /**
+   * Perform the escape algorithm for a point
+   * @param {*} pixelNum index in the image array to render
+   */
   escapeAlgorithm(pixelNum) {
     let fractalPos;
     let x = 0;
@@ -108,6 +141,7 @@ class JSRenderer {
       fractalPos = this.juliaPoint;
     }
     this.maxIter = Math.ceil(this.maxIter);
+    // slightly raised to make the outside area more smooth
     while (x * x + y * y < 10 && i < this.maxIter) {
       const xtemp = x * x - y * y + fractalPos[0];
       y = 2 * x * y + fractalPos[1];
@@ -117,16 +151,27 @@ class JSRenderer {
     if (i === this.maxIter) {
       return -1;
     }
-
+    // smooth the iteration count
     const q = (i - 1) - Math.log2(Math.log2(x * x + y * y)) + 4;
     return q;
   }
 
+  /**
+   * Update the fractal limit
+   */
   calculateFractalLimit() {
     this.fractalLimitX = this.centreCoords[0] - (this.width / 2) * this.pixelSize;
     this.fractalLimitY = this.centreCoords[1] - (this.height / 2) * this.pixelSize;
   }
 
+  /**
+   * Render a single row
+   * @param {*} y row idx
+   * @param {*} xStart row start position
+   * @param {*} xEnd row end position
+   * @param {*} showRenderTrace show the render trace
+   * @param {*} wid id of the worker
+   */
   renderRow(y, xStart, xEnd, showRenderTrace, wid) {
     const row = [];
     for (let x = xStart; x < xEnd; x += 1) {
@@ -140,6 +185,17 @@ class JSRenderer {
     return row;
   }
 
+  /**
+   * @param {*} xRect the horizontal protion to re-redner
+   * @param {*} yRect the vertical portion to re render
+   * @param {*} dX the X offset of the image
+   * @param {*} dY the Y offset of the image
+   * @param {*} oldArr the last image that was rendered
+   * @param {*} startRow row to start on
+   * @param {*} endRow row to end on
+   * @param {*} showRenderTrace show the render trace
+   * @param {*} wid id of the worker
+   */
   renderRange(xRect, yRect, dX, dY, oldArr, startRow, endRow, showRenderTrace, wid) {
     try {
       this.calculateFractalLimit();
@@ -182,6 +238,14 @@ class JSRenderer {
     }
   }
 
+  /**
+   * Render a chunk
+   * @param {*} wid worker id
+   * @param {*} startPixel start pixel of chunk
+   * @param {*} endPixel end pixel of chunk
+   * @param {*} arrSize chunk size
+   * @param {*} showRenderTrace show trace
+   */
   render(wid, startPixel, endPixel, arrSize, showRenderTrace) {
     this.calculateFractalLimit();
     const arr = new Uint8ClampedArray(arrSize);
