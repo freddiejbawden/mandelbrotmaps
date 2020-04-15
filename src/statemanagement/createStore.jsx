@@ -13,7 +13,9 @@ const createStore = (WrappedComponent) => class extends React.Component {
     // eslint-disable-next-line react/state-in-constructor
     state = {
       // eslint-disable-next-line react/destructuring-assignment
-
+      /**
+       * Convert current state value to URL
+       */
       toURL: () => {
         const serialize = (obj) => {
           const str = [];
@@ -28,10 +30,18 @@ const createStore = (WrappedComponent) => class extends React.Component {
         };
         return `${window.location.host}/app/?${serialize(this.state)}`;
       },
+      /**
+       * Return value of key
+       * @param key
+       */
       get: (key) => {
         const { state } = this.state;
         return state[key];
       },
+      /**
+       * Set value of key
+       * @param updates, array of key value pairs
+       */
       set: (updates) => {
         const { state } = this;
         Object.keys(updates).forEach((key) => {
@@ -40,16 +50,32 @@ const createStore = (WrappedComponent) => class extends React.Component {
         });
         this.setState(state);
       },
+      /**
+       * Remove a value from the state
+       * @param key
+       */
       remove: (key) => {
         const { state } = this;
         delete state[key];
         this.setState(state);
       },
+      /**
+       *
+       */
       toggle: (key) => {
         const { state } = this;
-        state[key] = !state[key];
-        this.setState(state);
+        if ((typeof state[key]) === 'boolean') {
+          state[key] = !state[key];
+          this.setState(state);
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn(`Cannot toggle key ${key} as it is not a boolean`);
+        }
       },
+      /**
+       * Update a stat
+       * @param updates Array of stats to update
+       */
       setStat: (updates) => {
         const { state } = this;
         Object.keys(updates).forEach((key) => {
@@ -58,11 +84,13 @@ const createStore = (WrappedComponent) => class extends React.Component {
         this.setState(state);
       },
       ...initialState,
-      ...this.defaultRenderer(),
       ...this.getParams(),
       ...this.defaultRenderer(),
     }
 
+    /**
+     * Parse the URL and update the state
+     */
     // eslint-disable-next-line class-methods-use-this
     getParams() {
       const search = window.location.href.split('?')[1];
@@ -86,6 +114,9 @@ const createStore = (WrappedComponent) => class extends React.Component {
       return j;
     }
 
+    /**
+     * Set the default renderer depending on the engine
+     */
     // eslint-disable-next-line class-methods-use-this
     defaultRenderer() {
       const uaData = parser(navigator.userAgent);
@@ -95,6 +126,9 @@ const createStore = (WrappedComponent) => class extends React.Component {
       };
     }
 
+    /**
+     * Render function attaches the state value
+     */
     render() {
       return (
         <StoreContext.Provider value={this.state}>
@@ -104,6 +138,10 @@ const createStore = (WrappedComponent) => class extends React.Component {
     }
 };
 
+/**
+ * Attaches a store to the passed component
+ * @param {*} WrappedComponent component to attach store to
+ */
 // eslint-disable-next-line react/prefer-stateless-function
 const withStore = (WrappedComponent) => class extends React.Component {
   render() {
