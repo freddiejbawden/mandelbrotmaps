@@ -167,9 +167,9 @@ class FractalViewer extends React.Component {
     // wait for 300ms before triggering the end of the drag
     document.addEventListener('keyup', async (e) => {
       if (e.keyCode >= 37 && e.keyCode <= 40) {
+        this.keysDown[e.keyCode] = false;
         clearTimeout(this.keyupTimeout);
         this.keyupTimeout = setTimeout(() => {
-          this.keysDown[e.keyCode] = false;
           this.handleDragEnd();
         }, 300);
       }
@@ -397,7 +397,7 @@ class FractalViewer extends React.Component {
      * @param {*} zoom
      */
     const iterationCalc = (zoom) => {
-      const newIter = 54 * Math.exp(Math.abs(0.5 * Math.log10(zoom)));
+      const newIter = 54 * Math.exp(Math.abs(0.2 * Math.log(zoom)));
       const p = this.props;
       const s = p.store;
       s.setStat({
