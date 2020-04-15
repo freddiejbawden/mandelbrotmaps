@@ -35,7 +35,7 @@ function About() {
         {' '}
         <a href="https://play.google.com/store/apps/details?id=uk.ac.ed.inf.mandelbrotmaps&hl=en_GB">Mandelbrot Maps App</a>
         {' '}
-        created a few years by several people (names to follow).
+        created a few years ago.
       </p>
       <img style={{ width: '100%' }} alt="Mandelbrot Fractal" src="fractal.png" />
     </div>
