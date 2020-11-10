@@ -2,15 +2,20 @@
 
 Mandelbrot Maps is a fractal renderer build using React and WASM + Rust for my final year project. It was developed over a year under the supervision of [Philip Wadler](http://homepages.inf.ed.ac.uk/wadler/).
 
-A development build can be found [here](https://mandelbrot-maps.herokuapp.com/), note it may take some time to load first time as the Heroku server powering it takes some time to spin up on the free tier! 
+A development build can be found [here](https://mandelbrot-maps.herokuapp.com/), note it may take some time to load first time as the Heroku server powering it takes some time to spin up on the free tier! A copy of my dissertation is available [here](docs/Dissertation.pdf)
+
+![Screenshot of applcation running on desktop](docs/detatched.png)
+
+![Screenshot of applcation running on desktop](docs/detatchedmobile.png)
+
 
 ## Setting up and Running Locally
 
 Navigate to the root directory of the project and run; 
 `npm install`
 
-To run call, this will start an instance of the site running on `localhost:3000`. 
-`npm start`
+`npm start` will start an instance of the site running on `localhost:3000`. 
+
 
 ## Dissertation Abstract
 
